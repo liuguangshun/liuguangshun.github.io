@@ -141,6 +141,149 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-centos_6x系统下源码安装mysql操作记录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/">centos 6x系统下源码安装mysql操作记录</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/" class="archive-article-date">
+  	<time datetime="2017-12-14T22:39:21.402Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在运维工作中经常部署各种运维环境，涉及mysql数据库的安装也是时常需要的。mysql数据库安装可以选择yum在线安装，但是这种安装的mysql一般是系统自带的，版本方面可能跟需求不太匹配。</p>
+<h2 id="可以通过源码安装的方式，自定义安装自己所需版本的mysql。"><a href="#可以通过源码安装的方式，自定义安装自己所需版本的mysql。" class="headerlink" title="可以通过源码安装的方式，自定义安装自己所需版本的mysql。"></a>可以通过源码安装的方式，自定义安装自己所需版本的mysql。</h2><p>mysql数据库yum在线安装：<br>[root@host-test-huanqiu ~]# yum -y install mysql mysql-server<br>[root@host-test-huanqiu ~]# /etc/init.d/mysqld start<br>[root@host-test-huanqiu ~]# mysqladmin password “123456”<br>[root@host-test-huanqiu ~]# mysql -p123456<br>mysql&gt; select version();<br>+———–+<br>| version() |<br>+———–+<br>| 5.1.73 |<br>+———–+</p>
+<h2 id="1-row-in-set-0-00-sec"><a href="#1-row-in-set-0-00-sec" class="headerlink" title="1 row in set (0.00 sec"></a>1 row in set (0.00 sec</h2><p>废话不多说，以下是centos6x系统下源码安装Mysql的操作记录，方便参考~</p>
+<p>1、卸载旧版本<br>[root@host-test-huanqiu ~]# rpm -qa | grep mysql<br>mysql-5.1.73-7.el6.x86_64<br>mysql-libs-5.1.73-7.el6.x86_64<br>mysql-server-5.1.73-7.el6.x86_64</p>
+<p>#普通删除模式<br>[root@host-test-huanqiu ~]# rpm -e mysql-5.1.73-7.el6.x86_64 mysql-libs-5.1.73-7.el6.x86_64 mysql-server-5.1.73-7.el6.x86_64 </p>
+<h1 id="强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除"><a href="#强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除" class="headerlink" title="强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除"></a>强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除</h1><p>[root@host-test-huanqiu ~]# rpm -e –nodeps mysql-5.1.73-7.el6.x86_64 mysql-libs-5.1.73-7.el6.x86_64 mysql-server-5.1.73-7.el6.x86_64</p>
+<p>#删除/etc/my.cnf<br>[root@host-test-huanqiu ~]# rm /etc/my.cnf</p>
+<p>2、安装编译代码需要的包<br>[root@host-test-huanqiu ~]# yum -y install make gcc-c++ cmake bison-devel ncurses-devel</p>
+<p>3、创建mysql用户，不建立mysql用户家目录（加-M参数），也就是禁用mysql账号登陆系统<br>[root@host-test-huanqiu ~]# groupadd mysql<br>[root@host-test-huanqiu ~]# useradd -g mysql mysql -M -s /sbin/nologin</p>
+<p>4、下载MySQL，源码编译安装</p>
+<p>[root@host-test-huanqiu ~]# cd /usr/local/src<br>[root@host-test-huanqiu src]# wget -c <a href="http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.34.tar.gz" target="_blank" rel="noopener">http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.34.tar.gz</a></p>
+<p>[root@host-test-huanqiu src]# tar -zxvf mysql-5.6.34.tar.gz<br>[root@host-test-huanqiu src]# cd mysql-5.6.34/<br>[root@host-test-huanqiu mysql-5.6.34]# cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/data -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci<br>[root@host-test-huanqiu mysql-5.6.34]# make &amp;&amp; make install<br>5、配置MySQL</p>
+<p>修改/usr/local/mysql权限<br>[root@host-test-huanqiu mysql-5.6.34]# mkdir -p /data/mysql/data<br>[root@host-test-huanqiu mysql-5.6.34]# chown -R mysql:mysql /usr/local/mysql<br>[root@host-test-huanqiu mysql-5.6.34]# chown -R mysql:mysql /data/mysql/data</p>
+<p>执行初始化配置脚本，创建系统自带的数据库和表<br>[root@host-test-huanqiu mysql-5.6.34]# cd /usr/local/mysql<br>[root@host-test-huanqiu mysql]# ./scripts/mysql_install_db –basedir=/usr/local/mysql –datadir=/data/mysql/data –user=mysql   //如果后续不小心删除了这个数据目录或这个目录下的文件被误操作删除了，还可以利用这个命令重新初始化<br>需要特别注意：<br>在启动MySQL服务时，会按照一定次序搜索my.cnf，先在/etc目录下找，找不到则会搜索”$basedir/my.cnf”，在本例中就是 /usr/local/mysql/my.cnf，这是新版MySQL的配置文件的默认位置！</p>
+<p>另外：<br>在CentOS 6.4版操作系统最小安装完成后，默认会在/etc目录下存在一个my.cnf，需要将此文件更名为其他的名字，如：/etc/my.cnf.bak，否则，该文件会干扰源码安装的MySQL的正确配置，造成无法启动。</p>
+<h2 id="在使用”yum-update”更新系统后，需要检查下-etc目录下是否会多出一个my-cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。"><a href="#在使用”yum-update”更新系统后，需要检查下-etc目录下是否会多出一个my-cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。" class="headerlink" title="在使用”yum update”更新系统后，需要检查下/etc目录下是否会多出一个my.cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。"></a>在使用”yum update”更新系统后，需要检查下/etc目录下是否会多出一个my.cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。</h2><p>启动MySQL<br>添加服务，拷贝服务脚本到init.d目录，并设置开机启动<br>[root@host-test-huanqiu mysql]# cp support-files/mysql.server /etc/init.d/mysql<br>[root@host-test-huanqiu mysql]# chkconfig mysql on<br>[root@host-test-huanqiu mysql]# service mysql start   //启动前，要先配置my.cnf文件（如下）， 并确保/data/mysql/data和/usr/local/mysql的mysql权限</p>
+<p>如果启动报错：<br>[root@slave-server mysql]# service mysql start<br>Starting MySQL.Logging to ‘/data/mysql/data/mysql-error.log’.<br>170416 12:55:28 mysqld_safe Directory ‘/usr/local/mysql/var’ for UNIX socket file don’t exists.<br> ERROR! The server quit without updating PID file (/data/mysql/data/mysql.pid).</p>
+<p>解决办法：<br>[root@slave-server mysql]# mkdir ／usr/local/mysql/var<br>[root@slave-server mysql]# chown -R mysql:mysql /usr/local/mysql<br>[root@slave-server mysql]# service mysql start<br>Starting MySQL.. SUCCESS!<br>配置用户和环境变量</p>
+<p>MySQL启动成功后，root默认没有密码，需要设置root密码，设置之前，需要先设置PATH，否则不能直接调用mysql<br>修改/etc/profile文件，在文件末尾添加<br>[root@host-test-huanqiu mysql]# vim /etc/profile<br>……..<br>export PATH=$PATH:/usr/local/mysql/bin<br>[root@host-test-huanqiu mysql]# source /etc/profile</p>
+<p>到此，就可以直接mysql登陆了<br>[root@host-test-huanqiu mysql]# mysql -uroot<br>…….<br>mysql&gt; select version();<br>+———–+<br>| version() |<br>+———–+<br>| 5.6.33 |<br>+———–+<br>1 row in set (0.00 sec)<br>登陆mysql，若是报错如下：</p>
+<p>[root@test2-235 mysql]# mysql<br>ERROR 2002 (HY000): Can’t connect to local MySQL server through socket ‘/var/lib/mysql/mysql.sock’ (2)</p>
+<p>解决办法<br>[root@test2-235 mysql]# mkdir /var/lib/mysql/<br>[root@test2-235 mysql]# ln -s /usr/local/mysql/var/mysql.sock /var/lib/mysql/mysql.sock<br>修改root密码，执行命令如下</p>
+<p>mysql&gt; SET PASSWORD = PASSWORD(‘123456’);</p>
+<p>若要设置root用户可以远程访问，执行<br>mysql&gt; GRANT ALL PRIVILEGES ON <em>.</em> TO ‘root’@’%’ IDENTIFIED BY ‘password’ WITH GRANT OPTION;<br>使授权立即生效<br>mysql&gt; FLUSH PRIVILEGES;</p>
+<p>也可以使用mysqladmin命令设置mysql密码<br>[root@host-test-huanqiu mysql]# mysqladmin password 123456 #安装mysql后第一次设置密码<br>[root@host-test-huanqiu mysql]# mysqladmin -p 旧密码 password 新密码 #重置密码<br>最后配置防火墙</p>
+<p>默认防火墙的3306端口默认没有开启，若要远程访问，需要开启这个端口.也可以做下白名单，比如只允许192.168.1.0/24网段的客户机访问本机的mysql。<br>[root@host-test-huanqiu mysql]# vim /etc/sysconfig/iptables<br>…….</p>
+<h2 id="A-INPUT-s-192-168-1-0-24-p-tcp-m-tcp-m-state-–state-NEW-dport-3306-j-ACCEPT"><a href="#A-INPUT-s-192-168-1-0-24-p-tcp-m-tcp-m-state-–state-NEW-dport-3306-j-ACCEPT" class="headerlink" title="-A INPUT -s 192.168.1.0/24 -p tcp -m tcp -m state –state NEW -dport 3306 -j ACCEPT"></a>-A INPUT -s 192.168.1.0/24 -p tcp -m tcp -m state –state NEW -dport 3306 -j ACCEPT</h2><p>下面贴下mysql6.x的my.cnf配置</p>
+<p>[client]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
+<p>[mysqld]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
+<p>basedir = /usr/local/mysql/<br>datadir = /data/mysql/data<br>pid-file = /data/mysql/data/mysql.pid<br>user = mysql<br>bind-address = 0.0.0.0<br>server-id = 1<br>sync_binlog=1<br>log_bin = mysql-bin</p>
+<p>skip-name-resolve</p>
+<p>back_log = 600</p>
+<p>max_connections = 3000<br>max_connect_errors = 3000</p>
+<p>table_open_cache = 512<br>max_allowed_packet = 16M<br>binlog_cache_size = 16M<br>max_heap_table_size = 16M<br>tmp_table_size = 256M</p>
+<p>read_buffer_size = 1024M<br>read_rnd_buffer_size = 1024M<br>sort_buffer_size = 1024M<br>join_buffer_size = 1024M<br>key_buffer_size = 8192M</p>
+<p>thread_cache_size = 8</p>
+<p>query_cache_size = 512M<br>query_cache_limit = 1024M</p>
+<p>ft_min_word_len = 4</p>
+<p>binlog_format = mixed<br>expire_logs_days = 30</p>
+<p>log_error = /data/mysql/data/mysql-error.log<br>slow_query_log = 1<br>long_query_time = 1<br>slow_query_log_file = /data/mysql/data/mysql-slow.log</p>
+<p>performance_schema = 0<br>explicit_defaults_for_timestamp</p>
+<p>skip-external-locking</p>
+<p>default_storage_engine = InnoDB<br>innodb_file_per_table = 1<br>innodb_open_files = 500<br>innodb_buffer_pool_size = 1024M<br>innodb_write_io_threads = 1000<br>innodb_read_io_threads = 1000<br>innodb_thread_concurrency = 8<br>innodb_purge_threads = 1<br>innodb_flush_log_at_trx_commit = 2<br>innodb_log_buffer_size = 4M<br>innodb_log_file_size = 32M<br>innodb_log_files_in_group = 3<br>innodb_max_dirty_pages_pct = 90<br>innodb_lock_wait_timeout = 120</p>
+<p>bulk_insert_buffer_size = 8M<br>myisam_sort_buffer_size = 8M<br>myisam_max_sort_file_size = 10G<br>myisam_repair_threads = 1</p>
+<p>interactive_timeout = 28800<br>wait_timeout = 28800</p>
+<p>[mysqldump]<br>quick<br>max_allowed_packet = 16M</p>
+<p>[myisamchk]<br>key_buffer_size = 8M<br>sort_buffer_size = 8M<br>read_buffer = 4M<br>write_buffer = 4M</p>
+<p>sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES<br>port = 3306<br>针对上面的部署过程，为了便于以后安装mysql环境，编写了下面的安装脚本，直接运行这个脚本就能自动化构建mysql环境了。<br>[root@slave-server ~]# cat mysqlinstall.sh                    （下载地址：<a href="https://pan.baidu.com/s/1gfEKC9d" target="_blank" rel="noopener">https://pan.baidu.com/s/1gfEKC9d</a>    密码：6ec3）</p>
+<p>#!/bin/bash</p>
+<p>#卸载系统自带的Mysql<br>/bin/rpm -e $(/bin/rpm -qa | grep mysql|xargs) –nodeps<br>/bin/rm -f /etc/my.cnf</p>
+<p>#安装编译代码需要的包<br>/usr/bin/yum -y install make gcc-c++ cmake bison-devel ncurses-devel</p>
+<p>#编译安装mysql5.6<br>/usr/sbin/groupadd mysql<br>/usr/sbin/useradd -g mysql mysql -M -s /sbin/nologin</p>
+<p>cd /usr/local/src<br>wget -c <a href="http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.37.tar.gz" target="_blank" rel="noopener">http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.37.tar.gz</a><br>/bin/tar -zxvf mysql-5.6.37.tar.gz<br>cd mysql-5.6.37/<br>/usr/bin/cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/data -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci<br>make &amp;&amp; make install</p>
+<p>#修改/usr/local/mysql权限<br>mkdir -p /data/mysql/data<br>/bin/chown -R mysql:mysql /usr/local/mysql<br>/bin/chown -R mysql:mysql /data/mysql/data</p>
+<p>#执行初始化配置脚本，创建系统自带的数据库和表<br>/usr/local/mysql/scripts/mysql_install_db –basedir=/usr/local/mysql –datadir=/data/mysql/data –user=mysql</p>
+<p>#配置my.cnf<br>cat &gt; /usr/local/mysql/my.cnf &lt;&lt; EOF<br>[client]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
+<p>[mysqld]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
+<p>basedir = /usr/local/mysql/<br>datadir = /data/mysql/data<br>pid-file = /data/mysql/data/mysql.pid<br>user = mysql<br>bind-address = 0.0.0.0<br>server-id = 1<br>sync_binlog=1<br>log_bin = mysql-bin</p>
+<p>skip-name-resolve</p>
+<p>#skip-networking<br>back_log = 600</p>
+<p>max_connections = 3000<br>max_connect_errors = 3000</p>
+<p>##open_files_limit = 65535<br>table_open_cache = 512<br>max_allowed_packet = 16M<br>binlog_cache_size = 16M<br>max_heap_table_size = 16M<br>tmp_table_size = 256M</p>
+<p>read_buffer_size = 1024M<br>read_rnd_buffer_size = 1024M<br>sort_buffer_size = 1024M<br>join_buffer_size = 1024M<br>key_buffer_size = 8192M</p>
+<p>thread_cache_size = 8</p>
+<p>query_cache_size = 512M<br>query_cache_limit = 1024M</p>
+<p>ft_min_word_len = 4</p>
+<p>binlog_format = mixed<br>expire_logs_days = 30</p>
+<p>log_error = /data/mysql/data/mysql-error.log<br>slow_query_log = 1<br>long_query_time = 1<br>slow_query_log_file = /data/mysql/data/mysql-slow.log</p>
+<p>performance_schema = 0<br>explicit_defaults_for_timestamp</p>
+<p>##lower_case_table_names = 1</p>
+<p>skip-external-locking</p>
+<p>default_storage_engine = InnoDB</p>
+<p>##default-storage-engine = MyISAM<br>innodb_file_per_table = 1<br>innodb_open_files = 500<br>innodb_buffer_pool_size = 1024M<br>innodb_write_io_threads = 1000<br>innodb_read_io_threads = 1000<br>innodb_thread_concurrency = 8<br>innodb_purge_threads = 1<br>innodb_flush_log_at_trx_commit = 2<br>innodb_log_buffer_size = 4M<br>innodb_log_file_size = 32M<br>innodb_log_files_in_group = 3<br>innodb_max_dirty_pages_pct = 90<br>innodb_lock_wait_timeout = 120</p>
+<p>bulk_insert_buffer_size = 8M<br>myisam_sort_buffer_size = 8M<br>myisam_max_sort_file_size = 10G<br>myisam_repair_threads = 1</p>
+<p>interactive_timeout = 28800<br>wait_timeout = 28800</p>
+<p>[mysqldump]<br>quick<br>max_allowed_packet = 16M</p>
+<p>[myisamchk]<br>key_buffer_size = 8M<br>sort_buffer_size = 8M<br>read_buffer = 4M<br>write_buffer = 4M</p>
+<p>sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES<br>port = 3306<br>EOF</p>
+<p>#启动mysql服务<br>cd /usr/local/mysql<br>/bin/mkdir var<br>/bin/chown -R mysql.mysql var<br>cp support-files/mysql.server /etc/init.d/mysql<br>/sbin/chkconfig mysql on<br>service mysql start</p>
+<p>#设置环境变量<br>echo “export PATH=$PATH:/usr/local/mysql/bin” &gt;&gt; /etc/profile<br>source /etc/profile</p>
+<p>#设置mysql登陆密码,初始密码为123456<br>/bin/mkdir -p /var/lib/mysql<br>ln -s /usr/local/mysql/var/mysql.sock /var/lib/mysql/mysql.sock<br>mysql -e “SET PASSWORD = PASSWORD(‘123456’);”<br>mysql -p123456 -e “GRANT ALL PRIVILEGES ON <em>.</em> TO ‘root’@’%’ IDENTIFIED BY ‘password’ WITH GRANT OPTION;”<br>mysql -p123456 -e “FLUSH PRIVILEGES;”</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-将Web应用性能提高十倍的10条建议" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
