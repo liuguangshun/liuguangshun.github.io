@@ -14,75 +14,46 @@
     
     
     
-    <link rel="alternate" href="/atom.xml## RSS address." title="Blogs" type="application/atom+xml">
+    <link rel="alternative" href="/Tinnypp/atom.xml" title="Blogs" type="application/atom+xml">
     
     
-    <link rel="icon" href="/img/pacman.png">
+    <link rel="icon" href="/img/favicon.ico">
     
     
-    <link rel="apple-touch-icon" href="/img/fish_footer.jpg">
-    <link rel="apple-touch-icon-precomposed" href="/img/fish_footer.jpg">
+    <link rel="apple-touch-icon" href="/img/myLogo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/myLogo.png">
     
+
+  
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    
+  
 
     <link rel="stylesheet" href="/css/style.css">
-    
-    <!-- 标签云侵入样式 -->
-  <style>
-    .tagcloudlist {position:relative; height:300px;}
-    .tagcloudlist  a {position:absolute; top:0px; left:0px;  text-decoration:none; padding: 3px 6px; }
-    .tagcloudlist  a:hover {border: 1px solid #eee; background: #000; }
-    
-    .ac_results {
-            padding: 0px;
-            border: 1px solid black;
-            background-color: white;
-            overflow: hidden;
-            z-index: 99999;
-        }
-    .ac_results ul {
-        width: 100%;
-        list-style-position: outside;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .ac_results li {
-        margin: 0px;
-        padding: 2px 5px;
-        cursor: default;
-        display: block;
-        font: menu;
-        font-size: 12px;
-        line-height: 16px;
-        overflow: hidden;
-    }
-    .ac_loading {
-        background: #FFF;
-    }
-    .ac_odd {
-        background-color: #EEE;
-    }
-    .ac_over {
-        background-color: #AAA;
-        color: #FFF;
-    }
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?d182ed77fc48758bf45a33835ee35745";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 
-  </style>
+      <script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+  (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+  e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v1/st.js','_st');
 
-    <script src="/js/jquery-2.1.0.min.js"></script>
-    <script src="/js/autocomplete.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/miaov.js"></script>
+  _st('install','.............Add your swiftype userID...............');
+</script>
 </head>
 
   <body>
     <header>
       <div>
 		
-			<div id="imglogo">
-				<a href="/"><img src="/img/fish_font.jpg" alt="Blogs" title="Blogs"/></a>
-			</div>
-			
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="Blogs">Blogs</a></h1>
 				<h2 class="blog-motto"></h2>
@@ -91,180 +62,27 @@
 			</a></div>
 			<nav class="animated">
 				<ul>
+                    <ul>
+					 
+						<li><a href="/Tinnypp">首页</a></li>
 					
-						<li><a href="/">Home</a></li>
+						<li><a href="/Tinnypp/archives">归档</a></li>
 					
-						<li><a href="/about">About Me</a></li>
+					<li>
 					
-					
-					<li> <a href="/atom.xml">RSS</a> </li>
-
-					<li> <a title="把这个链接拖到你的Chrome收藏夹工具栏中" href='javascript:(function() {
-	function c() {
-		var e = document.createElement("link");
-		e.setAttribute("type", "text/css");
-		e.setAttribute("rel", "stylesheet");
-		e.setAttribute("href", f);
-		e.setAttribute("class", l);
-		document.body.appendChild(e)
-	}
- 
-	function h() {
-		var e = document.getElementsByClassName(l);
-		for (var t = 0; t < e.length; t++) {
-			document.body.removeChild(e[t])
-		}
-	}
- 
-	function p() {
-		var e = document.createElement("div");
-		e.setAttribute("class", a);
-		document.body.appendChild(e);
-		setTimeout(function() {
-			document.body.removeChild(e)
-		}, 100)
-	}
- 
-	function d(e) {
-		return {
-			height : e.offsetHeight,
-			width : e.offsetWidth
-		}
-	}
- 
-	function v(i) {
-		var s = d(i);
-		return s.height > e && s.height < n && s.width > t && s.width < r
-	}
- 
-	function m(e) {
-		var t = e;
-		var n = 0;
-		while (!!t) {
-			n += t.offsetTop;
-			t = t.offsetParent
-		}
-		return n
-	}
- 
-	function g() {
-		var e = document.documentElement;
-		if (!!window.innerWidth) {
-			return window.innerHeight
-		} else if (e && !isNaN(e.clientHeight)) {
-			return e.clientHeight
-		}
-		return 0
-	}
- 
-	function y() {
-		if (window.pageYOffset) {
-			return window.pageYOffset
-		}
-		return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
-	}
- 
-	function E(e) {
-		var t = m(e);
-		return t >= w && t <= b + w
-	}
- 
-	function S() {
-		var e = document.createElement("audio");
-		e.setAttribute("class", l);
-		e.src = i;
-		e.loop = false;
-		e.addEventListener("canplay", function() {
-			setTimeout(function() {
-				x(k)
-			}, 500);
-			setTimeout(function() {
-				N();
-				p();
-				for (var e = 0; e < O.length; e++) {
-					T(O[e])
-				}
-			}, 15500)
-		}, true);
-		e.addEventListener("ended", function() {
-			N();
-			h()
-		}, true);
-		e.innerHTML = " <p>If you are reading this, it is because your browser does not support the audio element. We recommend that you get a new browser.</p> <p>";
-		document.body.appendChild(e);
-		e.play()
-	}
- 
-	function x(e) {
-		e.className += " " + s + " " + o
-	}
- 
-	function T(e) {
-		e.className += " " + s + " " + u[Math.floor(Math.random() * u.length)]
-	}
- 
-	function N() {
-		var e = document.getElementsByClassName(s);
-		var t = new RegExp("\\b" + s + "\\b");
-		for (var n = 0; n < e.length; ) {
-			e[n].className = e[n].className.replace(t, "")
-		}
-	}
- 
-	var e = 30;
-	var t = 30;
-	var n = 350;
-	var r = 350;
-	var i = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake.mp3";
-	var s = "mw-harlem_shake_me";
-	var o = "im_first";
-	var u = ["im_drunk", "im_baked", "im_trippin", "im_blown"];
-	var a = "mw-strobe_light";
-	var f = "//s3.amazonaws.com/moovweb-marketing/playground/harlem-shake-style.css";
-	var l = "mw_added_css";
-	var b = g();
-	var w = y();
-	var C = document.getElementsByTagName("*");
-	var k = null;
-	for (var L = 0; L < C.length; L++) {
-		var A = C[L];
-		if (v(A)) {
-			if (E(A)) {
-				k = A;
-				break
-			}
-		}
-	}
-	if (A === null) {
-		console.warn("Could not find a node of the right size. Please try a different page.");
-		return
-	}
-	c();
-	S();
-	var O = [];
-	for (var L = 0; L < C.length; L++) {
-		var A = C[L];
-		if (v(A)) {
-			O.push(A)
-		}
-	}
-})()    '>High一下</a> </li>
-
-
-				<li>
-					
-					 <form id="searchform" class="search" action="/search/index.html" method="get" accept-charset="utf-8">
-                    <label>Search</label>
-                    <input type="text" id="search" autocomplete="off" name="q" maxlength="20" placeholder="Search" />
-               		 </form>
+						<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="st-search-inpu" maxlength="20" placeholder="Search" />
+						</form>
 					
 					</li>
-				</ul>
-			</nav>			
-</div>
+                <!--<li><div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div></li>-->
 
+				</ul>
+			</nav>	
+</div>
     </header>
-    <div id="container">
+    <div id="container" class="clearfix">
       <div id="main" class="post" itemscope itemprop="blogPost">
 	<article itemprop="articleBody"> 
 		<header class="article-info clearfix">
@@ -272,21 +90,15 @@
     
       <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" title="将Web应用性能提高十倍的10条建议" itemprop="url">将Web应用性能提高十倍的10条建议</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://yoursite.com" title="刘广顺">刘广顺</a>
-    </p>
   <p class="article-time">
     <time datetime="2017-12-14T19:23:07.511Z" itemprop="datePublished">2017-12-14</time>
-    Updated:<time datetime="2017-12-14T19:23:07.480Z" itemprop="dateModified">2017-12-14</time>
-    
   </p>
 </header>
 	<div class="article-content">
 		
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">Contents</strong>
+			<strong class="toc-title"></strong>
 		
 		</div>
 		
@@ -310,9 +122,9 @@
 <nav class="article-nav clearfix">
  
 
-<div class="prev">
+<div class="next">
 <a href="/2017/12/14/zabbix3.0邮件报警/"  title="zabbix3.0邮件报警">
- <strong>PREVIOUS:</strong><br/> 
+ <strong>Old:</strong><br/> 
  <span>zabbix3.0邮件报警
 </span>
 </a>
@@ -320,126 +132,56 @@
 
 </nav>
 
+	
+<section class="comment">
+	
+	<div class="ds-thread" data-title="将Web应用性能提高十倍的10条建议" data-thread-key="将Web应用性能提高十倍的10条建议" data-author-key="刘广顺" data-url="http://yoursite.com/post/将Web应用性能提高十倍的10条建议"></div>
+	
+</section>
 
-	<!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="2017/12/14/将Web应用性能提高十倍的10条建议/" data-title="将Web应用性能提高十倍的10条建议" data-url="http://yoursite.com/2017/12/14/将Web应用性能提高十倍的10条建议/"></div>
-<!-- 多说评论框 end -->
+
 </div>  
-
-<script src="/js/snowstorm-min.js"></script>
-
-<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"2","bdPos":"right","bdTop":"100"},"image":{"viewList":["weixin","qzone","tsina","tqq","renren"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["weixin","qzone","tsina","tqq","renren"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
-
-
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
-
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">Contents</strong>
-  
-  </div>
-
-<div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
-<aside class="clearfix">
-
-  <div>
-<script charset="Shift_JIS" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_wh.js"></script>
-</div>
-
-
-  <div class="music">
-<p class="asidetitle">Music</p>
-<div class="music_player clearfix">
-<script type="text/javascript" src="http://www.xiami.com/widget/player-single?uid=45521081&sid=381307&mode=js"></script>
-</div>
-</div>
-
-  
-
-  
-<div class="categorieslist">
-<p class="asidetitle">Recent Posts</p>
-  <ul class="entry">
-    
-      <li>
-        <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/">将Web应用性能提高十倍的10条建议</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/14/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/14/hello-world/">Hello World</a>
-      </li>
-    
-  </ul>
-</div>
-
-
-  
-  <div class="archiveslist">
-    <p class="asidetitle"><a href="/archives">Archives</a></p>
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">3</span></li></ul>
-  </div>
-
-
-  
-<div class="widget">
-  <p class="asidetitle">Recent Comments</p>
-    
-<ul class="entry ds-recent-comments" data-num-items="8" data-show-avatars="0" data-show-time="1" data-show-admin="0" data-excerpt-length="70"></ul>
-</div>
-
-
-  
-
-
-  <div class="linklist">
-<h3 rel="grow" class="grow asidetitle">Blogroll</h3>
-<ul class="entry">
-<li><a href="http://www.cnblogs.com/voidy/" title="voidy's Blog">小鱼</a></li>
-<li><a href="http://haodong.net.cn/" title="haodong">耗子</a></li>
-<li><a href="http://lanlazy.gitcafe.io/" title="lanlazy">兰懒懒</a></li>
-<li><a href="http://chenxiaohua.net/" >努力加餐饭</a></li>
-<li><a href="http://www.techug.com/" >程序师</a></li>
-<li><a href="http://coolshell.cn/" >酷壳</a></li>
-<li><a href="http://www.ruanyifeng.com/blog/" >阮一峰</a></li>
-<li><a href="http://www.chenshake.com/" >陈沙克</a></li>
-<li><a href="http://mindhacks.cn/" >刘未鹏</a></li>
-<li><a href="http://www.cnblogs.com/gorlf/">刘飞</a></li>
-<li><a href="http://rico93.xyz/">Rico</a></li>
-</ul>
-</div>
-
-</aside>
-</div>
     </div>
     <footer><div id="footer" >
-	
-	<div class="line">
-		<span></span>
-		<div class="author"></div>
-	</div>
-	
-	
-	<div class="social-font clearfix">
+	<div class="copyright">
+		<span>Powered by <a href="https://github.com/hexojs/hexo">Hexo</a> and theme by 
+		<a href="https://github.com/levonlin/Tinnypp">Tinnypp</a>.</span>
 		
+			<span>© Levon</span>
 		
-		
-		
-		
-	</div>
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2017 
-		
-		<a href="http://yoursite.com" target="_blank" title="刘广顺">刘广顺</a>
-		
-		</p>
-</div>
-</footer>
-    
+	<div>
+</div></footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){ 
+  //back to top
+  function backToTop(){
+    var buttonHTML = $("<a href=\"#top\" id=\"back-top\">" + "<span>Back to Top</span></a>");
+    buttonHTML.appendTo($("body"));
+    var buttonToTop = $("#back-top");
+    // hide #back-top first
+    buttonToTop.hide();
+
+    // fade in #back-top
+    $(function() {
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                buttonToTop.fadeIn();
+            } else {
+                buttonToTop.fadeOut();
+            }
+        });
+        // scroll body to 0px on click
+        buttonToTop.click(function() {
+            $('body,html').animate({
+                scrollTop: 0
+            }, 800);
+            return false;
+        });
+    });
+  }
+  backToTop();
+
   $('.navbar').click(function(){
     $('header nav').toggleClass('shownav');
   });
@@ -454,7 +196,7 @@ $(document).ready(function(){
   var m = $('#main'),
       a = $('#asidepart'),
       c = $('.closeaside'),
-      o = $('.openaside');
+      ta = $('#toc.toc-aside');
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
@@ -463,24 +205,23 @@ $(document).ready(function(){
     {
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
-      o.css('display', 'none');
-      
-      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
+
+  var show = true;
   c.click(function(){
-    a.addClass('fadeOut').css('display', 'none');
-    o.css('display', 'block').addClass('fadeIn');
-    m.addClass('moveMain');
-  });
-  o.click(function(){
-    o.css('display', 'none').removeClass('beforeFadeIn');
-    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
-    m.removeClass('moveMain');
-  });
-  $(window).scroll(function(){
-    o.css("top",Math.max(80,260-$(this).scrollTop()));
+    if(show == true){
+        a.addClass('fadeOut').css('display', 'none');
+        ta.css('display', 'block').addClass('fadeIn');
+        m.addClass('moveMain');  
+    }else{
+        a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');     
+        ta.css('display', 'none'); 
+        m.removeClass('moveMain');
+        $('#toc.toc-aside').css('display', 'none');
+    }
+    show = !show;
   });
 });
 </script>
@@ -504,14 +245,9 @@ $(document).ready(function(){
   if(ah.length==0){
     t.css('display','none');
   }else{
-    c.click(function(){
-      ta.css('display', 'block').addClass('fadeIn');
-    });
-    o.click(function(){
-      ta.css('display', 'none');
-    });
+
     $(window).scroll(function(){
-      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+      ta.css("top",Math.max(140,240-$(this).scrollTop()));
     });
   };
 });
@@ -548,11 +284,11 @@ $(document).ready(function(){
 
 
 <script type="text/javascript">
-  var duoshuoQuery = {short_name:""};
+  var duoshuoQuery = {short_name:"tinnypp"};
   (function() {
     var ds = document.createElement('script');
     ds.type = 'text/javascript';ds.async = true;
-    ds.src = '//static.duoshuo.com/embed.js';
+    ds.src = '//static.duoshuo.com/embed.js';    //change to ds.src = '/js/embed.js'; to add useragent for duoshuo
     ds.charset = 'UTF-8';
     (document.getElementsByTagName('head')[0] 
     || document.getElementsByTagName('body')[0]).appendChild(ds);
@@ -561,27 +297,41 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
 
-
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?9723e4a6c94c2638d915c2747e92aef9";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
+<script type="text/javascript">
+  function footerPosition() {
+    var contentHeight = document.documentElement.scrollHeight,
+        winHeight = window.innerHeight;
+    if(contentHeight <= winHeight) {
+      $('footer').addClass('fixed-bottom');
+    } else {
+      $('footer').removeClass('fixed-bottom');
+    }
+  }
+  footerPosition();
+  $(window).resize(footerPosition);
 </script>
 
 
-
-<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
-<a title="返回顶部"><img src="/img/scrollup.png"/></a>
-</div>
-<script src="/js/scrolltop.js"></script>
-
   </body>
 </html>
-
-
-<a href="https://github.com/Voidly"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
