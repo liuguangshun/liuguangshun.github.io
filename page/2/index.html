@@ -137,14 +137,91 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-通过Dockerfile创建Mysql服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Centos搭建Nginx图片缓存服务器" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/Centos搭建Nginx图片缓存服务器/">Centos搭建Nginx图片缓存服务器</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/Centos搭建Nginx图片缓存服务器/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:50:20.223Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>创建Mysql服务的Centos Docker镜像<br>一、准备dockerfile<br>mkdir mysql_centos<br>cd mysql_centos<br>cat Dockerfile<br>FROM nginx_dockerfile:centos<br>RUN yum -y install gcc gcc-c++ make automake cmake<br>RUN groupadd mysql; useradd -r -M -u 39 -s /sbin/nologin -g mysql mysql<br>RUN mkdir /usr/local/mysql; mkdir /data/mysql/db -p<br>RUN yum install gcc gcc-c++ ncurses-devel bison bison-devel -y<br>RUN wget <a href="http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz" target="_blank" rel="noopener">http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz</a><br>RUN tar zxf mysql-5.6.29.tar.gz -C /usr/src/<br>WORKDIR /usr/src/mysql-5.6.29<br>RUN cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/db -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DEXTRA_CHARSETS=all -DDEFAULT_COLLATION=utf8_general_ci -DWITH-MYSQLD-LDFLAGS=-all-static -DWITH-CLIENT-LD-FLAGS=-all-static -DWITH_DEBUG=0 &amp;&amp; gmake &amp;&amp; gmake install<br>RUN chown -R root:mysql /usr/local/mysql/ &amp;&amp; chown -R mysql:mysql /data/mysql/db/<br>RUN chmod 775 /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh<br>RUN /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh –basedir=/usr/local/mysql –datadir=/data/mysql/db –no-defaults –user=mysql<br>RUN cp /usr/src/mysql-5.6.29/support-files/my-default.cnf /etc/my.cnf<br>RUN cp /usr/src/mysql-5.6.29/support-files/mysql.server /etc/init.d/mysqld<br>RUN chmod -R 775 /etc/init.d/mysqld &amp;&amp; /etc/init.d/mysqld start<br>RUN echo -e ‘#!/bin/bash\nexport PATH=$PATH:/usr/local/mysql/bin’ &gt;/etc/profile.d/mysql.sh<br>RUN source /etc/profile</p>
-<p>二、根据Dockerfile生成镜像<br>docker build -t mysql_dockerfile:nginx_dockerfile .</p>
-<p>docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>mysql_dockerfile    nginx_dockerfile    e8fcca4ad7b0        11 minutes ago      5.54GB<br>nginx_dockerfile    centos              28d333149027        3 days ago          692MB<br>nginx               centos              bb2863c49d58        3 days ago          586MB<br>sshd-centos         latest              0742cfe06535        3 days ago          328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB</p>
+        <p>搭建Nginx图片缓存服务器<br>[root@localhost ~]# yum -y install gcc gcc-c++ pcre-devel zlib-devel openssl<em><br>[root@localhost ~]# useradd -M -u 40 -s /sbin/nologin  nginx<br>[root@localhost ~]# tar zxvf ng<br>nginx-1.9.1.tar.gz              nginx-upload-module-2.2.tar.gz  ngx_cache_purge-2.3.tar.gz<br>[root@localhost ~]# tar zxvf nginx-1.9.1.tar.gz -C /usr/src/<br>[root@localhost ~]# tar zxvf nginx-upload-module-2.2.tar.gz -C /usr/src/<br>[root@localhost ~]# tar zxvf ngx_cache_purge-2.3.tar.gz -C /usr/src/<br>[root@localhost ~]# cd /usr/src/nginx-1.9.1/<br>[root@localhost nginx-1.9.1]# ./configure –prefix=/usr/local/nginx –user=nginx –group=nginx –add-module=/usr/src/ngx_cache_purge-2.3 –with-file-aio –with-http_stub_status_module –with-http_gzip_static_module –with-http_realip_module –with-http_ssl_module –add-module=/usr/src/nginx-upload-module-2.2<br>[root@localhost nginx-1.9.1]# make -j4<br>[root@localhost nginx-1.9.1]# make install<br>[root@localhost nginx-1.9.1]# ln -s /usr/local/nginx/sbin/</em> /usr/local/sbin/<br>[root@localhost nginx-1.9.1]# nginx<br>查看配置文件：<br>[root@localhost ~]# vim /usr/local/nginx/conf/nginx.conf</p>
+<p>#user  nobody;<br>user  nginx;<br>worker_processes  4;</p>
+<p>#error_log  logs/error.log;<br>error_log  logs/error.log  crit;</p>
+<p>#error_log  logs/error.log  info;</p>
+<p>pid        logs/nginx.pid;</p>
+<p>worker_rlimit_nofile 65535;</p>
+<p>events {<br>    use epoll;<br>    worker_connections  65535;<br>}</p>
+<p>http {<br>    include       mime.types;<br>    default_type  application/octet-stream;</p>
+<p> charset utf-8;<br>    server_names_hash_bucket_size 128;<br>    client_header_buffer_size 2k;<br>    large_client_header_buffers 4 4k;<br>    client_max_body_size 8m;</p>
+<p>server_tokens off;<br>    sendfile        on;<br>    tcp_nopush     on;<br>    tcp_nodelay on;</p>
+<p>fastcgi_connect_timeout 300;<br>    fastcgi_send_timeout 300;<br>    fastcgi_read_timeout 300;<br>    fastcgi_buffer_size 4k;<br>    fastcgi_buffers 8 4k;<br>    fastcgi_busy_buffers_size 8k;<br>fastcgi_temp_file_write_size 8k;</p>
+<p>open_file_cache max=204800 inactive=20s;<br>    open_file_cache_min_uses 1;<br>    open_file_cache_valid 30s;</p>
+<p> gzip on;<br>    gzip_min_length 1k;<br>    gzip_buffers 4 16k;<br>    gzip_http_version 1.0;<br>    gzip_comp_level 2;<br>    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript image/webp image/jpeg image/gif image/png;<br>    gzip_vary on;</p>
+<p> client_body_buffer_size  512k;<br>  proxy_connect_timeout    5;<br>  proxy_read_timeout       60;<br>  proxy_send_timeout       5;<br>  proxy_buffer_size        16k;<br>  proxy_buffers            4 64k;<br>  proxy_busy_buffers_size 128k;<br>  proxy_temp_file_write_size 128k;<br>  proxy_temp_path   /data/proxy_temp_dir;</p>
+<p>#设置Web缓存区名称为cache_one，内存缓存空间大小为200MB，1天没有被访问的内容自动清除，硬盘缓存空间大小为5GB。</p>
+<p>#proxy_cache_path和proxy_temp_path设置的目录需要在同一分区，因为它们之间是硬链接的关系。<br>  proxy_cache_path  /data/proxy_cache_dir  levels=1:2   keys_zone=cache_one:300m inactive=1d max_size=5g;</p>
+<p>keepalive_timeout  60;<br>    client_header_timeout 10;<br>    client_body_timeout 10;<br>    reset_timedout_connection on;<br>    send_timeout 10;</p>
+<pre><code>log_format  access  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
+         &apos;\status $body_bytes_sent &quot;$http_referer&quot; &apos;
+         &apos;&quot;$http_user_agent&quot; $http_x_forwarded_for&apos;;
+</code></pre><p>   upstream webservers{<br>        server 127.0.0.1:8100;<br>       }<br>include /usr/local/qxg/nginx/conf.d/*.conf;<br>}<br>[root@localhost ~]# vim /usr/local/qxg/nginx/conf.d/image.conf<br>server<br>    {<br>            listen  80;<br>            server_name  192.168.40.2;<br>            index index.php index.html index.htm;<br>            root   /data/imgerserver/;<br>            autoindex on;<br>            autoindex_localtime on;<br>            autoindex_exact_size off;<br>            access_log /data/nginx/logs/soft.log  combined;<br>            error_log  /data/nginx/logs/soft-error.log debug;</p>
+<pre><code>location ~ .*\.(webp|gif|jpg|jpeg|png|bmp|swf|ico)?$
+{
+    expires 30d;
+    proxy_cache cache_one;
+    proxy_cache_valid 200 304 301 302 10d;
+    proxy_cache_valid any 1d;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_cache_key $host$uri$is_args$args;
+    proxy_pass http://123.56.86.137:8010;
+} 
+
+
+location /nginx-status {
+    stub_status on;
+    access_log on;
+    allow 127.0.0.1;
+    allow 10.44.38.122; 
+    deny all;
+ }       
+
+
+location ~ .*\.(js|css)?$
+{
+    expires      24h;
+}
+</code></pre><p>}<br>server {<br>        listen 8010;<br>        server_name 192.168.40.2;<br>        root /data/imgerserver/;</p>
+<h1 id="autoindex-on"><a href="#autoindex-on" class="headerlink" title="autoindex on;"></a>autoindex on;</h1><pre><code>     autoindex_localtime on;
+     autoindex_exact_size off;
+     access_log /data/nginx/logs/image-access.log  combined;
+     error_log  /data/nginx/logs/image-error.log debug;
+
+
+location ~ .*\.(webp|gif|jpg|jpeg|png|bmp|swf|ico)$
+     {
+         expires 30d;
+     }
+
+
+     location ~ .*\.(js|css)?$
+     {
+         expires      24h;
+     }
+</code></pre><p>#proxy_cache cache_one;<br>}</p>
 
       
 
@@ -157,7 +234,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/Centos搭建Nginx图片缓存服务器/">展开全文 >></a>
         </p>
       
 
@@ -187,19 +264,29 @@
 
 
   
-    <article id="post-通过Dockerfile创建JDK8的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Centos7安装node" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/Centos7安装node/">Centos7安装node</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/Centos7安装node/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:49:46.596Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>通过Dockerfile创建JDK8的CentOS镜像<br>[root@node4 ~]# mkdir jdk8_centos<br>[root@node4 ~]# cd jdk8_centos/<br>准备jdk安装包<br>[root@node4 jdk8_centos]# ls<br>Dockerfile  server-jre-8u152-linux-x64.tar.gz<br>[root@node4 jdk8_centos]# vim Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM sshd_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#添加jdk安装包<br>RUN mkdir /usr/java<br>ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</p>
-<p>#安装jdk<br>RUN sed -i ‘$a\export LANG=en_US.UTF-8’ /etc/profile<br>RUN sed -i ‘$a\JAVA_HOME=/usr/java/jdk1.8.0_152’ /etc/profile<br>RUN sed -i ‘$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre’ /etc/profile<br>RUN sed -i ‘$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin’ /etc/profile<br>RUN sed -i ‘$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib’ /etc/profile<br>RUN sed -i ‘$a\export JAVA_HOME JRE_HOME PATH CLASSPATH’ /etc/profile</p>
-<p>#开放窗口的22端口<br>EXPOSE 22</p>
-<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>[root@node4 jdk8_centos]# docker build -t jdk8_dockerfile .<br>[root@node4 jdk8_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 jdk8_centos]# docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</p>
+        <p>1、 源码安装 Source Code<br>yum -y install gcc make gcc-c++openssl-devel wget<br>wget <a href="https://nodejs.org/dist/v8.9.3/node-v8.9.3.tar.gz" target="_blank" rel="noopener">https://nodejs.org/dist/v8.9.3/node-v8.9.3.tar.gz</a><br>tar zxvf node-v8.9.3.tar.gz -C /usr/src/<br>cd /usr/src/node-v8.9.3/<br>./configure<br>make &amp;&amp; make install<br>node -v<br>v8.9.3</p>
+<p>2、 二进制安装Binaries<br>通过wget下载<br>解压后，在bin文件夹中已经存在node以及npm，如果你进入到对应文件的中执行命令行一点问题都没有，不过不是全局的，所以将这个设置为全局就好了。<br>cd node-v8.9.3-linux-x64/bin<br>ls<br>./node -v<br>node文件夹具体放在哪，叫什么名字随你怎么定。然后设置全局：放在/usr/local/bin/下<br>ln -s /node-v8.9.3-linux-x64/bin/node /usr/local/bin/node<br>ln -s /node-v8.9.3-linux-x64/bin/npm /usr/local/bin/npm</p>
+<p>3、 yum安装<br>yum install nodejs npm<br>这种方式安装版本比较低，不建议此安装方法</p>
 
       
 
@@ -212,7 +299,111 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/Centos7安装node/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Centos6.5搭建L2TP_VPN" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">Centos6.5搭建L2TP_VPN</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:48:48.222Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、L2Tp安装<br>1、环境准备</p>
+<p>#安装epel源<br>[root@localhost ~]# rpm -ivh <a href="http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm" target="_blank" rel="noopener">http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm</a><br>[root@localhost ~]#service iptables stop<br>[root@localhost ~]#setenforce 0<br>[root@localhost ~]# sysctl -w net.ipv4.ip_forward=1<br>net.ipv4.ip_forward = 1</p>
+<p>2、软件安装<br>[root@localhost ~]# yum install xl2tpd -y</p>
+<p>二、L2TP配置<br>1、配置xl2tpd.conf主配置文件<br>[root@localhost ~]# vi /etc/xl2tpd/xl2tpd.conf<br>修改<br>[lns default]<br>ip range = 192.168.10.150-192.168.10.200           #VPN客户分配的IP地址<br>local ip = 192.168.10.250                         #L2TP VPN服务器的地址<br>require chap = yes<br>refuse pap = yes<br>require authentication = yes<br>name = LinuxVPNserver<br>ppp debug = yes<br>pppoptfile = /etc/ppp/options.xl2tpd<br>length bit = yes</p>
+<p>2、配置options.xl2tpd文件<br>[root@localhost ~]# vi /etc/ppp/options.xl2tpd<br>ipcp-accept-local<br>ipcp-accept-remote<br>ms-dns  114.114.114.114</p>
+<h1 id="ms-dns-192-168-1-1"><a href="#ms-dns-192-168-1-1" class="headerlink" title="ms-dns  192.168.1.1"></a>ms-dns  192.168.1.1</h1><h1 id="ms-dns-192-168-1-3"><a href="#ms-dns-192-168-1-3" class="headerlink" title="ms-dns  192.168.1.3"></a>ms-dns  192.168.1.3</h1><h1 id="ms-wins-192-168-1-2"><a href="#ms-wins-192-168-1-2" class="headerlink" title="ms-wins 192.168.1.2"></a>ms-wins 192.168.1.2</h1><h1 id="ms-wins-192-168-1-4"><a href="#ms-wins-192-168-1-4" class="headerlink" title="ms-wins 192.168.1.4"></a>ms-wins 192.168.1.4</h1><p>noccp<br>auth<br>crtscts<br>idle 1800<br>mtu 1410<br>mru 1410<br>nodefaultroute<br>debug<br>lock<br>proxyarp<br>connect-delay 5000</p>
+<p>3、配置账号密码<br>[root@localhost ~]# vi /etc/ppp/chap-secrets</p>
+<h1 id="Secrets-for-authentication-using-CHAP"><a href="#Secrets-for-authentication-using-CHAP" class="headerlink" title="Secrets for authentication using CHAP"></a>Secrets for authentication using CHAP</h1><h1 id="client-server-secret-IP-addresses"><a href="#client-server-secret-IP-addresses" class="headerlink" title="client        server  secret                  IP addresses"></a>client        server  secret                  IP addresses</h1><p>vpn             <em>       123.com              </em></p>
+<p>4、配置IP映射<br>iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>iptables -I FORWARD -s 192.168.10.0/24 -j ACCEPT<br>iptables -I FORWARD -d 192.168.10.0/24 -j ACCEPT<br>iptables -A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>iptables -A INPUT -p icmp -j ACCEPT<br>iptables -A INPUT -i lo -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT<br>iptables –table nat –append POSTROUTING –jump MASQUERADE<br>service iptables save<br>service iptables restart<br>查看iptables配置：<br>cat /etc/sysconfig/iptables</p>
+<h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*nat<br>:PREROUTING ACCEPT [46084:9975135]<br>:POSTROUTING ACCEPT [0:0]<br>:OUTPUT ACCEPT [77:6376]<br>-A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>-A POSTROUTING -j MASQUERADE<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*filter<br>:INPUT ACCEPT [0:0]<br>:FORWARD ACCEPT [0:0]<br>:OUTPUT ACCEPT [8307:4482787]<br>-A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT<br>-A INPUT -p icmp -j ACCEPT<br>-A INPUT -i lo -j ACCEPT<br>-A INPUT -p tcp -m state –state NEW -m tcp –dport 22 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT</p>
+<p>#-A INPUT -j REJECT –reject-with icmp-host-prohibited   //注意：如果有配置这个，一定要注释，否则连接不上vpn<br>-A FORWARD -d 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -s 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><p>三、启动L2TP<br>[root@localhost ~]# service xl2tpd start<br>Starting xl2tpd:                                           [  OK  ]<br>[root@localhost ~]# netstat -antup<br>Active Internet connections (servers and established)<br>Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name<br>tcp        0      0 0.0.0.0:22                  0.0.0.0:<em>                   LISTEN      5828/sshd<br>tcp        0      0 127.0.0.1:25                0.0.0.0:</em>                   LISTEN      1093/master<br>tcp        0     64 192.168.10.250:22           192.168.10.88:50518         ESTABLISHED 2002/sshd<br>tcp        0      0 :::22                       :::<em>                        LISTEN      5828/sshd<br>tcp        0      0 ::1:25                      :::</em>                        LISTEN      1093/master<br>udp        0      0 0.0.0.0:1701                0.0.0.0:*                               19963/xl2tpd<br>链接查看日志<br>[root@localhost ~]# tail -f /var/log/messages<br>Apr 19 12:57:40 localhost xl2tpd[19958]: setsockopt recvref[30]: Protocol not available<br>Apr 19 12:57:40 localhost kernel: PPP generic driver version 2.4.2<br>Apr 19 12:57:40 localhost kernel: NET: Registered protocol family 24<br>Apr 19 12:57:40 localhost xl2tpd[19958]: L2TP kernel support not detected (try modprobing l2tp_ppp and pppol2tp)<br>Apr 19 12:57:40 localhost xl2tpd[19963]: xl2tpd version xl2tpd-1.3.6 started on localhost.localdomain PID:19963<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Written by Mark Spencer, Copyright (C) 1998, Adtran, Inc.<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked by Scott Balmos and David Stipp, (C) 2001<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Inherited by Jeff McAdams, (C) 2002<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked again by Xelerance (www.xelerance.com) (C) 2006<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Listening on IP address 0.0.0.0, port 1701</p>
+<p>四、安装IPsec<br>1、安装IPsec，修改sysctl.conf文件<br>[root@localhost ~]# yum install openswan ppp lsof iptables -y<br>[root@localhost ~]# vi /etc/sysctl.conf<br>net.ipv4.ip_forward = 0     修改为 net.ipv4.ip_forward = 1<br>增加：<br>net.ipv4.conf.all.arp_notify = 1<br>net.ipv4.conf.all.send_redirects = 0<br>net.ipv4.conf.default.send_redirects = 0<br>net.ipv4.conf.all.accept_redirects = 0<br>net.ipv4.conf.default.accept_redirects = 0</p>
+<p>[root@localhost ~]# for vpn in /proc/sys/net/ipv4/conf/*; do echo 0 &gt; $vpn/accept_redirects; echo 0 &gt; $vpn/send_redirects; done<br>[root@localhost ~]# sysctl -p<br>2、编辑/etc/ipsec.conf<br>[root@localhost ~]# vi /etc/ipsec.conf<br>将protostack=auto，修改为：protostack=netkey</p>
+<h1 id="basic-configuration"><a href="#basic-configuration" class="headerlink" title="basic configuration"></a>basic configuration</h1><p>config setup</p>
+<pre><code># Debug-logging controls:  &quot;none&quot; for (almost) none, &quot;all&quot; for lots.
+# klipsdebug=none
+# plutodebug=&quot;control parsing&quot;
+# For Red Hat Enterprise Linux and Fedora, leave protostack=netkey
+protostack=netkey
+nat_traversal=yes
+virtual_private=%v4:10.0.0.0/8,%v4:192.168.0.0/16,%v4:172.16.0.0/12
+oe=off
+# Enable this if you see &quot;failed to find any available worker&quot;
+# nhelpers=0
+</code></pre><p>#You may put your configuration (.conf) file in the “/etc/ipsec.d/“ and uncomment this.</p>
+<p>#include /etc/ipsec.d/*.conf</p>
+<p>conn L2TP-PSK-NAT<br>    rightsubnet=vhost:%priv<br>    also=L2TP-PSK-noNAT</p>
+<p>conn L2TP-PSK-noNAT<br>    authby=secret<br>    pfs=no<br>    auto=add<br>    keyingtries=3<br>    rekey=no<br>    ikelifetime=8h<br>    keylife=1h<br>    type=transport<br>    left=192.168.40.88                         #VPN外网地址<br>    leftprotoport=17/1701<br>    right=%any<br>    rightprotoport=17/%any</p>
+<p>3、编辑ipsec.secrets文件<br>[root@localhost ~]# vi /etc/ipsec.secrets<br>192.168.40.88  %any: PSK “YourPsk”<br>192.168.1.88换成你自己VPS实际的公网IP, YourPsk你自己定一个密钥，到时候连VPN的时候在安全设置里要用。<br>[root@localhost ~]# service ipsec start<br>[root@localhost ~]#  ipsec verify<br>Checking your system to see if IPsec got installed and started correctly:<br>Version check and ipsec on-path                                 [OK]<br>Linux Openswan U2.6.32/K2.6.32-431.el6.x86_64 (netkey)<br>Checking for IPsec support in kernel                            [OK]<br> SAref kernel support                                           [N/A]<br> NETKEY:  Testing for disabled ICMP send_redirects              [OK]<br>NETKEY detected, testing for disabled ICMP accept_redirects     [OK]<br>Testing against enforced SElinux mode                           [OK]<br>Checking that pluto is running                                  [OK]<br> Pluto listening for IKE on udp 500                             [OK]<br> Pluto listening for NAT-T on udp 4500                          [OK]<br>Two or more interfaces found, checking IP forwarding            [OK]<br>Checking NAT and MASQUERADEing                                  [OK]<br>Checking for ‘ip’ command                                       [OK]<br>Checking /bin/sh is not /bin/dash                               [OK]<br>Checking for ‘iptables’ command                                 [OK]<br>Opportunistic Encryption Support                                [DISABLED]</p>
+<p>如果有failed，就无法进行下去，那需要自己去百度、google找答案吧，我搭建的时候是没有遇到，记得把selinux关掉。<br>五、验证<br>在win7上测试连接vpn<br>  打开网络共享中心–设置新的连接或网络–连接到工作区–创建vpn<br>  点击右下角网络图标–vpn连接–点击属性<br>  1.常规中的ip为vps的公网ip<br>  2.vpn类型：使用Ipsec 的第二层隧道协议(L2TP/IPsec)<br>    数据加密：需要加(如果服务器拒绝将断开连接)<br>    高级设置：使用预共享的密钥作身份验证<br>         密钥：YourPsk    (前面设置过的)<br>  点击确定后输入用户名和密码即可登陆。</p>
+<p>错误789：L2TP连接尝试失败，因为安全层在初始化与远程计算机的协商时遇到一个出来错误。, 其解决办法如下:<br>具体修改注册表的方法:<br>要向基于<br>Windows 2000 的计算机添加<br>ProhibitIpSec 注册表值，请按照下列步骤操作：<br>1.<br>单击“开始”，单击“运行”，键入 regedt32，然后单击“确定”。 </p>
+<ol>
+<li>找到下面的注册表子项，然后单击它：<br>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Rasman\Parameters </li>
+<li>在“编辑”菜单上，单击“添加值”。 </li>
+<li>在“值名称”框中，键入<br>ProhibitIpSec。 </li>
+<li>在“数据类型”列表中，单击“REG_DWORD”，然后单击“确定”。 </li>
+<li>在“数据”框中，键入1，然后单击“确定”。 </li>
+<li>修改AllowL2TPWeakCrypto数据键入为 1。</li>
+<li>退出注册表编辑器，然后重新启动计算机。 </li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">展开全文 >></a>
         </p>
       
 
@@ -685,66 +876,6 @@ Note: By displaying this field, top&apos;s own working set will be increased by 
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/12/15/Redis_Sentinel主从复制自动切换方案/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-nginx访问量统计" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>nginx访问量统计</p>
-<p>PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。<br>UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。<br>IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。</p>
-<p>1.根据访问IP统计UV<br>awk ‘{print $1}’  access.log|sort | uniq -c |wc -l</p>
-<p>2.统计访问URL统计PV<br>awk ‘{print $7}’ access.log|wc -l</p>
-<p>3.查询访问最频繁的URL<br>awk ‘{print $7}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
-<p>4.查询访问最频繁的IP<br>awk ‘{print $1}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
-<p>5.根据时间段统计查看日志<br>cat  access.log| sed -n ‘/14\/Mar\/2015:21/,/14\/Mar\/2015:22/p’|more</p>
-<p>6.统计IP访问个数（和根据访问IP统计UV一样）<br>cat access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort -nr | wc -l</p>
-<p>7.查看3点-6点之间的Ip访问个数<br>grep “2016:0[3-6]” access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort –nr | wc -l</p>
-<p>8.查看3点-6点之间的ip访问数，并且访问数&gt;=200的ip.<br>grep ‘2016:0[3-12]’ access.log | awk ‘{ips[$1]+=1}END{for(ip in ips) if(ips[ip]&gt;=200) print ips[ip],ip}’ | sort -nr</p>
-<p>9.查看并发连接数<br>netstat -nat|grep ESTABLISHED|wc -l</p>
-<p>10.获取每分钟的请求数量，输出成csv文件<br>cat /usr/local/nginx/logs/access.log  | awk ‘{print substr($4,14,5)}’ | uniq -c | awk ‘{print $2”,”$1}’ &gt; access.csv</p>
-<p>11.获取最耗时的请求时间、url、耗时，前10名, 可以修改后面的数字获取更多，不加则获取全部。<br>cat /usr/local/nginx/logs/access.log | awk ‘{print $4,$7,$NF}’ | awk -F ‘“‘ ‘{print $1,$2,$3}’ | sort -k3 -rn | head -10</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/nginx访问量统计/">展开全文 >></a>
         </p>
       
 

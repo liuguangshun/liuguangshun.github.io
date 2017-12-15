@@ -6,18 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Blogs</title>
+  <title>nginx访问量统计 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="nginx访问量统计 PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk">
+  <meta name="description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Blogs">
+<meta property="og:title" content="nginx访问量统计">
 <meta property="og:url" content="http://yoursite.com/2017/12/15/nginx访问量统计/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="nginx访问量统计 PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk">
-<meta property="og:updated_time" content="2017-12-15T03:26:11.000Z">
+<meta property="og:description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
+<meta property="og:updated_time" content="2017-12-15T16:58:55.870Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
-<meta name="twitter:description" content="nginx访问量统计 PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk">
+<meta name="twitter:title" content="nginx访问量统计">
+<meta name="twitter:description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -142,10 +142,24 @@
             <article id="post-nginx访问量统计" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nginx访问量统计
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/nginx访问量统计/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:58:55.912Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>nginx访问量统计</p>
-<p>PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。<br>UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。<br>IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。</p>
+        <p>PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。<br>UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。<br>IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。</p>
 <p>1.根据访问IP统计UV<br>awk ‘{print $1}’  access.log|sort | uniq -c |wc -l</p>
 <p>2.统计访问URL统计PV<br>awk ‘{print $7}’ access.log|wc -l</p>
 <p>3.查询访问最频繁的URL<br>awk ‘{print $7}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
@@ -250,18 +264,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/15/Redis_Sentinel主从复制自动切换方案/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          (no title)
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/12/15/mysql主从同步(2)-问题梳理/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title"></div>
+    <a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">通过Dockerfile创建支持SSH服务的CentOS镜像</div>
       <i class="icon-circle-right"></i>
     </a>
   
