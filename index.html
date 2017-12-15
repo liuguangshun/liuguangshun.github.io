@@ -137,6 +137,93 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Centos6.5搭建L2TP_VPN" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">Centos6.5搭建L2TP_VPN</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" class="archive-article-date">
+  	<time datetime="2017-12-15T20:59:40.424Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、L2Tp安装<br>1、环境准备</p>
+<p>#安装epel源<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -ivh http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># service iptables stop</span></span><br><span class="line">[root@localhost ~]<span class="comment"># setenforce 0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -w net.ipv4.ip_forward=1</span></span><br><span class="line">net.ipv4.ip_forward = 1</span><br></pre></td></tr></table></figure></p>
+<p>2、软件安装<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install xl2tpd -y</span></span><br></pre></td></tr></table></figure></p>
+<p>二、L2TP配置<br>1、配置xl2tpd.conf主配置文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vi /etc/xl2tpd/xl2tpd.conf</span></span><br><span class="line">修改</span><br><span class="line">[lns default]</span><br><span class="line">ip range = 192.168.10.150-192.168.10.200           <span class="comment">#VPN客户分配的IP地址</span></span><br><span class="line"><span class="built_in">local</span> ip = 192.168.10.250                         <span class="comment">#L2TP VPN服务器的地址</span></span><br><span class="line">require chap = yes</span><br><span class="line">refuse pap = yes</span><br><span class="line">require authentication = yes</span><br><span class="line">name = LinuxVPNserver</span><br><span class="line">ppp debug = yes</span><br><span class="line">pppoptfile = /etc/ppp/options.xl2tpd</span><br><span class="line">length bit = yes</span><br></pre></td></tr></table></figure></p>
+<p>2、配置options.xl2tpd文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vi /etc/ppp/options.xl2tpd</span></span><br><span class="line">ipcp-accept-local</span><br><span class="line">ipcp-accept-remote</span><br><span class="line">ms-dns  114.114.114.114</span><br><span class="line"><span class="comment"># ms-dns  192.168.1.1</span></span><br><span class="line"><span class="comment"># ms-dns  192.168.1.3</span></span><br><span class="line"><span class="comment"># ms-wins 192.168.1.2</span></span><br><span class="line"><span class="comment"># ms-wins 192.168.1.4</span></span><br><span class="line">noccp</span><br><span class="line">auth</span><br><span class="line">crtscts</span><br><span class="line">idle 1800</span><br><span class="line">mtu 1410</span><br><span class="line">mru 1410</span><br><span class="line">nodefaultroute</span><br><span class="line">debug</span><br><span class="line">lock</span><br><span class="line">proxyarp</span><br><span class="line">connect-delay 5000</span><br></pre></td></tr></table></figure></p>
+<p>3、配置账号密码<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vi /etc/ppp/chap-secrets</span></span><br><span class="line"><span class="comment"># Secrets for authentication using CHAP</span></span><br><span class="line"><span class="comment"># client        server  secret                  IP addresses</span></span><br><span class="line">vpn             *       123.com              *</span><br></pre></td></tr></table></figure></p>
+<p>4、配置IP映射<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE</span><br><span class="line">iptables -I FORWARD -s 192.168.10.0/24 -j ACCEPT</span><br><span class="line">iptables -I FORWARD -d 192.168.10.0/24 -j ACCEPT</span><br><span class="line">iptables -A FORWARD -j REJECT --reject-with icmp-host-prohibited</span><br><span class="line">iptables -A INPUT -p icmp -j ACCEPT</span><br><span class="line">iptables -A INPUT -i lo -j ACCEPT</span><br><span class="line">iptables -A INPUT -p udp -m state --state NEW -m udp --dport 1701 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p udp -m state --state NEW -m udp --dport 500 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p udp -m state --state NEW -m udp --dport 68 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p udp -m state --state NEW -m udp --dport 4500 -j ACCEPT</span><br><span class="line">iptables --table nat --append POSTROUTING --jump MASQUERADE</span><br><span class="line">service iptables save</span><br><span class="line">service iptables restart</span><br></pre></td></tr></table></figure></p>
+<p>查看iptables配置：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/sysconfig/iptables</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</span></span><br><span class="line">*nat</span><br><span class="line">:PREROUTING ACCEPT [46084:9975135]</span><br><span class="line">:POSTROUTING ACCEPT [0:0]</span><br><span class="line">:OUTPUT ACCEPT [77:6376]</span><br><span class="line">-A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE</span><br><span class="line">-A POSTROUTING -j MASQUERADE</span><br><span class="line">COMMIT</span><br><span class="line"><span class="comment"># Completed on Wed Apr 26 13:16:28 2017</span></span><br><span class="line"><span class="comment"># Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</span></span><br><span class="line">*filter</span><br><span class="line">:INPUT ACCEPT [0:0]</span><br><span class="line">:FORWARD ACCEPT [0:0]</span><br><span class="line">:OUTPUT ACCEPT [8307:4482787]</span><br><span class="line">-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">-A INPUT -p icmp -j ACCEPT</span><br><span class="line">-A INPUT -i lo -j ACCEPT</span><br><span class="line">-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT</span><br><span class="line">-A INPUT -p udp -m state --state NEW -m udp --dport 1701 -j ACCEPT</span><br><span class="line">-A INPUT -p udp -m state --state NEW -m udp --dport 500 -j ACCEPT</span><br><span class="line">-A INPUT -p udp -m state --state NEW -m udp --dport 68 -j ACCEPT</span><br><span class="line">-A INPUT -p udp -m state --state NEW -m udp --dport 4500 -j ACCEPT</span><br><span class="line"><span class="comment">#-A INPUT -j REJECT --reject-with icmp-host-prohibited   //注意：如果有配置这个，一定要注释，否则连接不上vpn</span></span><br><span class="line">-A FORWARD -d 192.168.10.0/24 -j ACCEPT</span><br><span class="line">-A FORWARD -s 192.168.10.0/24 -j ACCEPT</span><br><span class="line">-A FORWARD -j REJECT --reject-with icmp-host-prohibited</span><br><span class="line">COMMIT</span><br><span class="line"><span class="comment"># Completed on Wed Apr 26 13:16:28 2017</span></span><br></pre></td></tr></table></figure>
+<p>三、启动L2TP<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># service xl2tpd start</span></span><br><span class="line">Starting xl2tpd:                                           [  OK  ]</span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antup</span></span><br><span class="line">Active Internet connections (servers and established)</span><br><span class="line">Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   </span><br><span class="line">tcp        0      0 0.0.0.0:22                  0.0.0.0:*                   LISTEN      5828/sshd           </span><br><span class="line">tcp        0      0 127.0.0.1:25                0.0.0.0:*                   LISTEN      1093/master         </span><br><span class="line">tcp        0     64 192.168.10.250:22           192.168.10.88:50518         ESTABLISHED 2002/sshd           </span><br><span class="line">tcp        0      0 :::22                       :::*                        LISTEN      5828/sshd           </span><br><span class="line">tcp        0      0 ::1:25                      :::*                        LISTEN      1093/master         </span><br><span class="line">udp        0      0 0.0.0.0:1701                0.0.0.0:*                               19963/xl2tpd</span><br><span class="line">链接查看日志</span><br><span class="line">[root@localhost ~]<span class="comment"># tail -f /var/log/messages</span></span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19958]: setsockopt recvref[30]: Protocol not available</span><br><span class="line">Apr 19 12:57:40 localhost kernel: PPP generic driver version 2.4.2</span><br><span class="line">Apr 19 12:57:40 localhost kernel: NET: Registered protocol family 24</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19958]: L2TP kernel support not detected (try modprobing l2tp_ppp and pppol2tp)</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: xl2tpd version xl2tpd-1.3.6 started on localhost.localdomain PID:19963</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: Written by Mark Spencer, Copyright (C) 1998, Adtran, Inc.</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: Forked by Scott Balmos and David Stipp, (C) 2001</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: Inherited by Jeff McAdams, (C) 2002</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: Forked again by Xelerance (www.xelerance.com) (C) 2006</span><br><span class="line">Apr 19 12:57:40 localhost xl2tpd[19963]: Listening on IP address 0.0.0.0, port 1701</span><br></pre></td></tr></table></figure></p>
+<p>四、安装IPsec<br>1、安装IPsec，修改sysctl.conf文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install openswan ppp lsof iptables -y</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vi /etc/sysctl.conf</span></span><br><span class="line">net.ipv4.ip_forward = 0     修改为 net.ipv4.ip_forward = 1</span><br><span class="line">增加：</span><br><span class="line">net.ipv4.conf.all.arp_notify = 1</span><br><span class="line">net.ipv4.conf.all.send_redirects = 0</span><br><span class="line">net.ipv4.conf.default.send_redirects = 0</span><br><span class="line">net.ipv4.conf.all.accept_redirects = 0</span><br><span class="line">net.ipv4.conf.default.accept_redirects = 0</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># for vpn in /proc/sys/net/ipv4/conf/*; do echo 0 &gt; $vpn/accept_redirects; echo 0 &gt; $vpn/send_redirects; done</span></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -p</span></span><br></pre></td></tr></table></figure>
+<p>2、编辑/etc/ipsec.conf<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vi /etc/ipsec.conf</span></span><br><span class="line">将protostack=auto，修改为：protostack=netkey</span><br><span class="line"><span class="comment"># basic configuration</span></span><br><span class="line">config setup</span><br><span class="line">        <span class="comment"># Debug-logging controls:  "none" for (almost) none, "all" for lots.</span></span><br><span class="line">        <span class="comment"># klipsdebug=none</span></span><br><span class="line">        <span class="comment"># plutodebug="control parsing"</span></span><br><span class="line">        <span class="comment"># For Red Hat Enterprise Linux and Fedora, leave protostack=netkey</span></span><br><span class="line">        protostack=netkey</span><br><span class="line">        nat_traversal=yes</span><br><span class="line">        virtual_private=%v4:10.0.0.0/8,%v4:192.168.0.0/16,%v4:172.16.0.0/12</span><br><span class="line">        oe=off</span><br><span class="line">        <span class="comment"># Enable this if you see "failed to find any available worker"</span></span><br><span class="line">        <span class="comment"># nhelpers=0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#You may put your configuration (.conf) file in the "/etc/ipsec.d/" and uncomment this.</span></span><br><span class="line"><span class="comment">#include /etc/ipsec.d/*.conf</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">conn L2TP-PSK-NAT</span><br><span class="line">	rightsubnet=vhost:%priv</span><br><span class="line">	also=L2TP-PSK-noNAT</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">conn L2TP-PSK-noNAT</span><br><span class="line">	authby=secret</span><br><span class="line">	pfs=no</span><br><span class="line">	auto=add</span><br><span class="line">	keyingtries=3</span><br><span class="line">	rekey=no</span><br><span class="line">	ikelifetime=8h</span><br><span class="line">	keylife=1h</span><br><span class="line">	<span class="built_in">type</span>=transport</span><br><span class="line">	left=192.168.40.88                         <span class="comment">#VPN外网地址</span></span><br><span class="line">	leftprotoport=17/1701</span><br><span class="line">	right=%any</span><br><span class="line">	rightprotoport=17/%any</span><br></pre></td></tr></table></figure></p>
+<p>3、编辑ipsec.secrets文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vi /etc/ipsec.secrets</span></span><br><span class="line">192.168.40.88  %any: PSK “YourPsk”   </span><br><span class="line">192.168.1.88换成你自己VPS实际的公网IP, YourPsk你自己定一个密钥，到时候连VPN的时候在安全设置里要用。</span><br><span class="line">[root@localhost ~]<span class="comment"># service ipsec start</span></span><br><span class="line">[root@localhost ~]<span class="comment">#  ipsec verify</span></span><br><span class="line">Checking your system to see <span class="keyword">if</span> IPsec got installed and started correctly:</span><br><span class="line">Version check and ipsec on-path                             	[OK]</span><br><span class="line">Linux Openswan U2.6.32/K2.6.32-431.el6.x86_64 (netkey)</span><br><span class="line">Checking <span class="keyword">for</span> IPsec support <span class="keyword">in</span> kernel                        	[OK]</span><br><span class="line"> SAref kernel support                                       	[N/A]</span><br><span class="line"> NETKEY:  Testing <span class="keyword">for</span> disabled ICMP send_redirects          	[OK]</span><br><span class="line">NETKEY detected, testing <span class="keyword">for</span> disabled ICMP accept_redirects 	[OK]</span><br><span class="line">Testing against enforced SElinux mode                       	[OK]</span><br><span class="line">Checking that pluto is running                              	[OK]</span><br><span class="line"> Pluto listening <span class="keyword">for</span> IKE on udp 500                         	[OK]</span><br><span class="line"> Pluto listening <span class="keyword">for</span> NAT-T on udp 4500                      	[OK]</span><br><span class="line">Two or more interfaces found, checking IP forwarding        	[OK]</span><br><span class="line">Checking NAT and MASQUERADEing                              	[OK]</span><br><span class="line">Checking <span class="keyword">for</span> <span class="string">'ip'</span> <span class="built_in">command</span>                                   	[OK]</span><br><span class="line">Checking /bin/sh is not /bin/dash                           	[OK]</span><br><span class="line">Checking <span class="keyword">for</span> <span class="string">'iptables'</span> <span class="built_in">command</span>                             	[OK]</span><br><span class="line">Opportunistic Encryption Support                            	[DISABLED]</span><br></pre></td></tr></table></figure></p>
+<p>如果有failed，就无法进行下去，那需要自己去百度、google找答案吧，我搭建的时候是没有遇到，记得把selinux关掉。<br>五、验证<br>在win7上测试连接vpn<br>  打开网络共享中心–设置新的连接或网络–连接到工作区–创建vpn<br>  点击右下角网络图标–vpn连接–点击属性<br>  1.常规中的ip为vps的公网ip<br>  2.vpn类型：使用Ipsec 的第二层隧道协议(L2TP/IPsec)<br>    数据加密：需要加(如果服务器拒绝将断开连接)<br>    高级设置：使用预共享的密钥作身份验证<br>         密钥：YourPsk    (前面设置过的)<br>  点击确定后输入用户名和密码即可登陆。</p>
+<p>错误789：L2TP连接尝试失败，因为安全层在初始化与远程计算机的协商时遇到一个出来错误。, 其解决办法如下:<br>具体修改注册表的方法:<br>要向基于<br>Windows 2000 的计算机添加<br>ProhibitIpSec 注册表值，请按照下列步骤操作：<br>1.<br>单击“开始”，单击“运行”，键入 regedt32，然后单击“确定”。 </p>
+<ol>
+<li>找到下面的注册表子项，然后单击它：<br>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Rasman\Parameters </li>
+<li>在“编辑”菜单上，单击“添加值”。 </li>
+<li>在“值名称”框中，键入<br>ProhibitIpSec。 </li>
+<li>在“数据类型”列表中，单击“REG_DWORD”，然后单击“确定”。 </li>
+<li>在“数据”框中，键入1，然后单击“确定”。 </li>
+<li>修改AllowL2TPWeakCrypto数据键入为 1。</li>
+<li>退出注册表编辑器，然后重新启动计算机。 </li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Redis_Sentinel主从复制自动切换方案" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -875,81 +962,6 @@ Note: By displaying this field, top&apos;s own working set will be increased by 
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-通过Dockerfile创建nginx服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">通过Dockerfile创建nginx服务的Centos镜像</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:57:33.531Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>通过Dockerfile生成镜像<br>在宿主机上准备的文件清单：<br>Dockerfile</p>
-<p>#启动ssh和apache服务的角本<br>run.sh<br>以上文件都放到/root/nginx_centos目录下<br>mkdir -p /root/nginx_centos<br>cd /root/nginx_centos<br>一、准备run.sh文件<br>在/root/nginx_centos目录新建run.sh<br>vim run.sh</p>
-<p>#!/bin/bash<br>/usr/sbin/sshd &amp;<br>/usr/local/nginx/sbin/nginx<br>二、准备Dockerfile<br>在/root/nginx_centos目录新建Dockerfile<br>cat Dockerfile</p>
-<p>#新生成的镜像是基于sshd:dockerfile镜像<br>FROM sshd-centos<br>MAINTAINER by cmzsteven<br>WORKDIR /usr/local/src</p>
-<p>#安装wget<br>RUN yum install -y  wget</p>
-<p>#下载并解压源码包<br>RUN wget <a href="http://nginx.org/download/nginx-1.12.1.tar.gz" target="_blank" rel="noopener">http://nginx.org/download/nginx-1.12.1.tar.gz</a><br>RUN tar zxvf nginx-1.12.1.tar.gz<br>WORKDIR nginx-1.12.1</p>
-<p>#编译安装nginx<br>RUN yum -y install gcc gcc-c++ pcre-devel zlib-devel openssl*<br>RUN useradd -M -u 40 -s /sbin/nologin  nginx<br>RUN ./configure –prefix=/usr/local/nginx –user=nginx –group=nginx –with-file-aio –with-http_stub_status_module –with-http_gzip_static_module –with-http_flv_module –with-http_ssl_module –with-http_realip_module<br>RUN make<br>RUN make install</p>
-<p>#启动Nginx服务<br>RUN ln -s /usr/local/nginx/sbin/* /usr/local/sbin/<br>RUN /usr/local/nginx/sbin/nginx</p>
-<p>#修改Nginx配置文件,以非daemon方式启动<br>RUN echo “daemon off;”&gt;&gt;/usr/local/nginx/conf/nginx.conf</p>
-<p>#复制服务启动脚本并设置权限<br>ADD run.sh /usr/local/sbin/run.sh<br>RUN chmod 755 /usr/local/sbin/run.sh</p>
-<p>#设置生成容器时需要执行的脚本<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>#开放22、80、443端口<br>EXPOSE 22<br>EXPOSE 80<br>EXPOSE 443</p>
-<p>需要注意的是：在Dockerfile文件中更换当前目录不可以用“cd”命令，而要改用“WORKDIR”.<br>三、根据Dockerfile生成镜像<br>docker build -t nginx_dockerfile:centos .<br>查看镜像：<br>ocker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>nginx_dockerfile    centos              28d333149027        6 minutes ago       692MB<br>nginx               centos              bb2863c49d58        2 hours ago         586MB<br>sshd-centos         latest              0742cfe06535        3 hours ago         328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB<br>四、根据镜像生成的容器并进行测试<br>1、生成新的容器<br>docker run -d -p 2224:22 -p 8001:80 -p 4443:443 nginx_dockerfile:centos /usr/local/sbin/run.sh<br>将容器的22端口、80端口和443端口分别映射到到宿主机上的2224端口、8001端口和4443端口,并运行服务脚本。<br>2、测试</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">展开全文 >></a>
         </p>
       
 
