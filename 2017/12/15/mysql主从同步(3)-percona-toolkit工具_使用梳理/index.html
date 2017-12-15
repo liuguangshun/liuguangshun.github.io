@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017/12 | Blogs</title>
+  <title>mysql主从同步(3)-percona-toolkit工具_使用梳理 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/12/index.html">
+  <meta name="description" content="在mysql工作中接触最多的就是mysql replication，mysql在复制方面还是会有一些常规问题，比如主库宕机或者从库宕机有可能会导致复制中断，通常需要进行人为修复，或者很多时候需要把一个从库提升为主库，但对从库和主库的数据一致性不能保证一样。这种情况下就需要使用percona-toolkit工具的pt-table-checksum组件来检查主从数据的一致性；如果发现不一致的数据，可以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql主从同步(3)-percona-toolkit工具_使用梳理">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="在mysql工作中接触最多的就是mysql replication，mysql在复制方面还是会有一些常规问题，比如主库宕机或者从库宕机有可能会导致复制中断，通常需要进行人为修复，或者很多时候需要把一个从库提升为主库，但对从库和主库的数据一致性不能保证一样。这种情况下就需要使用percona-toolkit工具的pt-table-checksum组件来检查主从数据的一致性；如果发现不一致的数据，可以">
+<meta property="og:updated_time" content="2017-12-15T16:53:16.244Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="mysql主从同步(3)-percona-toolkit工具_使用梳理">
+<meta name="twitter:description" content="在mysql工作中接触最多的就是mysql replication，mysql在复制方面还是会有一些常规问题，比如主库宕机或者从库宕机有可能会导致复制中断，通常需要进行人为修复，或者很多时候需要把一个从库提升为主库，但对从库和主库的数据一致性不能保证一样。这种情况下就需要使用percona-toolkit工具的pt-table-checksum组件来检查主从数据的一致性；如果发现不一致的数据，可以">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,277 +139,386 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-mysql主从同步(3)-percona-toolkit工具_使用梳理" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:53:42.363Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/">mysql主从同步(4)-Slave延迟状态监控</a>
+    <h1 class="article-title" itemprop="name">
+      mysql主从同步(3)-percona-toolkit工具_使用梳理
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
+        
+        <a href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
   	<time datetime="2017-12-15T16:53:16.263Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在mysql工作中接触最多的就是mysql replication，mysql在复制方面还是会有一些常规问题，比如主库宕机或者从库宕机有可能会导致复制中断，通常需要进行人为修复，或者很多时候需要把一个从库提升为主库，但对从库和主库的数据一致性不能保证一样。这种情况下就需要使用percona-toolkit工具的pt-table-checksum组件来检查主从数据的一致性；如果发现不一致的数据，可以通过pt-table-sync修复；还可以通过pt-heartbeat监控主从复制延迟。当然如果数据量小，slave只是当做一个备份使用，那么出现数据不一致完全可以重做，或者通过其他方法解决。如果数据量非常大，重做就是非常蛋碎的一件事情了。比如说，线上数据库做了主从同步环境，数据库在进行了迁移后，需要对mysql迁移（Replication）后的数据一致性进行校验，但又不能对生产环境使用造成影响，pt-table-checksum成为了绝佳也是唯一的检查工具。</p>
+<p>percona-toolkit介绍<br>percona-toolkit是一组高级命令行工具的集合，用来执行各种通过手工执行非常复杂和麻烦的mysql和系统任务，这些任务包括：<br>   1）检查master和slave数据的一致性<br>   2）有效地对记录进行归档<br>   3）查找重复的索引<br>   4）对服务器信息进行汇总<br>   5）分析来自日志和tcpdump的查询<br>   6）当系统出问题的时候收集重要的系统信息<br>percona-toolkit源自Maatkit和Aspersa工具，这两个工具是管理mysql的最有名的工具。不过，现在Maatkit工具已经不维护了，所以以后推荐还是使用percona-toolkit工具！<br>这些工具主要包括开发、性能、配置、监控、复制、系统、实用六大类，作为一个优秀的DBA，里面有的工具非常有用，如果能掌握并加以灵活应用，将能极大的提高工作效率。</p>
+<p>percona-toolkit工具中最主要的三个组件分别是：<br>   1）pt-table-checksum 负责监测mysql主从数据一致性<br>   2）pt-table-sync 负责当主从数据不一致时修复数据，让它们保存数据的一致性<br>   3）pt-heartbeat 负责监控mysql主从同步延迟<br>下面就对这三个组件的使用做一记录，当然percona-toolkit工具也有很多其他组件，后面会一一说明。</p>
+<p>percona-toolkit工具安装（建议主库和从库服务器上都安装）<br>软件下载并在主库服务器上安装 [百度云盘下载地址：<a href="https://pan.baidu.com/s/1bp1OOgf" target="_blank" rel="noopener">https://pan.baidu.com/s/1bp1OOgf</a>   （提取密码：y462）]<br>[root@master-server src]# wget <a href="https://www.percona.com/downloads/percona-toolkit/2.2.7/RPM/percona-toolkit-2.2.7-1.noarch.rpm" target="_blank" rel="noopener">https://www.percona.com/downloads/percona-toolkit/2.2.7/RPM/percona-toolkit-2.2.7-1.noarch.rpm</a><br>[root@master-server src]# rpm -ivh percona-toolkit-2.2.7-1.noarch.rpm     //安装后，percona-toolkit工具的各个组件命令就有有了（输入ht-，按TAB键就会显示）</p>
+<p>安装该工具依赖的软件包<br>[root@master-server src]# yum install perl-IO-Socket-SSL perl-DBD-MySQL perl-Time-HiRes perl perl-DBI -y</p>
+<p>一、pt-table-checksum使用梳理<br>pt-table-checksum 是 Percona-Toolkit的组件之一，用于检测MySQL主、从库的数据是否一致。其原理是在主库执行基于statement的sql语句来生成主库数据块的checksum，把相同的sql语句传递到从库执行，并在从库上计算相同数据块的checksum，最后，比较主从库上相同数据块的checksum值，由此判断主从数据是否一致。检测过程根据唯一索引将表按row切分为块（chunk），以为单位计算，可以避免锁表。检测时会自动判断复制延迟、 master的负载， 超过阀值后会自动将检测暂停，减小对线上服务的影响。<br>pt-table-checksum 默认情况下可以应对绝大部分场景，官方说，即使上千个库、上万亿的行，它依然可以很好的工作，这源自于设计很简单，一次检查一个表，不需要太多的内存和多余的操作；必要时，pt-table-checksum 会根据服务器负载动态改变 chunk 大小，减少从库的延迟。</p>
+<p>为了减少对数据库的干预，pt-table-checksum还会自动侦测并连接到从库，当然如果失败，可以指定–recursion-method选项来告诉从库在哪里。它的易用性还体现在，复制若有延迟，在从库 checksum 会暂停直到赶上主库的计算时间点（也通过选项–设定一个可容忍的延迟最大值，超过这个值也认为不一致）。</p>
+<p>为了保证主数据库服务的安全，该工具实现了许多保护措施：<br>    1）自动设置 innodb_lock_wait_timeout 为1s，避免引起<br>    2）默认当数据库有25个以上的并发查询时，pt-table-checksum会暂停。可以设置 –max-load 选项来设置这个阀值<br>    3）当用 Ctrl+C 停止任务后，工具会正常的完成当前 chunk 检测，下次使用 –resume 选项启动可以恢复继续下一个 chunk</p>
+<p>pt-table-checksum [OPTIONS] [DSN]<br>pt-table-checksum：在主（master）上通过执行校验的查询对复制的一致性进行检查，对比主从的校验值，从而产生结果。DSN指向的是主的地址，该工具的退出状态不为零，如果发现有任何差别，或者如果出现任何警告或错误。注意：第一次运行的时候需要加上–create-replicate-table参数，生成checksums表！！如果不加这个参数，那么就需要在对应库下手工添加这张表了,表结构SQL如下：</p>
+<p>CREATE TABLE checksums (<br>   db             char(64)     NOT NULL,<br>   tbl            char(64)     NOT NULL,<br>   chunk          int          NOT NULL,<br>   chunk_time     float            NULL,<br>   chunk_index    varchar(200)     NULL,<br>   lower_boundary text             NULL,<br>   upper_boundary text             NULL,<br>   this_crc       char(40)     NOT NULL,<br>   this_cnt       int          NOT NULL,<br>   master_crc     char(40)         NULL,<br>   master_cnt     int              NULL,<br>   ts             timestamp    NOT NULL,<br>   PRIMARY KEY (db, tbl, chunk),<br>   INDEX ts_db_tbl (ts, db, tbl)<br>) ENGINE=InnoDB;<br>常用参数解释：<br>–nocheck-replication-filters ：不检查复制过滤器，建议启用。后面可以用–databases来指定需要检查的数据库。<br>–no-check-binlog-format : 不检查复制的binlog模式，要是binlog模式是ROW，则会报错。<br>–replicate-check-only :只显示不同步的信息。<br>–replicate= ：把checksum的信息写入到指定表中，建议直接写到被检查的数据库当中。<br>–databases= ：指定需要被检查的数据库，多个则用逗号隔开。<br>–tables= ：指定需要被检查的表，多个用逗号隔开<br>h= ：Master的地址<br>u= ：用户名<br>p=：密码<br>P= ：端口</p>
+<p>最重要的一点就是：<br>要在主库上授权，能让主库ip访问。这一点不能忘记！（实验证明从库上可以不授权，但最好还是从库也授权）<br>注意：<br>1）根据测试，需要一个即能登录主库，也能登录从库的账号；<br>2）只能指定一个host，必须为主库的IP；<br>3）在检查时会向表加S锁；<br>4）运行之前需要从库的同步IO和SQL进程是YES状态。</p>
+<p>例如：（本文例子中：192.168.1.101是主库ip，192.168.1.102是从库ip）<br>在主库执行授权（一定要对主库ip授权，授权的用户名和密码可以自行定义，不过要保证这个权限能同时登陆主库和从库）<br>mysql&gt; GRANT SELECT, PROCESS, SUPER, REPLICATION SLAVE,CREATE,DELETE,INSERT,UPDATE ON <em>.</em> TO ‘root’@’192.168.1.101’ identified by ‘123456’;<br>mysql&gt; flush privileges;</p>
+<p>在从库上执行授权<br>mysql&gt; GRANT SELECT, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY ‘123456’;<br>mysql&gt; flush privileges;</p>
+<p>如下，在主库上执行的一个检查主从数据一致性的命令（别忘了第一次运行的时候需要添加–create-replicate-table参数，后续再运行时就不需要加了）：<br>下面命令中的192.168.1.101是主库ip<br>检查的是huanqiu库下的haha表的数据（当然，命令中也可以不跟表，直接检查某整个库的数据；如下去掉–tables=haha表，直接检查huanqiu库的数据）<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –create-replicate-table –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<p>Diffs cannot be detected because no slaves were found.  Please read the –recursion-method documentation for information.<br>            TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE<br>01-08T04:04:54      0      0        4       1       0   0.009 huanqiu.haha<br>上面有报错：<br>Diffs cannot be detected because no slaves were found. Please read the –recursion-method documentation for information<br>上面的提示信息很清楚，因为找不到从，所以执行失败，提示用参数–recursion-method 可以指定模式解决。<br>其实是因为从库的slave关闭了。<br>在主库上执行：</p>
+<p>mysql&gt; show processlist;<br>+—-+——+———–+——+———+——+——-+——————+<br>| Id | User | Host      | db   | Command | Time | State | Info             |<br>+—-+——+———–+——+———+——+——-+——————+<br>| 10 | root | localhost | NULL | Query   |    0 | init  | show processlist |<br>+—-+——+———–+——+———+——+——-+——————+<br>发现没有slave在运行。</p>
+<p>在从库上开启slave<br>mysql&gt; start slave;<br>mysql&gt; show slave status\G;</p>
+<p>再在主库上执行：</p>
+<p>mysql&gt; show processlist;<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>| Id | User  | Host                | db   | Command     | Time | State                                                                 | Info             |<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>| 10 | root  | localhost           | NULL | Query       |    0 | init                                                                  | show processlist |<br>| 18 | slave | 192.168.1.102:37115 | NULL | Binlog Dump |    5 | Master has sent all binlog to slave; waiting for binlog to be updated | NULL             |<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>发现已有slave在运行。</p>
+<p>再次执行检查命令：<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<pre><code>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
+</code></pre><p>01-08T04:11:03      0      0        4       1       0   1.422 huanqiu.haha<br>解释：<br>TS ：完成检查的时间。<br>ERRORS ：检查时候发生错误和警告的数量。<br>DIFFS ：0表示一致，1表示不一致。当指定–no-replicate-check时，会一直为0，当指定–replicate-check-only会显示不同的信息。<br>ROWS ：表的行数。<br>CHUNKS ：被划分到表中的块的数目。<br>SKIPPED ：由于错误或警告或过大，则跳过块的数目。<br>TIME ：执行的时间。<br>TABLE ：被检查的表名。</p>
+<p>二、pt-table-sync用法梳理<br>如果通过pt-table-checksum 检查找到了不一致的数据表，那么如何同步数据呢？即如何修复MySQL主从不一致的数据，让他们保持一致性呢？<br>这时候可以利用另外一个工具pt-table-sync。<br>使用方法：<br>pt-table-sync: 高效的同步MySQL表之间的数据，他可以做单向和双向同步的表数据。他可以同步单个表，也可以同步整个库。它不同步表结构、索引、或任何其他模式对象。所以在修复一致性之前需要保证他们表存在。</p>
+<p>假如上面检查数据时发现主从不一致<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<p>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE<br>01-08T04:18:07      0      1        4       1       0   0.843 huanqiu.haha<br>现在需要DIFFS为1可知主从数据不一致，需要修复！修复命令如下：<br>先master的ip，用户，密码，然后是slave的ip，用户，密码<br>[root@master-server ~]# pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print</p>
+<p>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘1’, ‘wangshibo’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘2’, ‘wangshikui’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘3’, ‘limeng’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘4’, ‘wanghi’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>参数解释：<br>–replicate= ：指定通过pt-table-checksum得到的表，这2个工具差不多都会一直用。<br>–databases= : 指定执行同步的数据库。<br>–tables= ：指定执行同步的表，多个用逗号隔开。<br>–sync-to-master ：指定一个DSN，即从的IP，他会通过show processlist或show slave status 去自动的找主。<br>h= ：服务器地址，命令里有2个ip，第一次出现的是Master的地址，第2次是Slave的地址。<br>u= ：帐号。<br>p= ：密码。<br>–print ：打印，但不执行命令。<br>–execute ：执行命令。</p>
+<p>上面命令介绍完了，接下来开始执行修复：<br>通过（–print）打印出来了修复数据的sql语句，可以手动的在slave从库上执行，让他们数据保持一致性，这样比较麻烦！<br>可以直接在master主库上执行修复操作，通过–execute参数，如下：<br>[root@master-server ~]# pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute</p>
+<p>如上修复后，再次检查，发现主从库数据已经一致了！<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<pre><code>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
+</code></pre><h2 id="01-08T04-36-43-0-0-4-1-0-0-040-huanqiu-haha"><a href="#01-08T04-36-43-0-0-4-1-0-0-040-huanqiu-haha" class="headerlink" title="01-08T04:36:43      0      0        4       1       0   0.040 huanqiu.haha"></a>01-08T04:36:43      0      0        4       1       0   0.040 huanqiu.haha</h2><p>建议:<br>修复数据的时候，最好还是用–print打印出来的好，这样就可以知道那些数据有问题，可以人为的干预下。<br>不然直接执行了，出现问题之后更不好处理。总之还是在处理之前做好数据的备份工作。</p>
+<p>注意：要是表中没有唯一索引或则主键则会报错：</p>
+<h2 id="Can’t-make-changes-on-the-master-because-no-unique-index-exists-at-usr-local-bin-pt-table-sync-line-10591"><a href="#Can’t-make-changes-on-the-master-because-no-unique-index-exists-at-usr-local-bin-pt-table-sync-line-10591" class="headerlink" title="Can’t make changes on the master because no unique index exists at /usr/local/bin/pt-table-sync line 10591."></a>Can’t make changes on the master because no unique index exists at /usr/local/bin/pt-table-sync line 10591.</h2><p>为了确保主从数据的一致性，可以编写监控脚本，定时检查。当检查到主从数据不一致时，强制修复数据。<br>[root@master-server ~]# cat /root/pt_huanqiu.sh</p>
+<p>#!/bin/bash<br>NUM=$(/usr/bin/pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu  h=192.168.1.101,u=root,p=123456,P=3306|awk -F” “ ‘{print $3}’|sed -n ‘2p’)<br>if [ $NUM -eq 1 ];then<br>  /usr/bin/pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print<br>  /usr/bin/pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute<br>else<br>  echo “data is ok”<br>fi<br>[root@master-server ~]# cat /root/pt_huanpc.sh </p>
+<p>#!/bin/bash<br>NUM=$(/usr/bin/pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanpc.checksums –databases=huanpc  h=192.168.1.101,u=root,p=123456,P=3306|awk -F” “ ‘{print $3}’|sed -n ‘2p’)<br>if [ $NUM -eq 1 ];then<br>  /usr/bin/pt-table-sync –replicate=huanpc.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print<br>  /usr/bin/pt-table-sync –replicate=huanpc.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute<br>else<br>  echo “data is ok”<br>fi<br>[root@master-server ~]# crontab -l</p>
+<p>#检查主从huanqiu库数据一致性</p>
+<ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 10;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 20;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 30;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 40;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 50;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>#检查主从huanpc库数据一致性</p>
+<ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>/bin/bash -x /root/root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 10;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 20;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 30;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 40;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 50;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>最后总结：<br>pt-table-checksum和pt-table-sync工具很给力，工作中常常在使用。注意使用该工具需要授权，一般SELECT, PROCESS, SUPER, REPLICATION SLAVE等权限就已经足够了。</p>
+<hr>
+<p>另外说一个问题：<br>在上面的操作中，在主库里添加pt-table-checksum检查的权限（从库可以不授权）后，进行数据一致性检查操作，会在操作的库（实例中是huanqiu、huanpc）下产生一个checksums表！<br>这张checksums表是pt-table-checksum检查过程中产生的。这张表一旦产生了，默认是删除不了的，并且这张表所在的库也默认删除不了，删除后过一会儿就又会出来。</p>
+<p>mysql&gt; use huanqiu;<br>Reading table information for completion of table and column names<br>You can turn off this feature to get a quicker startup with -A</p>
+<p>Database changed<br>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| haha              |<br>+——————-+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; show tables;         //过一段时间再次查看，发现checksums表还在<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>不仅这张表删除不了，这张表所在的库也删除不了，删除后过一会儿就是自动生成。<br>mysql&gt; drop database huanqiu;<br>Query OK, 1 row affected (0.01 sec)</p>
+<p>mysql&gt; drop database huanpc;<br>Query OK, 1 row affected (0.02 sec)</p>
+<p>mysql&gt; show databases;<br>+——————–+<br>| Database           |<br>+——————–+<br>| information_schema |<br>| huanqiu            |<br>| mysql              |<br>| performance_schema |<br>| test               |<br>+——————–+<br>5 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop database huanqiu;<br>Query OK, 1 row affected (0.01 sec)</p>
+<p>mysql&gt; show databases;<br>+——————–+<br>| Database           |<br>+——————–+<br>| information_schema |<br>| huanpc             |<br>| huanqiu            |<br>| mysql              |<br>| performance_schema |<br>| test               |<br>+——————–+<br>6 rows in set (0.00 sec)<br>要想删除的话，一定要先把pt-table-checksum检查前添加的权限收回！</p>
+<p>mysql&gt; show grants for ‘root’@’192.168.1.101’;<br>+————————————————————————————————————————————————————————————-+<br>| Grants for root@192.168.1.101                                                                                                                                                       |<br>+————————————————————————————————————————————————————————————-+<br>| GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY PASSWORD ‘*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9’ |<br>+————————————————————————————————————————————————————————————-+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; revoke SELECT, INSERT, UPDATE, DELETE, CREATE, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> FROM ‘root’@’192.168.1.101’;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show grants for ‘root’@’192.168.1.101’;<br>+—————————————————————————————————————–+<br>| Grants for root@192.168.1.101                                                                                   |<br>+—————————————————————————————————————–+<br>| GRANT USAGE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY PASSWORD ‘*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9’ |<br>+—————————————————————————————————————–+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; select user,host,password from mysql.user;<br>+——-+—————+——————————————-+<br>| user  | host          | password                                  |<br>+——-+—————+——————————————-+<br>| root  | localhost     | <em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| root  | master-server |                                           |<br>| root  | 127.0.0.1     |                                           |<br>| root  | ::1           |                                           |<br>|       | localhost     |                                           |<br>|       | master-server |                                           |<br>| root  | 192.168.1.101 | </em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| slave | 192.168.1.102 | *4F0FF134CC4C1A2872D972373A6AA86CA0A81872 |<br>+——-+—————+——————————————-+<br>8 rows in set (0.00 sec)</p>
+<p>mysql&gt; delete from mysql.user where user=”root” and host=”192.168.1.101”;   //这一步其实不必操作，此步删除操作不能在上面revoke执行前进行，否则revoke回收权限失败！<br>Query OK, 1 row affected (0.00 sec)</p>
+<p>mysql&gt; select user,host,password from mysql.user;<br>+——-+—————+——————————————-+<br>| user  | host          | password                                  |<br>+——-+—————+——————————————-+<br>| root  | localhost     | <em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| root  | master-server |                                           |<br>| root  | 127.0.0.1     |                                           |<br>| root  | ::1           |                                           |<br>|       | localhost     |                                           |<br>|       | master-server |                                           |<br>| slave | 192.168.1.102 | </em>4F0FF134CC4C1A2872D972373A6AA86CA0A81872 |<br>+——-+—————+——————————————-+<br>7 rows in set (0.00 sec)<br>权限删除后，就能成功删除checksums这张表和它所在的库了！<br>主库的checksums删除了，从库的这张表也会跟着删除</p>
+<p>mysql&gt; use huanpc;<br>Database changed<br>mysql&gt; show tables;<br>+——————+<br>| Tables_in_huanpc |<br>+——————+<br>| checksums        |<br>| heihei           |<br>+——————+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show tables;<br>+——————+<br>| Tables_in_huanpc |<br>+——————+<br>| heihei           |<br>+——————+<br>1 row in set (0.01 sec)</p>
+<p>mysql&gt; use huanqiu;<br>Reading table information for completion of table and column names<br>You can turn off this feature to get a quicker startup with -A</p>
+<p>Database changed<br>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.00 sec)</p>
+<p>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| haha              |<br>+——————-+<br>1 row in set (0.00 sec)<br>也就是说，checksums表一旦产生，不仅这张表默认删除不了，连同它所在的库，要是想删除它们，只能如上操作先撤销权限。<br>pt-heartbeat监控mysql主从复制延迟整理</p>
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:51:33.065Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          mysql主从同步(4)-Slave延迟状态监控
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Mysql主从同步(1)-主从_主主环境部署梳理</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/">Mysql主从同步(1)-主从_主主环境部署梳理</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/linux_查看当前系统的负载情况/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:50:43.121Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/linux_查看当前系统的负载情况/">linux_查看当前系统的负载情况</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/Centos搭建Nginx图片缓存服务器/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:50:20.223Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/Centos搭建Nginx图片缓存服务器/">Centos搭建Nginx图片缓存服务器</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:49:46.596Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/Centos7安装node/">Centos7安装node</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:48:48.222Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">Centos6.5搭建L2TP_VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:40:45.930Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:40:39.466Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:40:34.248Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/2017/12/page/2/">2</a><a class="page-number" href="/archives/2017/12/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/12/page/2/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -429,8 +542,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

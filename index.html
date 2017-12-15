@@ -137,6 +137,386 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-mysql主从同步(4)-Slave延迟状态监控" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/">mysql主从同步(4)-Slave延迟状态监控</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:53:42.363Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前部署了mysql主从同步环境（Mysql主从同步(1)-主从/主主环境部署梳理），针对主从同步过程中slave延迟状态的监控梳理如下：</p>
+<p>在mysql日常维护工作中，对于主从复制的监控主要体现在：<br>1）检查数据是否一致；主从数据不同步时，参考下面两篇文档记录进行数据修复：<br>mysql主从同步(3)-percona-toolkit工具-使用梳理<br>利用mk-table-checksum监测Mysql主从数据一致性操作记录</p>
+<p>2）监控主从同步延迟，同步延迟的检查工作主要从下面两方面着手：<br>1.一般的做法就是根据Seconds_Behind_Master的值来判断slave的延迟状态。<br>可以通过监控show slave status\G命令输出的Seconds_Behind_Master参数的值来判断，是否有发生主从延时。</p>
+<p>mysql&gt; show slave status\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Slave_IO_State: Waiting for master to send event<br>Master_Host: 192.168.1.101<br>Master_User: slave<br>Master_Port: 3306<br>Connect_Retry: 60<br>Master_Log_File: mysql-bin.000004<br>Read_Master_Log_Pos: 761249<br>Relay_Log_File: mysql-relay-bin.000008<br>Relay_Log_Pos: 761408<br>Relay_Master_Log_File: mysql-bin.000004<br>Slave_IO_Running: Yes<br>Slave_SQL_Running: Yes<br>Replicate_Do_DB: huanqiu,huanpc<br>Replicate_Ignore_DB: mysql<br>Replicate_Do_Table:<br>Replicate_Ignore_Table:<br>Replicate_Wild_Do_Table:<br>Replicate_Wild_Ignore_Table:<br>Last_Errno: 0<br>Last_Error:<br>Skip_Counter: 0<br>Exec_Master_Log_Pos: 761249<br>Relay_Log_Space: 761620<br>Until_Condition: None<br>Until_Log_File:<br>Until_Log_Pos: 0<br>Master_SSL_Allowed: No<br>Master_SSL_CA_File:<br>Master_SSL_CA_Path:<br>Master_SSL_Cert:<br>Master_SSL_Cipher:<br>Master_SSL_Key:<br>Seconds_Behind_Master: 0<br>Master_SSL_Verify_Server_Cert: No<br>Last_IO_Errno: 0<br>Last_IO_Error:<br>Last_SQL_Errno: 0<br>Last_SQL_Error:<br>Replicate_Ignore_Server_Ids:<br>Master_Server_Id: 101<br>Master_UUID: b667a58f-d6e0-11e6-8c0a-fa163e2d66ac<br>Master_Info_File: /data/mysql/data/master.info<br>SQL_Delay: 0<br>SQL_Remaining_Delay: NULL<br>Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it<br>Master_Retry_Count: 86400<br>Master_Bind:<br>Last_IO_Error_Timestamp:<br>Last_SQL_Error_Timestamp:<br>Master_SSL_Crl:<br>Master_SSL_Crlpath:<br>Retrieved_Gtid_Set:<br>Executed_Gtid_Set:<br>Auto_Position: 0<br>1 row in set (0.00 sec)</p>
+<p>ERROR:<br>No query specified<br>以上是show slave status\G的输出结果，需要监控下面三个参数：<br>   1）Slave_IO_Running：该参数可作为io_thread的监控项，Yes表示io_thread的和主库连接正常并能实施复制工作，No则说明与主库通讯异常，多数情况是由主从间网络引起的问题；<br>   2）Slave_SQL_Running：该参数代表sql_thread是否正常，YES表示正常，NO表示执行失败，具体就是语句是否执行通过，常会遇到主键重复或是某个表不存在。<br>   3）Seconds_Behind_Master：是通过比较sql_thread执行的event的timestamp和io_thread复制好的event的timestamp(简写为ts)进行比较，而得到的这么一个差值；<br>        NULL—表示io_thread或是sql_thread有任何一个发生故障，也就是该线程的Running状态是No，而非Yes。<br>        0 — 该值为零，是我们极为渴望看到的情况，表示主从复制良好，可以认为lag不存在。<br>        正值 — 表示主从已经出现延时，数字越大表示从库落后主库越多。</p>
+<pre><code>负值 — 几乎很少见，我只是听一些资深的DBA说见过，其实，这是一个BUG值，该参数是不支持负值的，也就是不应该出现。
+</code></pre><hr>
+<p>Seconds_Behind_Master的计算方式可能带来的问题：</p>
+<h2 id="relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io-thread与sql-thread之间，而io-thread才真正与主库有关联，于是，问题就出来了，当主库I-O负载很大或是网络阻塞，io-thread不能及时复制binlog（没有中断，也在复制），而sql-thread一直都能跟上io-thread的脚本，这时Seconds-Behind-Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io-thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds-Behind-Master这个参数会有负值出现，我们已经知道该值是io-thread的最近跟新的ts与sql-thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。"><a href="#relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io-thread与sql-thread之间，而io-thread才真正与主库有关联，于是，问题就出来了，当主库I-O负载很大或是网络阻塞，io-thread不能及时复制binlog（没有中断，也在复制），而sql-thread一直都能跟上io-thread的脚本，这时Seconds-Behind-Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io-thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds-Behind-Master这个参数会有负值出现，我们已经知道该值是io-thread的最近跟新的ts与sql-thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。" class="headerlink" title="relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io_thread与sql_thread之间，而io_thread才真正与主库有关联，于是，问题就出来了，当主库I/O负载很大或是网络阻塞，io_thread不能及时复制binlog（没有中断，也在复制），而sql_thread一直都能跟上io_thread的脚本，这时Seconds_Behind_Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io_thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds_Behind_Master这个参数会有负值出现，我们已经知道该值是io_thread的最近跟新的ts与sql_thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。"></a>relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io_thread与sql_thread之间，而io_thread才真正与主库有关联，于是，问题就出来了，当主库I/O负载很大或是网络阻塞，io_thread不能及时复制binlog（没有中断，也在复制），而sql_thread一直都能跟上io_thread的脚本，这时Seconds_Behind_Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io_thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds_Behind_Master这个参数会有负值出现，我们已经知道该值是io_thread的最近跟新的ts与sql_thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。</h2><p>简单来说，就是监控slave同步状态中的：<br>1）Slave_IO_Running、Slave_SQL_Running状态值，如果都为YES，则表示主从同步；反之，主从不同步。<br>2）Seconds_Behind_Master的值，如果为0，则表示主从同步不延时，反之同步延时。</p>
+<p>2.上面根据Seconds_Behind_Master的值来判断slave的延迟状态，这么做在大部分情况下尚可接受，但其实是并不够准确的。对于Slave延迟状态的监控，还应该做到下面的考虑：<br>首先，我们先看下slave的状态：<br>mysql&gt; show slave status\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>slave_IO_State: Waiting for master to send event</p>
+<hr>
+<p>Master_Log_File: mysql-bin.000327<br>Read_Master_Log_Pos: 668711237<br>Relay_Log_File: mysql-relay-bin.002999<br>Relay_Log_Pos: 214736858<br>Relay_Master_Log_File: mysql-bin.000327<br>slave_IO_Running: Yes<br>slave_SQL_Running: Yes</p>
+<hr>
+<p>Skip_Counter: 0<br>Exec_Master_Log_Pos: 654409041<br>Relay_Log_Space: 229039311</p>
+<hr>
+<p>Seconds_Behind_Master: 3296</p>
+<hr>
+<p>可以看到 Seconds_Behind_Master 的值是 3296，也就是slave至少延迟了 3296 秒。</p>
+<p>我们再来看下slave上的2个REPLICATION进程状态：<br>mysql&gt; show full processlist\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Id: 6<br>User: system user<br>Host:<br>db: NULL<br>Command: Connect<br>Time: 22005006<br>State: Waiting for master to send event<br>Info: NULL<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 2. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Id: 7<br>User: system user<br>Host:<br>db: NULL<br>Command: Connect<br>Time: 3293<br>State: Updating<br>Info: UPDATE <strong> SET </strong> WHERE **</p>
+<p>可以看到SQL线程一直在执行UPDATE操作，注意到 Time 的值是 3293，看起来像是这个UPDATE操作执行了3293秒，一个普通的SQL而已，肯定不至于需要这么久。<br>实际上，在REPLICATION进程中，Time 这列的值可能有几种情况：<br>   1）SQL线程当前执行的binlog（实际上是relay log）中的timestamp和IO线程最新的timestamp的差值，这就是通常大家认为的 Seconds_Behind_Master 值，并不是某个SQL的实际执行耗时；<br>   2）SQL线程当前如果没有活跃SQL在执行的话，Time值就是SQL线程的idle time；<br>而IO线程的Time值则是该线程自从启动以来的总时长（多少秒），如果系统时间在IO线程启动后发生修改的话，可能会导致该Time值异常，比如变成负数，或者非常大。<br>来看下面几个状态：<br>设置pager，只查看关注的几个status值<br>mysql&gt; pager cat | egrep -i ‘system user|Exec_Master_Log_Pos|Seconds_Behind_Master|Read_Master_Log_Pos’;</p>
+<p>这是没有活跃SQL的情况，Time值是idle time，并且 Seconds_Behind_Master 为 0<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004245 | Waiting for master to send event | NULL |<br>| 7 | system user | | NULL | Connect | 13 | Has read all relay log;**<br>Read_Master_Log_Pos: 445167889<br>Exec_Master_Log_Pos: 445167889<br>Seconds_Behind_Master: 0</p>
+<p>多执行几次，看下是否有活跃的SQL<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004248 | Waiting for master to send event | NULL |<br>| 7 | system user | | NULL | Connect | 16 | Has read all relay log;**<br>Read_Master_Log_Pos: 445167889<br>Exec_Master_Log_Pos: 445167889<br>Seconds_Behind_Master: 0</p>
+<p>发现有活跃SQL了，Time值是和 Seconds_Behind_Master 一样，即SQL线程比IO线程“慢”了1秒<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004252 | Waiting for master to send event | NULL |<br>| 7 | system user | | floweradmin | Connect | 1 | Updating | update **<br>Read_Master_Log_Pos: 445182239<br>Exec_Master_Log_Pos: 445175263<br>Seconds_Behind_Master: 1</p>
+<p>再次查看下状态<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004254 | Waiting for master to send event | NULL |<br>| 7 | system user | | floweradmin | Connect | 1 | Updating | update **<br>Read_Master_Log_Pos: 445207174<br>Exec_Master_Log_Pos: 445196837<br>Seconds_Behind_Master: 1<br>检查到此，可以说下如何正确判断slave的延迟情况：<br>1）首先看 Relay_Master_Log_File 和 Master_Log_File 是否有差异；<br>2）如果Relay_Master_Log_File 和 Master_Log_File 是一样的话，再来看Exec_Master_Log_Pos 和 Read_Master_Log_Pos 的差异，对比SQL线程比IO线程慢了多少个binlog事件；<br>3）如果Relay_Master_Log_File 和 Master_Log_File 不一样，那说明延迟可能较大，需要从MASTER上取得binlog status，判断当前的binlog和MASTER上的差距；</p>
+<p>因此，相对更加严谨的做法是：<br>在第三方监控节点上，对MASTER和slave同时发起SHOW BINARY LOGS和SHOW slave STATUS\G的请求，最后判断二者binlog的差异，以及 Exec_Master_Log_Pos 和Read_Master_Log_Pos 的差异。</p>
+<p>例如：<br>在MASTER上执行SHOW BINARY LOGS 的结果是：<br>+——————+————–+<br>| Log_name | File_size |<br>+——————+————–+<br>| mysql-bin.000009 | 1073742063 |<br>| mysql-bin.000010 | 107374193 |<br>+——————+————–+<br>而在slave上执行SHOW slave STATUS\G 的结果是：</p>
+<p>Master_Log_File: mysql-bin.000009<br>Read_Master_Log_Pos: 668711237<br>Relay_Master_Log_File: mysql-bin.000009<br>slave_IO_Running: Yes<br>slave_SQL_Running: Yes</p>
+<hr>
+<p>Exec_Master_Log_Pos: 654409041</p>
+<hr>
+<p>Seconds_Behind_Master: 3296</p>
+<hr>
+<p>这时候，slave实际的延迟应该是：<br>mysql-bin.000009 这个binlog中的binlog position 1073742063 和 slave上读取到的binlog position之间的差异延迟，即：<br>1073742063 - 654409041 = 419333022 个binlog event<br>并且还要加上 mysql-bin.000010这个binlog已经产生的107374193个binlog event，共<br>107374193 + 419333022 = 526707215 个binlog event</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-mysql主从同步(3)-percona-toolkit工具_使用梳理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:53:16.263Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在mysql工作中接触最多的就是mysql replication，mysql在复制方面还是会有一些常规问题，比如主库宕机或者从库宕机有可能会导致复制中断，通常需要进行人为修复，或者很多时候需要把一个从库提升为主库，但对从库和主库的数据一致性不能保证一样。这种情况下就需要使用percona-toolkit工具的pt-table-checksum组件来检查主从数据的一致性；如果发现不一致的数据，可以通过pt-table-sync修复；还可以通过pt-heartbeat监控主从复制延迟。当然如果数据量小，slave只是当做一个备份使用，那么出现数据不一致完全可以重做，或者通过其他方法解决。如果数据量非常大，重做就是非常蛋碎的一件事情了。比如说，线上数据库做了主从同步环境，数据库在进行了迁移后，需要对mysql迁移（Replication）后的数据一致性进行校验，但又不能对生产环境使用造成影响，pt-table-checksum成为了绝佳也是唯一的检查工具。</p>
+<p>percona-toolkit介绍<br>percona-toolkit是一组高级命令行工具的集合，用来执行各种通过手工执行非常复杂和麻烦的mysql和系统任务，这些任务包括：<br>   1）检查master和slave数据的一致性<br>   2）有效地对记录进行归档<br>   3）查找重复的索引<br>   4）对服务器信息进行汇总<br>   5）分析来自日志和tcpdump的查询<br>   6）当系统出问题的时候收集重要的系统信息<br>percona-toolkit源自Maatkit和Aspersa工具，这两个工具是管理mysql的最有名的工具。不过，现在Maatkit工具已经不维护了，所以以后推荐还是使用percona-toolkit工具！<br>这些工具主要包括开发、性能、配置、监控、复制、系统、实用六大类，作为一个优秀的DBA，里面有的工具非常有用，如果能掌握并加以灵活应用，将能极大的提高工作效率。</p>
+<p>percona-toolkit工具中最主要的三个组件分别是：<br>   1）pt-table-checksum 负责监测mysql主从数据一致性<br>   2）pt-table-sync 负责当主从数据不一致时修复数据，让它们保存数据的一致性<br>   3）pt-heartbeat 负责监控mysql主从同步延迟<br>下面就对这三个组件的使用做一记录，当然percona-toolkit工具也有很多其他组件，后面会一一说明。</p>
+<p>percona-toolkit工具安装（建议主库和从库服务器上都安装）<br>软件下载并在主库服务器上安装 [百度云盘下载地址：<a href="https://pan.baidu.com/s/1bp1OOgf" target="_blank" rel="noopener">https://pan.baidu.com/s/1bp1OOgf</a>   （提取密码：y462）]<br>[root@master-server src]# wget <a href="https://www.percona.com/downloads/percona-toolkit/2.2.7/RPM/percona-toolkit-2.2.7-1.noarch.rpm" target="_blank" rel="noopener">https://www.percona.com/downloads/percona-toolkit/2.2.7/RPM/percona-toolkit-2.2.7-1.noarch.rpm</a><br>[root@master-server src]# rpm -ivh percona-toolkit-2.2.7-1.noarch.rpm     //安装后，percona-toolkit工具的各个组件命令就有有了（输入ht-，按TAB键就会显示）</p>
+<p>安装该工具依赖的软件包<br>[root@master-server src]# yum install perl-IO-Socket-SSL perl-DBD-MySQL perl-Time-HiRes perl perl-DBI -y</p>
+<p>一、pt-table-checksum使用梳理<br>pt-table-checksum 是 Percona-Toolkit的组件之一，用于检测MySQL主、从库的数据是否一致。其原理是在主库执行基于statement的sql语句来生成主库数据块的checksum，把相同的sql语句传递到从库执行，并在从库上计算相同数据块的checksum，最后，比较主从库上相同数据块的checksum值，由此判断主从数据是否一致。检测过程根据唯一索引将表按row切分为块（chunk），以为单位计算，可以避免锁表。检测时会自动判断复制延迟、 master的负载， 超过阀值后会自动将检测暂停，减小对线上服务的影响。<br>pt-table-checksum 默认情况下可以应对绝大部分场景，官方说，即使上千个库、上万亿的行，它依然可以很好的工作，这源自于设计很简单，一次检查一个表，不需要太多的内存和多余的操作；必要时，pt-table-checksum 会根据服务器负载动态改变 chunk 大小，减少从库的延迟。</p>
+<p>为了减少对数据库的干预，pt-table-checksum还会自动侦测并连接到从库，当然如果失败，可以指定–recursion-method选项来告诉从库在哪里。它的易用性还体现在，复制若有延迟，在从库 checksum 会暂停直到赶上主库的计算时间点（也通过选项–设定一个可容忍的延迟最大值，超过这个值也认为不一致）。</p>
+<p>为了保证主数据库服务的安全，该工具实现了许多保护措施：<br>    1）自动设置 innodb_lock_wait_timeout 为1s，避免引起<br>    2）默认当数据库有25个以上的并发查询时，pt-table-checksum会暂停。可以设置 –max-load 选项来设置这个阀值<br>    3）当用 Ctrl+C 停止任务后，工具会正常的完成当前 chunk 检测，下次使用 –resume 选项启动可以恢复继续下一个 chunk</p>
+<p>pt-table-checksum [OPTIONS] [DSN]<br>pt-table-checksum：在主（master）上通过执行校验的查询对复制的一致性进行检查，对比主从的校验值，从而产生结果。DSN指向的是主的地址，该工具的退出状态不为零，如果发现有任何差别，或者如果出现任何警告或错误。注意：第一次运行的时候需要加上–create-replicate-table参数，生成checksums表！！如果不加这个参数，那么就需要在对应库下手工添加这张表了,表结构SQL如下：</p>
+<p>CREATE TABLE checksums (<br>   db             char(64)     NOT NULL,<br>   tbl            char(64)     NOT NULL,<br>   chunk          int          NOT NULL,<br>   chunk_time     float            NULL,<br>   chunk_index    varchar(200)     NULL,<br>   lower_boundary text             NULL,<br>   upper_boundary text             NULL,<br>   this_crc       char(40)     NOT NULL,<br>   this_cnt       int          NOT NULL,<br>   master_crc     char(40)         NULL,<br>   master_cnt     int              NULL,<br>   ts             timestamp    NOT NULL,<br>   PRIMARY KEY (db, tbl, chunk),<br>   INDEX ts_db_tbl (ts, db, tbl)<br>) ENGINE=InnoDB;<br>常用参数解释：<br>–nocheck-replication-filters ：不检查复制过滤器，建议启用。后面可以用–databases来指定需要检查的数据库。<br>–no-check-binlog-format : 不检查复制的binlog模式，要是binlog模式是ROW，则会报错。<br>–replicate-check-only :只显示不同步的信息。<br>–replicate= ：把checksum的信息写入到指定表中，建议直接写到被检查的数据库当中。<br>–databases= ：指定需要被检查的数据库，多个则用逗号隔开。<br>–tables= ：指定需要被检查的表，多个用逗号隔开<br>h= ：Master的地址<br>u= ：用户名<br>p=：密码<br>P= ：端口</p>
+<p>最重要的一点就是：<br>要在主库上授权，能让主库ip访问。这一点不能忘记！（实验证明从库上可以不授权，但最好还是从库也授权）<br>注意：<br>1）根据测试，需要一个即能登录主库，也能登录从库的账号；<br>2）只能指定一个host，必须为主库的IP；<br>3）在检查时会向表加S锁；<br>4）运行之前需要从库的同步IO和SQL进程是YES状态。</p>
+<p>例如：（本文例子中：192.168.1.101是主库ip，192.168.1.102是从库ip）<br>在主库执行授权（一定要对主库ip授权，授权的用户名和密码可以自行定义，不过要保证这个权限能同时登陆主库和从库）<br>mysql&gt; GRANT SELECT, PROCESS, SUPER, REPLICATION SLAVE,CREATE,DELETE,INSERT,UPDATE ON <em>.</em> TO ‘root’@’192.168.1.101’ identified by ‘123456’;<br>mysql&gt; flush privileges;</p>
+<p>在从库上执行授权<br>mysql&gt; GRANT SELECT, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY ‘123456’;<br>mysql&gt; flush privileges;</p>
+<p>如下，在主库上执行的一个检查主从数据一致性的命令（别忘了第一次运行的时候需要添加–create-replicate-table参数，后续再运行时就不需要加了）：<br>下面命令中的192.168.1.101是主库ip<br>检查的是huanqiu库下的haha表的数据（当然，命令中也可以不跟表，直接检查某整个库的数据；如下去掉–tables=haha表，直接检查huanqiu库的数据）<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –create-replicate-table –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<p>Diffs cannot be detected because no slaves were found.  Please read the –recursion-method documentation for information.<br>            TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE<br>01-08T04:04:54      0      0        4       1       0   0.009 huanqiu.haha<br>上面有报错：<br>Diffs cannot be detected because no slaves were found. Please read the –recursion-method documentation for information<br>上面的提示信息很清楚，因为找不到从，所以执行失败，提示用参数–recursion-method 可以指定模式解决。<br>其实是因为从库的slave关闭了。<br>在主库上执行：</p>
+<p>mysql&gt; show processlist;<br>+—-+——+———–+——+———+——+——-+——————+<br>| Id | User | Host      | db   | Command | Time | State | Info             |<br>+—-+——+———–+——+———+——+——-+——————+<br>| 10 | root | localhost | NULL | Query   |    0 | init  | show processlist |<br>+—-+——+———–+——+———+——+——-+——————+<br>发现没有slave在运行。</p>
+<p>在从库上开启slave<br>mysql&gt; start slave;<br>mysql&gt; show slave status\G;</p>
+<p>再在主库上执行：</p>
+<p>mysql&gt; show processlist;<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>| Id | User  | Host                | db   | Command     | Time | State                                                                 | Info             |<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>| 10 | root  | localhost           | NULL | Query       |    0 | init                                                                  | show processlist |<br>| 18 | slave | 192.168.1.102:37115 | NULL | Binlog Dump |    5 | Master has sent all binlog to slave; waiting for binlog to be updated | NULL             |<br>+—-+——-+———————+——+————-+——+———————————————————————–+——————+<br>发现已有slave在运行。</p>
+<p>再次执行检查命令：<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<pre><code>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
+</code></pre><p>01-08T04:11:03      0      0        4       1       0   1.422 huanqiu.haha<br>解释：<br>TS ：完成检查的时间。<br>ERRORS ：检查时候发生错误和警告的数量。<br>DIFFS ：0表示一致，1表示不一致。当指定–no-replicate-check时，会一直为0，当指定–replicate-check-only会显示不同的信息。<br>ROWS ：表的行数。<br>CHUNKS ：被划分到表中的块的数目。<br>SKIPPED ：由于错误或警告或过大，则跳过块的数目。<br>TIME ：执行的时间。<br>TABLE ：被检查的表名。</p>
+<p>二、pt-table-sync用法梳理<br>如果通过pt-table-checksum 检查找到了不一致的数据表，那么如何同步数据呢？即如何修复MySQL主从不一致的数据，让他们保持一致性呢？<br>这时候可以利用另外一个工具pt-table-sync。<br>使用方法：<br>pt-table-sync: 高效的同步MySQL表之间的数据，他可以做单向和双向同步的表数据。他可以同步单个表，也可以同步整个库。它不同步表结构、索引、或任何其他模式对象。所以在修复一致性之前需要保证他们表存在。</p>
+<p>假如上面检查数据时发现主从不一致<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<p>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE<br>01-08T04:18:07      0      1        4       1       0   0.843 huanqiu.haha<br>现在需要DIFFS为1可知主从数据不一致，需要修复！修复命令如下：<br>先master的ip，用户，密码，然后是slave的ip，用户，密码<br>[root@master-server ~]# pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print</p>
+<p>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘1’, ‘wangshibo’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘2’, ‘wangshikui’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘3’, ‘limeng’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>REPLACE INTO <code>huanqiu</code>.<code>haha</code>(<code>id</code>, <code>name</code>) VALUES (‘4’, ‘wanghi’) /<em>percona-toolkit src_db:huanqiu src_tbl:haha src_dsn:h=192.168.1.101,p=…,u=root dst_db:huanqiu dst_tbl:haha dst_dsn:h=192.168.1.102,p=…,u=root lock:1 transaction:1 changing_src:huanqiu.checksums replicate:huanqiu.checksums bidirectional:0 pid:23676 user:root host:master-server</em>/;<br>参数解释：<br>–replicate= ：指定通过pt-table-checksum得到的表，这2个工具差不多都会一直用。<br>–databases= : 指定执行同步的数据库。<br>–tables= ：指定执行同步的表，多个用逗号隔开。<br>–sync-to-master ：指定一个DSN，即从的IP，他会通过show processlist或show slave status 去自动的找主。<br>h= ：服务器地址，命令里有2个ip，第一次出现的是Master的地址，第2次是Slave的地址。<br>u= ：帐号。<br>p= ：密码。<br>–print ：打印，但不执行命令。<br>–execute ：执行命令。</p>
+<p>上面命令介绍完了，接下来开始执行修复：<br>通过（–print）打印出来了修复数据的sql语句，可以手动的在slave从库上执行，让他们数据保持一致性，这样比较麻烦！<br>可以直接在master主库上执行修复操作，通过–execute参数，如下：<br>[root@master-server ~]# pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute</p>
+<p>如上修复后，再次检查，发现主从库数据已经一致了！<br>[root@master-server ~]# pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu –tables=haha h=192.168.1.101,u=root,p=123456,P=3306</p>
+<pre><code>TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
+</code></pre><h2 id="01-08T04-36-43-0-0-4-1-0-0-040-huanqiu-haha"><a href="#01-08T04-36-43-0-0-4-1-0-0-040-huanqiu-haha" class="headerlink" title="01-08T04:36:43      0      0        4       1       0   0.040 huanqiu.haha"></a>01-08T04:36:43      0      0        4       1       0   0.040 huanqiu.haha</h2><p>建议:<br>修复数据的时候，最好还是用–print打印出来的好，这样就可以知道那些数据有问题，可以人为的干预下。<br>不然直接执行了，出现问题之后更不好处理。总之还是在处理之前做好数据的备份工作。</p>
+<p>注意：要是表中没有唯一索引或则主键则会报错：</p>
+<h2 id="Can’t-make-changes-on-the-master-because-no-unique-index-exists-at-usr-local-bin-pt-table-sync-line-10591"><a href="#Can’t-make-changes-on-the-master-because-no-unique-index-exists-at-usr-local-bin-pt-table-sync-line-10591" class="headerlink" title="Can’t make changes on the master because no unique index exists at /usr/local/bin/pt-table-sync line 10591."></a>Can’t make changes on the master because no unique index exists at /usr/local/bin/pt-table-sync line 10591.</h2><p>为了确保主从数据的一致性，可以编写监控脚本，定时检查。当检查到主从数据不一致时，强制修复数据。<br>[root@master-server ~]# cat /root/pt_huanqiu.sh</p>
+<p>#!/bin/bash<br>NUM=$(/usr/bin/pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanqiu.checksums –databases=huanqiu  h=192.168.1.101,u=root,p=123456,P=3306|awk -F” “ ‘{print $3}’|sed -n ‘2p’)<br>if [ $NUM -eq 1 ];then<br>  /usr/bin/pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print<br>  /usr/bin/pt-table-sync –replicate=huanqiu.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute<br>else<br>  echo “data is ok”<br>fi<br>[root@master-server ~]# cat /root/pt_huanpc.sh </p>
+<p>#!/bin/bash<br>NUM=$(/usr/bin/pt-table-checksum –nocheck-replication-filters –no-check-binlog-format –replicate=huanpc.checksums –databases=huanpc  h=192.168.1.101,u=root,p=123456,P=3306|awk -F” “ ‘{print $3}’|sed -n ‘2p’)<br>if [ $NUM -eq 1 ];then<br>  /usr/bin/pt-table-sync –replicate=huanpc.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –print<br>  /usr/bin/pt-table-sync –replicate=huanpc.checksums h=192.168.1.101,u=root,p=123456 h=192.168.1.102,u=root,p=123456 –execute<br>else<br>  echo “data is ok”<br>fi<br>[root@master-server ~]# crontab -l</p>
+<p>#检查主从huanqiu库数据一致性</p>
+<ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 10;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 20;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 30;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 40;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 50;/bin/bash -x /root/pt_huanqiu.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>#检查主从huanpc库数据一致性</p>
+<ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>/bin/bash -x /root/root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 10;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 20;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 30;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 40;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li><ul>
+<li><ul>
+<li>sleep 50;/bin/bash -x /root/pt_huanpc.sh &gt; /dev/null 2&gt;&amp;1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>最后总结：<br>pt-table-checksum和pt-table-sync工具很给力，工作中常常在使用。注意使用该工具需要授权，一般SELECT, PROCESS, SUPER, REPLICATION SLAVE等权限就已经足够了。</p>
+<hr>
+<p>另外说一个问题：<br>在上面的操作中，在主库里添加pt-table-checksum检查的权限（从库可以不授权）后，进行数据一致性检查操作，会在操作的库（实例中是huanqiu、huanpc）下产生一个checksums表！<br>这张checksums表是pt-table-checksum检查过程中产生的。这张表一旦产生了，默认是删除不了的，并且这张表所在的库也默认删除不了，删除后过一会儿就又会出来。</p>
+<p>mysql&gt; use huanqiu;<br>Reading table information for completion of table and column names<br>You can turn off this feature to get a quicker startup with -A</p>
+<p>Database changed<br>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| haha              |<br>+——————-+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; show tables;         //过一段时间再次查看，发现checksums表还在<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>不仅这张表删除不了，这张表所在的库也删除不了，删除后过一会儿就是自动生成。<br>mysql&gt; drop database huanqiu;<br>Query OK, 1 row affected (0.01 sec)</p>
+<p>mysql&gt; drop database huanpc;<br>Query OK, 1 row affected (0.02 sec)</p>
+<p>mysql&gt; show databases;<br>+——————–+<br>| Database           |<br>+——————–+<br>| information_schema |<br>| huanqiu            |<br>| mysql              |<br>| performance_schema |<br>| test               |<br>+——————–+<br>5 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop database huanqiu;<br>Query OK, 1 row affected (0.01 sec)</p>
+<p>mysql&gt; show databases;<br>+——————–+<br>| Database           |<br>+——————–+<br>| information_schema |<br>| huanpc             |<br>| huanqiu            |<br>| mysql              |<br>| performance_schema |<br>| test               |<br>+——————–+<br>6 rows in set (0.00 sec)<br>要想删除的话，一定要先把pt-table-checksum检查前添加的权限收回！</p>
+<p>mysql&gt; show grants for ‘root’@’192.168.1.101’;<br>+————————————————————————————————————————————————————————————-+<br>| Grants for root@192.168.1.101                                                                                                                                                       |<br>+————————————————————————————————————————————————————————————-+<br>| GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY PASSWORD ‘*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9’ |<br>+————————————————————————————————————————————————————————————-+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; revoke SELECT, INSERT, UPDATE, DELETE, CREATE, PROCESS, SUPER, REPLICATION SLAVE ON <em>.</em> FROM ‘root’@’192.168.1.101’;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show grants for ‘root’@’192.168.1.101’;<br>+—————————————————————————————————————–+<br>| Grants for root@192.168.1.101                                                                                   |<br>+—————————————————————————————————————–+<br>| GRANT USAGE ON <em>.</em> TO ‘root’@’192.168.1.101’ IDENTIFIED BY PASSWORD ‘*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9’ |<br>+—————————————————————————————————————–+<br>1 row in set (0.00 sec)</p>
+<p>mysql&gt; select user,host,password from mysql.user;<br>+——-+—————+——————————————-+<br>| user  | host          | password                                  |<br>+——-+—————+——————————————-+<br>| root  | localhost     | <em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| root  | master-server |                                           |<br>| root  | 127.0.0.1     |                                           |<br>| root  | ::1           |                                           |<br>|       | localhost     |                                           |<br>|       | master-server |                                           |<br>| root  | 192.168.1.101 | </em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| slave | 192.168.1.102 | *4F0FF134CC4C1A2872D972373A6AA86CA0A81872 |<br>+——-+—————+——————————————-+<br>8 rows in set (0.00 sec)</p>
+<p>mysql&gt; delete from mysql.user where user=”root” and host=”192.168.1.101”;   //这一步其实不必操作，此步删除操作不能在上面revoke执行前进行，否则revoke回收权限失败！<br>Query OK, 1 row affected (0.00 sec)</p>
+<p>mysql&gt; select user,host,password from mysql.user;<br>+——-+—————+——————————————-+<br>| user  | host          | password                                  |<br>+——-+—————+——————————————-+<br>| root  | localhost     | <em>6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |<br>| root  | master-server |                                           |<br>| root  | 127.0.0.1     |                                           |<br>| root  | ::1           |                                           |<br>|       | localhost     |                                           |<br>|       | master-server |                                           |<br>| slave | 192.168.1.102 | </em>4F0FF134CC4C1A2872D972373A6AA86CA0A81872 |<br>+——-+—————+——————————————-+<br>7 rows in set (0.00 sec)<br>权限删除后，就能成功删除checksums这张表和它所在的库了！<br>主库的checksums删除了，从库的这张表也会跟着删除</p>
+<p>mysql&gt; use huanpc;<br>Database changed<br>mysql&gt; show tables;<br>+——————+<br>| Tables_in_huanpc |<br>+——————+<br>| checksums        |<br>| heihei           |<br>+——————+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.01 sec)</p>
+<p>mysql&gt; show tables;<br>+——————+<br>| Tables_in_huanpc |<br>+——————+<br>| heihei           |<br>+——————+<br>1 row in set (0.01 sec)</p>
+<p>mysql&gt; use huanqiu;<br>Reading table information for completion of table and column names<br>You can turn off this feature to get a quicker startup with -A</p>
+<p>Database changed<br>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| checksums         |<br>| haha              |<br>+——————-+<br>2 rows in set (0.00 sec)</p>
+<p>mysql&gt; drop table checksums;<br>Query OK, 0 rows affected (0.00 sec)</p>
+<p>mysql&gt; show tables;<br>+——————-+<br>| Tables_in_huanqiu |<br>+——————-+<br>| haha              |<br>+——————-+<br>1 row in set (0.00 sec)<br>也就是说，checksums表一旦产生，不仅这张表默认删除不了，连同它所在的库，要是想删除它们，只能如上操作先撤销权限。<br>pt-heartbeat监控mysql主从复制延迟整理</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/mysql主从同步(3)-percona-toolkit工具_使用梳理/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Mysql主从同步(1)-主从_主主环境部署梳理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -845,111 +1225,6 @@ oe=off
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-通过Dockerfile创建Mysql服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>创建Mysql服务的Centos Docker镜像<br>一、准备dockerfile<br>mkdir mysql_centos<br>cd mysql_centos<br>cat Dockerfile<br>FROM nginx_dockerfile:centos<br>RUN yum -y install gcc gcc-c++ make automake cmake<br>RUN groupadd mysql; useradd -r -M -u 39 -s /sbin/nologin -g mysql mysql<br>RUN mkdir /usr/local/mysql; mkdir /data/mysql/db -p<br>RUN yum install gcc gcc-c++ ncurses-devel bison bison-devel -y<br>RUN wget <a href="http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz" target="_blank" rel="noopener">http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz</a><br>RUN tar zxf mysql-5.6.29.tar.gz -C /usr/src/<br>WORKDIR /usr/src/mysql-5.6.29<br>RUN cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/db -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DEXTRA_CHARSETS=all -DDEFAULT_COLLATION=utf8_general_ci -DWITH-MYSQLD-LDFLAGS=-all-static -DWITH-CLIENT-LD-FLAGS=-all-static -DWITH_DEBUG=0 &amp;&amp; gmake &amp;&amp; gmake install<br>RUN chown -R root:mysql /usr/local/mysql/ &amp;&amp; chown -R mysql:mysql /data/mysql/db/<br>RUN chmod 775 /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh<br>RUN /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh –basedir=/usr/local/mysql –datadir=/data/mysql/db –no-defaults –user=mysql<br>RUN cp /usr/src/mysql-5.6.29/support-files/my-default.cnf /etc/my.cnf<br>RUN cp /usr/src/mysql-5.6.29/support-files/mysql.server /etc/init.d/mysqld<br>RUN chmod -R 775 /etc/init.d/mysqld &amp;&amp; /etc/init.d/mysqld start<br>RUN echo -e ‘#!/bin/bash\nexport PATH=$PATH:/usr/local/mysql/bin’ &gt;/etc/profile.d/mysql.sh<br>RUN source /etc/profile</p>
-<p>二、根据Dockerfile生成镜像<br>docker build -t mysql_dockerfile:nginx_dockerfile .</p>
-<p>docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>mysql_dockerfile    nginx_dockerfile    e8fcca4ad7b0        11 minutes ago      5.54GB<br>nginx_dockerfile    centos              28d333149027        3 days ago          692MB<br>nginx               centos              bb2863c49d58        3 days ago          586MB<br>sshd-centos         latest              0742cfe06535        3 days ago          328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-通过Dockerfile创建JDK8的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>通过Dockerfile创建JDK8的CentOS镜像<br>[root@node4 ~]# mkdir jdk8_centos<br>[root@node4 ~]# cd jdk8_centos/<br>准备jdk安装包<br>[root@node4 jdk8_centos]# ls<br>Dockerfile  server-jre-8u152-linux-x64.tar.gz<br>[root@node4 jdk8_centos]# vim Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM sshd_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#添加jdk安装包<br>RUN mkdir /usr/java<br>ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</p>
-<p>#安装jdk<br>RUN sed -i ‘$a\export LANG=en_US.UTF-8’ /etc/profile<br>RUN sed -i ‘$a\JAVA_HOME=/usr/java/jdk1.8.0_152’ /etc/profile<br>RUN sed -i ‘$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre’ /etc/profile<br>RUN sed -i ‘$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin’ /etc/profile<br>RUN sed -i ‘$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib’ /etc/profile<br>RUN sed -i ‘$a\export JAVA_HOME JRE_HOME PATH CLASSPATH’ /etc/profile</p>
-<p>#开放窗口的22端口<br>EXPOSE 22</p>
-<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>[root@node4 jdk8_centos]# docker build -t jdk8_dockerfile .<br>[root@node4 jdk8_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 jdk8_centos]# docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">展开全文 >></a>
         </p>
       
 
