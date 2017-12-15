@@ -137,6 +137,236 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-通过Dockerfile创建Mysql服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:57:12.679Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>创建Mysql服务的Centos Docker镜像<br>一、准备dockerfile<br>mkdir mysql_centos<br>cd mysql_centos<br>cat Dockerfile<br>FROM nginx_dockerfile:centos<br>RUN yum -y install gcc gcc-c++ make automake cmake<br>RUN groupadd mysql; useradd -r -M -u 39 -s /sbin/nologin -g mysql mysql<br>RUN mkdir /usr/local/mysql; mkdir /data/mysql/db -p<br>RUN yum install gcc gcc-c++ ncurses-devel bison bison-devel -y<br>RUN wget <a href="http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz" target="_blank" rel="noopener">http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz</a><br>RUN tar zxf mysql-5.6.29.tar.gz -C /usr/src/<br>WORKDIR /usr/src/mysql-5.6.29<br>RUN cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/db -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DEXTRA_CHARSETS=all -DDEFAULT_COLLATION=utf8_general_ci -DWITH-MYSQLD-LDFLAGS=-all-static -DWITH-CLIENT-LD-FLAGS=-all-static -DWITH_DEBUG=0 &amp;&amp; gmake &amp;&amp; gmake install<br>RUN chown -R root:mysql /usr/local/mysql/ &amp;&amp; chown -R mysql:mysql /data/mysql/db/<br>RUN chmod 775 /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh<br>RUN /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh –basedir=/usr/local/mysql –datadir=/data/mysql/db –no-defaults –user=mysql<br>RUN cp /usr/src/mysql-5.6.29/support-files/my-default.cnf /etc/my.cnf<br>RUN cp /usr/src/mysql-5.6.29/support-files/mysql.server /etc/init.d/mysqld<br>RUN chmod -R 775 /etc/init.d/mysqld &amp;&amp; /etc/init.d/mysqld start<br>RUN echo -e ‘#!/bin/bash\nexport PATH=$PATH:/usr/local/mysql/bin’ &gt;/etc/profile.d/mysql.sh<br>RUN source /etc/profile</p>
+<p>二、根据Dockerfile生成镜像<br>docker build -t mysql_dockerfile:nginx_dockerfile .</p>
+<p>docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>mysql_dockerfile    nginx_dockerfile    e8fcca4ad7b0        11 minutes ago      5.54GB<br>nginx_dockerfile    centos              28d333149027        3 days ago          692MB<br>nginx               centos              bb2863c49d58        3 days ago          586MB<br>sshd-centos         latest              0742cfe06535        3 days ago          328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建JDK8的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:56:28.681Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建JDK8的CentOS镜像<br>[root@node4 ~]# mkdir jdk8_centos<br>[root@node4 ~]# cd jdk8_centos/<br>准备jdk安装包<br>[root@node4 jdk8_centos]# ls<br>Dockerfile  server-jre-8u152-linux-x64.tar.gz<br>[root@node4 jdk8_centos]# vim Dockerfile</p>
+<p>#生成的新镜像以centos镜像为基础<br>FROM sshd_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
+<p>#升级系统<br>RUN yum -y update</p>
+<p>#添加jdk安装包<br>RUN mkdir /usr/java<br>ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</p>
+<p>#安装jdk<br>RUN sed -i ‘$a\export LANG=en_US.UTF-8’ /etc/profile<br>RUN sed -i ‘$a\JAVA_HOME=/usr/java/jdk1.8.0_152’ /etc/profile<br>RUN sed -i ‘$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre’ /etc/profile<br>RUN sed -i ‘$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin’ /etc/profile<br>RUN sed -i ‘$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib’ /etc/profile<br>RUN sed -i ‘$a\export JAVA_HOME JRE_HOME PATH CLASSPATH’ /etc/profile</p>
+<p>#开放窗口的22端口<br>EXPOSE 22</p>
+<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
+<p>[root@node4 jdk8_centos]# docker build -t jdk8_dockerfile .<br>[root@node4 jdk8_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 jdk8_centos]# docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-mysql主从同步(4)-Slave延迟状态监控" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/">mysql主从同步(4)-Slave延迟状态监控</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:53:42.363Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前部署了mysql主从同步环境（Mysql主从同步(1)-主从/主主环境部署梳理），针对主从同步过程中slave延迟状态的监控梳理如下：</p>
+<p>在mysql日常维护工作中，对于主从复制的监控主要体现在：<br>1）检查数据是否一致；主从数据不同步时，参考下面两篇文档记录进行数据修复：<br>mysql主从同步(3)-percona-toolkit工具-使用梳理<br>利用mk-table-checksum监测Mysql主从数据一致性操作记录</p>
+<p>2）监控主从同步延迟，同步延迟的检查工作主要从下面两方面着手：<br>1.一般的做法就是根据Seconds_Behind_Master的值来判断slave的延迟状态。<br>可以通过监控show slave status\G命令输出的Seconds_Behind_Master参数的值来判断，是否有发生主从延时。</p>
+<p>mysql&gt; show slave status\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Slave_IO_State: Waiting for master to send event<br>Master_Host: 192.168.1.101<br>Master_User: slave<br>Master_Port: 3306<br>Connect_Retry: 60<br>Master_Log_File: mysql-bin.000004<br>Read_Master_Log_Pos: 761249<br>Relay_Log_File: mysql-relay-bin.000008<br>Relay_Log_Pos: 761408<br>Relay_Master_Log_File: mysql-bin.000004<br>Slave_IO_Running: Yes<br>Slave_SQL_Running: Yes<br>Replicate_Do_DB: huanqiu,huanpc<br>Replicate_Ignore_DB: mysql<br>Replicate_Do_Table:<br>Replicate_Ignore_Table:<br>Replicate_Wild_Do_Table:<br>Replicate_Wild_Ignore_Table:<br>Last_Errno: 0<br>Last_Error:<br>Skip_Counter: 0<br>Exec_Master_Log_Pos: 761249<br>Relay_Log_Space: 761620<br>Until_Condition: None<br>Until_Log_File:<br>Until_Log_Pos: 0<br>Master_SSL_Allowed: No<br>Master_SSL_CA_File:<br>Master_SSL_CA_Path:<br>Master_SSL_Cert:<br>Master_SSL_Cipher:<br>Master_SSL_Key:<br>Seconds_Behind_Master: 0<br>Master_SSL_Verify_Server_Cert: No<br>Last_IO_Errno: 0<br>Last_IO_Error:<br>Last_SQL_Errno: 0<br>Last_SQL_Error:<br>Replicate_Ignore_Server_Ids:<br>Master_Server_Id: 101<br>Master_UUID: b667a58f-d6e0-11e6-8c0a-fa163e2d66ac<br>Master_Info_File: /data/mysql/data/master.info<br>SQL_Delay: 0<br>SQL_Remaining_Delay: NULL<br>Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it<br>Master_Retry_Count: 86400<br>Master_Bind:<br>Last_IO_Error_Timestamp:<br>Last_SQL_Error_Timestamp:<br>Master_SSL_Crl:<br>Master_SSL_Crlpath:<br>Retrieved_Gtid_Set:<br>Executed_Gtid_Set:<br>Auto_Position: 0<br>1 row in set (0.00 sec)</p>
+<p>ERROR:<br>No query specified<br>以上是show slave status\G的输出结果，需要监控下面三个参数：<br>   1）Slave_IO_Running：该参数可作为io_thread的监控项，Yes表示io_thread的和主库连接正常并能实施复制工作，No则说明与主库通讯异常，多数情况是由主从间网络引起的问题；<br>   2）Slave_SQL_Running：该参数代表sql_thread是否正常，YES表示正常，NO表示执行失败，具体就是语句是否执行通过，常会遇到主键重复或是某个表不存在。<br>   3）Seconds_Behind_Master：是通过比较sql_thread执行的event的timestamp和io_thread复制好的event的timestamp(简写为ts)进行比较，而得到的这么一个差值；<br>        NULL—表示io_thread或是sql_thread有任何一个发生故障，也就是该线程的Running状态是No，而非Yes。<br>        0 — 该值为零，是我们极为渴望看到的情况，表示主从复制良好，可以认为lag不存在。<br>        正值 — 表示主从已经出现延时，数字越大表示从库落后主库越多。</p>
+<pre><code>负值 — 几乎很少见，我只是听一些资深的DBA说见过，其实，这是一个BUG值，该参数是不支持负值的，也就是不应该出现。
+</code></pre><hr>
+<p>Seconds_Behind_Master的计算方式可能带来的问题：</p>
+<h2 id="relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io-thread与sql-thread之间，而io-thread才真正与主库有关联，于是，问题就出来了，当主库I-O负载很大或是网络阻塞，io-thread不能及时复制binlog（没有中断，也在复制），而sql-thread一直都能跟上io-thread的脚本，这时Seconds-Behind-Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io-thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds-Behind-Master这个参数会有负值出现，我们已经知道该值是io-thread的最近跟新的ts与sql-thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。"><a href="#relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io-thread与sql-thread之间，而io-thread才真正与主库有关联，于是，问题就出来了，当主库I-O负载很大或是网络阻塞，io-thread不能及时复制binlog（没有中断，也在复制），而sql-thread一直都能跟上io-thread的脚本，这时Seconds-Behind-Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io-thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds-Behind-Master这个参数会有负值出现，我们已经知道该值是io-thread的最近跟新的ts与sql-thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。" class="headerlink" title="relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io_thread与sql_thread之间，而io_thread才真正与主库有关联，于是，问题就出来了，当主库I/O负载很大或是网络阻塞，io_thread不能及时复制binlog（没有中断，也在复制），而sql_thread一直都能跟上io_thread的脚本，这时Seconds_Behind_Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io_thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds_Behind_Master这个参数会有负值出现，我们已经知道该值是io_thread的最近跟新的ts与sql_thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。"></a>relay-log和主库的bin-log里面的内容完全一样，在记录sql语句的同时会被记录上当时的ts，所以比较参考的值来自于binlog，其实主从没有必要与NTP进行同步，也就是说无需保证主从时钟的一致。其实比较动作真正是发生在io_thread与sql_thread之间，而io_thread才真正与主库有关联，于是，问题就出来了，当主库I/O负载很大或是网络阻塞，io_thread不能及时复制binlog（没有中断，也在复制），而sql_thread一直都能跟上io_thread的脚本，这时Seconds_Behind_Master的值是0，也就是我们认为的无延时，但是，实际上不是，你懂得。这也就是为什么大家要批判用这个参数来监控数据库是否发生延时不准的原因，但是这个值并不是总是不准，如果当io_thread与master网络很好的情况下，那么该值也是很有价值的。之前，提到Seconds_Behind_Master这个参数会有负值出现，我们已经知道该值是io_thread的最近跟新的ts与sql_thread执行到的ts差值，前者始终是大于后者的，唯一的肯能就是某个event的ts发生了错误，比之前的小了，那么当这种情况发生时，负值出现就成为可能。</h2><p>简单来说，就是监控slave同步状态中的：<br>1）Slave_IO_Running、Slave_SQL_Running状态值，如果都为YES，则表示主从同步；反之，主从不同步。<br>2）Seconds_Behind_Master的值，如果为0，则表示主从同步不延时，反之同步延时。</p>
+<p>2.上面根据Seconds_Behind_Master的值来判断slave的延迟状态，这么做在大部分情况下尚可接受，但其实是并不够准确的。对于Slave延迟状态的监控，还应该做到下面的考虑：<br>首先，我们先看下slave的状态：<br>mysql&gt; show slave status\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>slave_IO_State: Waiting for master to send event</p>
+<hr>
+<p>Master_Log_File: mysql-bin.000327<br>Read_Master_Log_Pos: 668711237<br>Relay_Log_File: mysql-relay-bin.002999<br>Relay_Log_Pos: 214736858<br>Relay_Master_Log_File: mysql-bin.000327<br>slave_IO_Running: Yes<br>slave_SQL_Running: Yes</p>
+<hr>
+<p>Skip_Counter: 0<br>Exec_Master_Log_Pos: 654409041<br>Relay_Log_Space: 229039311</p>
+<hr>
+<p>Seconds_Behind_Master: 3296</p>
+<hr>
+<p>可以看到 Seconds_Behind_Master 的值是 3296，也就是slave至少延迟了 3296 秒。</p>
+<p>我们再来看下slave上的2个REPLICATION进程状态：<br>mysql&gt; show full processlist\G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Id: 6<br>User: system user<br>Host:<br>db: NULL<br>Command: Connect<br>Time: 22005006<br>State: Waiting for master to send event<br>Info: NULL<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 2. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>Id: 7<br>User: system user<br>Host:<br>db: NULL<br>Command: Connect<br>Time: 3293<br>State: Updating<br>Info: UPDATE <strong> SET </strong> WHERE **</p>
+<p>可以看到SQL线程一直在执行UPDATE操作，注意到 Time 的值是 3293，看起来像是这个UPDATE操作执行了3293秒，一个普通的SQL而已，肯定不至于需要这么久。<br>实际上，在REPLICATION进程中，Time 这列的值可能有几种情况：<br>   1）SQL线程当前执行的binlog（实际上是relay log）中的timestamp和IO线程最新的timestamp的差值，这就是通常大家认为的 Seconds_Behind_Master 值，并不是某个SQL的实际执行耗时；<br>   2）SQL线程当前如果没有活跃SQL在执行的话，Time值就是SQL线程的idle time；<br>而IO线程的Time值则是该线程自从启动以来的总时长（多少秒），如果系统时间在IO线程启动后发生修改的话，可能会导致该Time值异常，比如变成负数，或者非常大。<br>来看下面几个状态：<br>设置pager，只查看关注的几个status值<br>mysql&gt; pager cat | egrep -i ‘system user|Exec_Master_Log_Pos|Seconds_Behind_Master|Read_Master_Log_Pos’;</p>
+<p>这是没有活跃SQL的情况，Time值是idle time，并且 Seconds_Behind_Master 为 0<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004245 | Waiting for master to send event | NULL |<br>| 7 | system user | | NULL | Connect | 13 | Has read all relay log;**<br>Read_Master_Log_Pos: 445167889<br>Exec_Master_Log_Pos: 445167889<br>Seconds_Behind_Master: 0</p>
+<p>多执行几次，看下是否有活跃的SQL<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004248 | Waiting for master to send event | NULL |<br>| 7 | system user | | NULL | Connect | 16 | Has read all relay log;**<br>Read_Master_Log_Pos: 445167889<br>Exec_Master_Log_Pos: 445167889<br>Seconds_Behind_Master: 0</p>
+<p>发现有活跃SQL了，Time值是和 Seconds_Behind_Master 一样，即SQL线程比IO线程“慢”了1秒<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004252 | Waiting for master to send event | NULL |<br>| 7 | system user | | floweradmin | Connect | 1 | Updating | update **<br>Read_Master_Log_Pos: 445182239<br>Exec_Master_Log_Pos: 445175263<br>Seconds_Behind_Master: 1</p>
+<p>再次查看下状态<br>mysql&gt; show processlist; show slave status\G;<br>| 6 | system user | | NULL | Connect | 22004254 | Waiting for master to send event | NULL |<br>| 7 | system user | | floweradmin | Connect | 1 | Updating | update **<br>Read_Master_Log_Pos: 445207174<br>Exec_Master_Log_Pos: 445196837<br>Seconds_Behind_Master: 1<br>检查到此，可以说下如何正确判断slave的延迟情况：<br>1）首先看 Relay_Master_Log_File 和 Master_Log_File 是否有差异；<br>2）如果Relay_Master_Log_File 和 Master_Log_File 是一样的话，再来看Exec_Master_Log_Pos 和 Read_Master_Log_Pos 的差异，对比SQL线程比IO线程慢了多少个binlog事件；<br>3）如果Relay_Master_Log_File 和 Master_Log_File 不一样，那说明延迟可能较大，需要从MASTER上取得binlog status，判断当前的binlog和MASTER上的差距；</p>
+<p>因此，相对更加严谨的做法是：<br>在第三方监控节点上，对MASTER和slave同时发起SHOW BINARY LOGS和SHOW slave STATUS\G的请求，最后判断二者binlog的差异，以及 Exec_Master_Log_Pos 和Read_Master_Log_Pos 的差异。</p>
+<p>例如：<br>在MASTER上执行SHOW BINARY LOGS 的结果是：<br>+——————+————–+<br>| Log_name | File_size |<br>+——————+————–+<br>| mysql-bin.000009 | 1073742063 |<br>| mysql-bin.000010 | 107374193 |<br>+——————+————–+<br>而在slave上执行SHOW slave STATUS\G 的结果是：</p>
+<p>Master_Log_File: mysql-bin.000009<br>Read_Master_Log_Pos: 668711237<br>Relay_Master_Log_File: mysql-bin.000009<br>slave_IO_Running: Yes<br>slave_SQL_Running: Yes</p>
+<hr>
+<p>Exec_Master_Log_Pos: 654409041</p>
+<hr>
+<p>Seconds_Behind_Master: 3296</p>
+<hr>
+<p>这时候，slave实际的延迟应该是：<br>mysql-bin.000009 这个binlog中的binlog position 1073742063 和 slave上读取到的binlog position之间的差异延迟，即：<br>1073742063 - 654409041 = 419333022 个binlog event<br>并且还要加上 mysql-bin.000010这个binlog已经产生的107374193个binlog event，共<br>107374193 + 419333022 = 526707215 个binlog event</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-mysql主从同步(3)-percona-toolkit工具_使用梳理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -952,227 +1182,6 @@ oe=off
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-zabbix通过jmx监控tomcat" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>一、服务端配置<br>1、安装jdk（版本1.8.0_91）<br>rpm -ivh jdk-8u91-linux-x64.rpm<br>vi /etc/profile<br>最后添加：<br>JAVA_HOME=/usr/java/jdk1.8.0_91<br>CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>export JAVA_HOME<br>export PATH<br>export CLASSPATH</p>
-<p>source /etc/profile<br>安装与配置比较简单，过程省略。执行java -version命令，出现类似界面表示成功。<br>[root@iZ25kscmkn3Z ~]# java -version<br>java version “1.8.0_91”<br>Java(TM) SE Runtime Environment (build 1.8.0_91-b14)<br>Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)</p>
-<p>2、安装Zabbix-Java-gateway<br>cd /usr/src/zabbix-3.0.0/<br>./configure –enable-java -prefix=/usr/local/zabbix/zabbix_java<br>make &amp;&amp; make install</p>
-<p>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>ls<br>bin  lib  settings.sh  shutdown.sh  startup.sh<br>3、修改Java-gateway的配置文件并启动它<br>配置文件路径为/data/zabbix/zabbix_java/sbin/zabbix_java/settings.sh<br>启用以下参数：<br>vi settings.sh<br>LISTEN_IP=”0.0.0.0”<br>LISTEN_PORT=10052<br>START_POLLERS=5</p>
-<p>4、修改zabbix_server的配置文件并重启<br>vi /usr/local/zabbix/etc/zabbix_server.conf<br>JavaGateway=127.0.0.1<br>JavaGatewayPort=10052<br>StartJavaPollers=5</p>
-<p>启动zabbix_java<br>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>./startup.sh<br>重启zabbix_server</p>
-<h1 id="etc-init-d-zabbix-server-restart"><a href="#etc-init-d-zabbix-server-restart" class="headerlink" title="/etc/init.d/zabbix_server restart"></a>/etc/init.d/zabbix_server restart</h1><p>二、Tomcat服务端<br>1、给tomcat启动脚本添加参数，开启JMX<br>vi /usr/local/site/bin/catalina.sh<br>添加如下内容：<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djava.rmi.server.hostname=10.44.21.14”  —-备注（10.44.21.14是客户端ip地址）<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djavax.management.builder.initial=”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote=true”</p>
-<p>#CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.port=12345”#端口配置不用了<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.ssl=false”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.authenticate=false”  </p>
-<p>vi conf/server.xml(tomcat8.5版本不要在conf/server.xml增加以下内容，tomcat会起不来)<br>省略…  </p>
-<p><server port="8005" shutdown="SHUTDOWN"><br>     <listener classname="org.apache.catalina.startup.VersionLoggerListener"><br>     <!-- Security listener. Documentation at /docs/config/listeners.html  
-     <Listener className="org.apache.catalina.security.SecurityListener" />  
-     --><br>     <!--APR library loader. Documentation at /docs/apr.html --><br>     <listener classname="org.apache.catalina.core.AprLifecycleListener" sslengine="on"><br>     <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html --><br>     <listener classname="org.apache.catalina.core.JasperListener"><br>     <!-- Prevent memory leaks due to use of particular java/javax APIs--><br>     <listener classname="org.apache.catalina.core.JreMemoryLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"><br>     <listener classname="org.apache.catalina.core.ThreadLocalLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" rmiregistryportplatform="10052" rmiserverportplatform="10053">     —-默认添加最后两行<br>省略..</listener></listener></listener></listener></listener></listener></listener></server></p>
-<p>2、下载catalina-jmx-remote.jar<br>wget  <a href="http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar" target="_blank" rel="noopener">http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar</a>  #我的tomcat版本是7.0.56<br>将下载后后的jar包放到被监控的tomcat实例的lib目录下。<br>3、重启tomcat<br>/usr/local/site/bin/shutdown.sh<br>/usr/local/site/bin/startup.sh<br>4、测试是否可以获取数据<br>下载cmdline-jmxclient-0.10.3.jar工具<br>在服务器端进行测试<br>java -jar cmdline-jmxclient-0.10.3.jar -  10.44.21.143:10052 java.lang:type=Memory NonHeapMemoryUsage<br>08/29/2016 17:40:15 +0800 org.archive.jmx.Client NonHeapMemoryUsage:<br>committed: 105644032<br>init: 2555904<br>max: -1<br>used: 101895192</p>
-<p>问题：<br>web界面上显示cannot connect to [[192.168.18.20]:10052]: [111] Connection refused  ，192.168.18.20是我一个agent端的ip地址。debug级别已经调整为4，没有看到报错。 </p>
-<p>tomcat8.5只需要在bin/catalina.sh增加，重启tomcat服务<br>CATALINA_OPTS=”-Dcom.sun.management.jmxremote<br>-Dcom.sun.management.jmxremote.authenticate=false<br>-Dcom.sun.management.jmxremote.ssl=false<br>-Dcom.sun.management.jmxremote.port=12345<br>-Djava.rmi.server.hostname=10.27.242.110”</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/zabbix通过jmx监控tomcat/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-zabbix密钥监控mysal、nginx、php" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>一、zabbix监控mysql<br>在客户机上配置：<br>[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_mysql.sh</p>
-<p>#!/bin/bash</p>
-<h1 id="——————————————————————————"><a href="#——————————————————————————" class="headerlink" title="——————————————————————————-"></a>——————————————————————————-</h1><h1 id="FileName-check-mysql-sh"><a href="#FileName-check-mysql-sh" class="headerlink" title="FileName:    check_mysql.sh"></a>FileName:    check_mysql.sh</h1><h1 id="Revision-1-0"><a href="#Revision-1-0" class="headerlink" title="Revision:    1.0"></a>Revision:    1.0</h1><h1 id="Date-2016-06-20"><a href="#Date-2016-06-20" class="headerlink" title="Date:        2016/06/20"></a>Date:        2016/06/20</h1><h1 id="Author-Liuguangshun"><a href="#Author-Liuguangshun" class="headerlink" title="Author:      Liuguangshun"></a>Author:      Liuguangshun</h1><h1 id="Email-lgs6666-yeah-net"><a href="#Email-lgs6666-yeah-net" class="headerlink" title="Email:       lgs6666@yeah.net"></a>Email:       lgs6666@yeah.net</h1><h1 id="Website-www-test-com"><a href="#Website-www-test-com" class="headerlink" title="Website:     www.test.com"></a>Website:     www.test.com</h1><h1 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h1><h1 id="Notes"><a href="#Notes" class="headerlink" title="Notes:       ~"></a>Notes:       ~</h1><h1 id="——————————————————————————-1"><a href="#——————————————————————————-1" class="headerlink" title="——————————————————————————-"></a>——————————————————————————-</h1><h1 id="Copyright-2016-c-Liuguangshun"><a href="#Copyright-2016-c-Liuguangshun" class="headerlink" title="Copyright:   2016 (c) Liuguangshun"></a>Copyright:   2016 (c) Liuguangshun</h1><h1 id="License"><a href="#License" class="headerlink" title="License:"></a>License:</h1><h1 id="用户名"><a href="#用户名" class="headerlink" title="用户名"></a>用户名</h1><p>MYSQL_USER=’root’</p>
-<h1 id="密码"><a href="#密码" class="headerlink" title="密码"></a>密码</h1><p>MYSQL_PWD=’YyIrpFNhIofsd’</p>
-<h1 id="主机地址-IP"><a href="#主机地址-IP" class="headerlink" title="主机地址/IP"></a>主机地址/IP</h1><p>MYSQL_HOST=’127.0.0.1’</p>
-<h1 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h1><p>MYSQL_PORT=’3306’</p>
-<h1 id="数据连接"><a href="#数据连接" class="headerlink" title="数据连接"></a>数据连接</h1><p>MYSQL_CONN=”/usr/local/bin/mysqladmin -u${MYSQL_USER} -p${MYSQL_PWD} -h${MYSQL_HOST} -P${MYSQL_PORT}”</p>
-<h1 id="参数是否正确"><a href="#参数是否正确" class="headerlink" title="参数是否正确"></a>参数是否正确</h1><p>if [ $# -ne “1” ];then<br>    echo “arg error!”<br>fi</p>
-<h1 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h1><p>case $1 in<br>    Uptime)<br>        result=<code>${MYSQL_CONN} status|cut -f2 -d&quot;:&quot;|cut -f1 -d&quot;T&quot;</code><br>        echo $result<br>        ;;<br>    Com_update)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_update&quot;|cut -d&quot;|&quot; -f3</code><br>        echo $result<br>        ;;<br>    Slow_queries)<br>        result=<code>${MYSQL_CONN} status |cut -f5 -d&quot;:&quot;|cut -f1 -d&quot;O&quot;</code><br>        echo $result<br>        ;;<br>    Com_select)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_select&quot;|cut -d&quot;|&quot; -f3</code><br>        echo $result<br>               ;;<br>    Com_rollback)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_rollback&quot;|cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>    Questions)<br>        result=<code>${MYSQL_CONN} status|cut -f4 -d&quot;:&quot;|cut -f1 -d&quot;S&quot;</code><br>                echo $result<br>                ;;<br>    Com_insert)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_insert&quot;|cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>    Com_delete)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_delete&quot;|cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>    Com_commit)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_commit&quot;|cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>    Bytes_sent)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Bytes_sent&quot; |cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>Bytes_received)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Bytes_received&quot; |cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>    Com_begin)<br>        result=<code>${MYSQL_CONN} extended-status |grep -w &quot;Com_begin&quot;|cut -d&quot;|&quot; -f3</code><br>                echo $result<br>                ;;<br>        *)<br>        echo “Usage:$0(Uptime|Com_update|Slow_queries|Com_select|Com_rollback|Questions|Com_insert|Com_delete|Com_commit|Bytes_sent|Bytes_received|Com_begin)”<br>        ;;<br>Esac</p>
-<p>[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/zabbix_agentd.conf<br>在后面添加：</p>
-<h1 id="获取mysql版本"><a href="#获取mysql版本" class="headerlink" title="获取mysql版本"></a>获取mysql版本</h1><p>UserParameter=mysql.version,mysql -V</p>
-<h1 id="获取mysql性能指标-这个是上面定义好的脚本"><a href="#获取mysql性能指标-这个是上面定义好的脚本" class="headerlink" title="获取mysql性能指标,这个是上面定义好的脚本"></a>获取mysql性能指标,这个是上面定义好的脚本</h1><p>UserParameter=mysql.status[*],/usr/local/zabbix/etc/chk_mysql.sh $1</p>
-<h1 id="获取mysql运行状态"><a href="#获取mysql运行状态" class="headerlink" title="获取mysql运行状态"></a>获取mysql运行状态</h1><p>UserParameter=mysql.ping,mysqladmin -uroot -pYyIrpFNhIofsd -P3306 -h127.0.0.1  ping | grep -c alive</p>
-<p>服务端取值：<br>[root@iZ25t2tlsnqZ ~]# zabbix_get -s 10.44.37.221 -p10050 -k mysql.status[Com_update]<br>297</p>
-<p>二、监控php-fpm<br>[root@iZ25j76vlxnZ ~]# vim /usr/local/php/etc/php-fpm.conf<br>pm.status_path = /status    //把；好去掉，启用监控fpm状态</p>
-<p>[root@iZ25j76vlxnZ ~]# vim /usr/local/nginx/conf/nginx.conf<br> location ~ ^/(status|ping)$<br>         {<br>        fastcgi_pass   127.0.0.1:9000;<br>        include fastcgi_params;<br>        fastcgi_index index.php;<br>        fastcgi_param SCRIPT_FILENAME /scripts$fastcgi_script_name;<br>        allow 127.0.0.1;<br>        allow 10.170.236.125;<br>        deny all;<br>        }</p>
-<p>[root@iZ25j76vlxnZ ~]# service nginx restart<br>[root@iZ25j76vlxnZ etc]# curl -s <a href="http://localhost/status" target="_blank" rel="noopener">http://localhost/status</a>  //测试是否可以看到php-fpm的状态，有信息即可<br>创建监控脚本：<br>[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_php-fpm.sh</p>
-<p>#!/bin/bash</p>
-<p>#monitor php-fpm status from zabbix</p>
-<p>#lincense:GPL</p>
-<p>#mail:lgs6666@yeah.net</p>
-<p>#date:2016.06.20<br>source /etc/bashrc &gt;/dev/null 2&gt;&amp;1<br>source /etc/profile &gt;/dev/null 2&gt;&amp;1<br>LOG=/usr/local/zabbix/etc/phpfpm_status.log<br>curl -s <a href="http://localhost/status" target="_blank" rel="noopener">http://localhost/status</a> &gt;$LOG<br>pool(){<br> awk ‘/pool/ {print $NF}’ $LOG<br>}<br>process_manager(){<br> awk ‘/process manager/ {print $NF}’ $LOG<br>}<br>start_since(){<br> awk ‘/start since:/ {print $NF}’ $LOG<br>}<br>accepted_conn(){<br>        awk ‘/accepted conn:/ {print $NF}’ $LOG<br>}<br>listen_queue(){<br>        awk ‘/^(listen queue:)/ {print $NF}’ $LOG<br>}<br>max_listen_queue(){<br>        awk ‘/max listen queue:/ {print $NF}’ $LOG<br>}<br>listen_queue_len(){<br>        awk ‘/listen queue len:/ {print $NF}’ $LOG<br>}<br>idle_processes(){<br>        awk ‘/idle processes:/ {print $NF}’ $LOG<br>}<br>active_processes(){<br>        awk ‘/^(active processes:)/ {print $NF}’ $LOG<br>}<br>total_processes(){<br>        awk ‘/total processes:/ {print $NF}’ $LOG<br>}<br>max_active_processes(){<br>        awk ‘/max active processes:/ {print $NF}’ $LOG<br>}<br>max_children_reached(){<br>        awk ‘/max children reached:/ {print $NF}’ $LOG<br>}<br>slow_requests(){<br>        awk ‘/slow requests:/ {print $NF}’ $LOG<br>}<br>case “$1” in<br>pool)<br> pool<br> ;;<br>process_manager)<br> process_manager<br> ;;<br>start_since)<br> start_since<br> ;;<br>accepted_conn)<br> accepted_conn<br> ;;<br>listen_queue)<br> listen_queue<br> ;;<br>max_listen_queue)<br> max_listen_queue<br> ;;<br>listen_queue_len)<br> listen_queue_len<br> ;;<br>idle_processes)<br> idle_processes<br> ;;<br>active_processes)<br> active_processes<br> ;;<br>total_processes)<br> total_processes<br> ;;<br>max_active_processes)<br> max_active_processes<br> ;;<br>max_children_reached)<br> max_children_reached<br> ;;<br>slow_requests)<br> slow_requests<br> ;;<br>*)<br>echo “Usage: $0 {pool|process_manager|start_since|accepted_conn|listen_queue|max_listen_queue|listen_queue_len|idle_processes|active_processes|total_processes|max_active_processes|max_children_reached|slow_requests}”<br>esac</p>
-<p>引用脚本文件<br>[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/zabbix_agentd.conf</p>
-<p>#UserParameter=php-fpm[*],/usr/local/zabbix/etc/chk_php-fpm.sh “$1”<br>UserParameter=phpfpm.status.pool,/usr/local/zabbix/etc/chk_php-fpm.sh pool<br>UserParameter=phpfpm.status.process.manager,/usr/local/zabbix/etc/chk_php-fpm.sh process_manager<br>UserParameter=phpfpm.status.start.since,/usr/local/zabbix/etc/chk_php-fpm.sh start_since<br>UserParameter=phpfpm.status.accepted.conn,/usr/local/zabbix/etc/chk_php-fpm.sh accepted_conn<br>UserParameter=phpfpm.status.listen.queue,/usr/local/zabbix/etc/chk_php-fpm.sh listen_queue<br>UserParameter=phpfpm.status.max.listen.queue,/usr/local/zabbix/etc/chk_php-fpm.sh max_listen_queue<br>UserParameter=phpfpm.status.listen.queue.len,/usr/local/zabbix/etc/chk_php-fpm.sh listen_queue_len<br>UserParameter=phpfpm.status.idle.processes,/usr/local/zabbix/etc/chk_php-fpm.sh idle_processes<br>UserParameter=phpfpm.status.active.processes,/usr/local/zabbix/etc/chk_php-fpm.sh active_processes<br>UserParameter=phpfpm.status.total.processes,/usr/local/zabbix/etc/chk_php-fpm.sh total_processes<br>UserParameter=phpfpm.status.max.active.processes,/usr/local/zabbix/etc/chk_php-fpm.sh max_active_processes<br>UserParameter=phpfpm.status.max.children.reached,/usr/local/zabbix/etc/chk_php-fpm.sh max_children_reached<br>UserParameter=phpfpm.status.slow.requests,/usr/local/zabbix/etc/chk_php-fpm.sh slow_requests</p>
-<p>[root@iZ25j76vlxnZ ~]# /etc/init.d/zabbix_agentd restart<br>[root@iZ25wrxqp21Z etc]# curl <a href="http://127.0.0.1/status" target="_blank" rel="noopener">http://127.0.0.1/status</a><br>pool:                 www<br>process manager:      dynamic<br>start time:           27/Apr/2016:14:21:33 +0800<br>start since:          85601<br>accepted conn:        37078<br>listen queue:         0<br>max listen queue:     13<br>listen queue len:     128<br>idle processes:       2<br>active processes:     1<br>total processes:      3<br>max active processes: 5<br>max children reached: 4<br>slow requests:        0<br>下面介绍每个参数的作用：<br>pool：php-fpm池的名称，一般都是应该是www<br>process manage：进程的管理方法，php-fpm支持三种管理方法，分别是static,dynamic和ondemand，一般情况下都是dynamic<br>start time：php-fpm启动时候的时间，不管是restart或者reload都会更新这里的时间<br>start since：php-fpm自启动起来经过的时间，默认为秒<br>accepted conn：当前接收的连接数<br>listen queue：在队列中等待连接的请求个数，如果这个数字为非0，那么最好增加进程的fpm个数<br>max listen queue：从fpm启动以来，在队列中等待连接请求的最大值<br>listen queue len：等待连接的套接字队列大小<br>idle processes：空闲的进程个数<br>active processes：活动的进程个数<br>total processes：总共的进程个数<br>max active processes：从fpm启动以来，活动进程的最大个数，如果这个值小于当前的max_children，可以调小此值<br>max children reached：当pm尝试启动更多的进程，却因为max_children的限制，没有启动更多进程的次数。如果这个值非0，那么可以适当增加fpm的进程数<br>slow requests：慢请求的次数，一般如果这个值未非0，那么可能会有慢的php进程，一般一个不好的mysql查询是最大的祸首。</p>
-<p>服务器验证：<br>[root@iZ25t2tlsnqZ ~]# zabbix_get -s 10.44.37.221 -p 10050 -k phpfpm.status.idle.processes<br>127        //获取到数据说明配置没问题了，接下来在web页面上添加模板</p>
-<p>三、监控nginx<br>[root@iZ25j76vlxnZ ~]# vim /usr/local/nginx/conf/nginx.conf<br>在php-pfm下增加：<br>   location /nginx-status {<br>        stub_status on;<br>        access_log on;<br>        allow 127.0.0.1;<br>        allow 10.170.236.125;<br>        deny all;<br>        }</p>
-<p>[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_nginx.sh</p>
-<p>#!/bin/bash</p>
-<h1 id="Script-to-fetch-nginx-statuses-for-tribily-monitoring-systems"><a href="#Script-to-fetch-nginx-statuses-for-tribily-monitoring-systems" class="headerlink" title="Script to fetch nginx statuses for tribily monitoring systems"></a>Script to fetch nginx statuses for tribily monitoring systems</h1><h1 id="Author-lgs6666-yeah-net"><a href="#Author-lgs6666-yeah-net" class="headerlink" title="Author: lgs6666@yeah.net"></a>Author: lgs6666@yeah.net</h1><h1 id="License-GPLv2"><a href="#License-GPLv2" class="headerlink" title="License: GPLv2"></a>License: GPLv2</h1><h1 id="Set-Variables"><a href="#Set-Variables" class="headerlink" title="Set Variables"></a>Set Variables</h1><p>BKUP_DATE=<code>/bin/date +%Y%m%d</code><br>LOG=”/data/log/zabbix/webstatus.log”<br>HOST=127.0.0.1<br>PORT=”80”</p>
-<h1 id="Functions-to-return-nginx-stats"><a href="#Functions-to-return-nginx-stats" class="headerlink" title="Functions to return nginx stats"></a>Functions to return nginx stats</h1><p>function active {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| grep ‘Active’ | awk ‘{print $NF}’<br>}<br>function reading {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| grep ‘Reading’ | awk ‘{print $2}’<br>}<br>function writing {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| grep ‘Writing’ | awk ‘{print $4}’<br>}<br>function waiting {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| grep ‘Waiting’ | awk ‘{print $6}’<br>}<br>function accepts {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| awk NR==3 | awk ‘{print $1}’<br>}<br>function handled {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| awk NR==3 | awk ‘{print $2}’<br>}<br>function requests {<br>/usr/bin/curl “<a href="http://$HOST:$PORT/nginx-status" target="_blank" rel="noopener">http://$HOST:$PORT/nginx-status</a>“ 2&gt;/dev/null| awk NR==3 | awk ‘{print $3}’<br>}</p>
-<h1 id="Run-the-requested-function"><a href="#Run-the-requested-function" class="headerlink" title="Run the requested function"></a>Run the requested function</h1><p>$1</p>
-<p>在被监控端配置：<br>[liuguangshun@iZ25j76vlxnZ ~]$ vim /usr/local/zabbix/etc/zabbix_agentd.conf<br>在最后添加：<br>UserParameter=nginx.accepts,/usr/local/zabbix/etc/chk_nginx.sh accepts<br>UserParameter=nginx.handled,/usr/local/zabbix/etc/chk_nginx.sh handled<br>UserParameter=nginx.requests,/usr/local/zabbix/etc/chk_nginx.sh requests<br>UserParameter=nginx.connections.active,/usr/local/zabbix/etc/chk_nginx.sh active<br>UserParameter=nginx.connections.reading,/usr/local/zabbix/etc/chk_nginx.sh reading<br>UserParameter=nginx.connections.writing,/usr/local/zabbix/etc/chk_nginx.sh writing<br>UserParameter=nginx.connections.waiting,/usr/local/zabbix/etc/chk_nginx.sh waiting</p>
-<p>在被监控查看nginx状态：<br>[root@iZ25wrxqp21Z etc]# curl <a href="http://127.0.0.1/nginx-status" target="_blank" rel="noopener">http://127.0.0.1/nginx-status</a><br>Active connections: 1<br>server accepts handled requests<br> 67561 67561 159860<br>Reading: 0 Writing: 1 Waiting: 0<br>Activeconnections:对后端发起的活动连接数；<br>server accepts 67561：nginx 总共处理了67561个连接；<br>handled：成功创建了67561次握手；<br>requests：总共处理了159860请求。<br>Reading：nginx读取客户端的header数；<br>Writing: nginx 返回给客户端的header数；<br>Waiting: nginx 请求处理完成，正在等待下一请求指令的连接。</p>
-<p>服务器上测试<br>[root@iZ25t2tlsnqZ ~]# zabbix_get -s 10.44.37.221 -p 10050 -k “nginx.accepts”<br>3151<br>注意：在web添加模板时，键值（密钥，web是通过键值来链接监控服务器的）要和监控端UserParameter后面的值一样，例如nginx.accepts</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/zabbix密钥监控mysal、nginx、php/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Redis_Sentinel主从复制自动切换方案" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>一、准备环境</p>
-<p>#配置环境：<br>Redis Sentinel：192.68.40.16:26379<br>Redis server主：192.168.40.17:6379<br>Redis server从：192.168.40.18:6380</p>
-<p>#查看主服务器状态：<br>[root@localhost ~]# redis-cli -p 6379 -a pwd123 info Replication</p>
-<h1 id="Replication"><a href="#Replication" class="headerlink" title="Replication"></a>Replication</h1><p>role:master<br>connected_slaves:1<br>slave0:ip=127.0.0.1,port=6380,state=online,offset=27794,lag=0<br>master_repl_offset:27794<br>repl_backlog_active:1<br>repl_backlog_size:1048576<br>repl_backlog_first_byte_offset:2<br>repl_backlog_histlen:27793<br>You have new mail in /var/spool/mail/root</p>
-<p>#查看从服务器状态<br>[root@localhost ~]# redis-cli -p 6380 -a pwd123 info Replication</p>
-<h1 id="Replication-1"><a href="#Replication-1" class="headerlink" title="Replication"></a>Replication</h1><p>role:slave<br>master_host:127.0.0.1<br>master_port:6379<br>master_link_status:up<br>master_last_io_seconds_ago:2<br>master_sync_in_progress:0<br>slave_repl_offset:29162<br>slave_priority:100<br>slave_read_only:1<br>connected_slaves:0<br>master_repl_offset:0<br>repl_backlog_active:0<br>repl_backlog_size:1048576<br>repl_backlog_first_byte_offset:0<br>repl_backlog_histlen:0<br>二、搭建sentinel哨兵服务</p>
-<p>#启动Redis Sentinel</p>
-<p>#Sentinel的配置文件为sentinel.conf，复制一下配置，修改IP地址即可<br>[root@localhost ~]# vim /etc/redis/sentinel.conf</p>
-<p>#sentinel实例监听的端口<br>port 26379</p>
-<p>#守护进程模式<br>daemonize yes</p>
-<p>#指明日志文件名<br>logfile “./sentinel1.log”</p>
-<p>#工作路径，sentinel一般指定/tmp比较简单<br>dir ./</p>
-<p>#master1</p>
-<p>#哨兵监控这个master，在至少quorum个哨兵实例都认为master down后把master标记为odown</p>
-<p>#（objective down客观down；相对应的存在sdown，subjective down，主观down）状态。</p>
-<p>#slaves是自动发现，所以你没必要明确指定slaves。<br>sentinel monitor master1 192.168.40.17 6379 1</p>
-<h1 id="master或slave多长时间（默认30秒）不能使用后标记为s-down状态。"><a href="#master或slave多长时间（默认30秒）不能使用后标记为s-down状态。" class="headerlink" title="master或slave多长时间（默认30秒）不能使用后标记为s_down状态。"></a>master或slave多长时间（默认30秒）不能使用后标记为s_down状态。</h1><p>sentinel down-after-milliseconds master1 1500</p>
-<p>#若sentinel在该配置值内未能完成failover操作（即故障时master/slave自动切换），则认为本次failover失败。<br>sentinel failover-timeout master1 10000</p>
-<p>#设置master和slaves验证密码<br>sentinel auth-pass master1 pwd123 </p>
-<p>[root@localhost ~]# redis-server /etc/redis/sentinel.conf –sentinel &amp;<br>[1] 19296</p>
-<p>#在sentinel中查看redis主从信息<br>[root@localhost ~]# redis-cli -p 26379<br>127.0.0.1:26379&gt; info Sentinel</p>
-<h1 id="Sentinel"><a href="#Sentinel" class="headerlink" title="Sentinel"></a>Sentinel</h1><p>sentinel_masters:1<br>sentinel_tilt:0<br>sentinel_running_scripts:0<br>sentinel_scripts_queue_length:0<br>master0:name=master1,status=ok,address=192.168.40.17:6379,slaves=3,sentinels=1 </p>
-<p>#在sentinel中查看所监控道的master和slave<br>127.0.0.1:26379&gt; SENTINEL masters<br>1)  1) “name”<br>    2) “master1”<br>    3) “ip”<br>    4) “192.168.40.17”<br>    5) “port”<br>    6) “6379”<br>    7) “runid”<br>    8) “91399b3205a9061a5f1aa306692886f200374e90”<br>    9) “flags”<br>   10) “master”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “898”<br>   15) “last-ping-reply”<br>   16) “898”<br>   17) “info-refresh”<br>   18) “5019”<br>   19) “role-reported”<br>   20) “master”<br>   21) “role-reported-time”<br>   22) “266970”<br>   23) “config-epoch”<br>   24) “0”<br>   25) “num-slaves”<br>   26) “1”<br>   27) “num-other-sentinels”<br>   28) “0”<br>   29) “quorum”<br>   30) “1”<br>   31) “down-after-milliseconds”<br>   32) “1500”<br>   33) “failover-timeout”<br>   34) “10000”<br>   35) “parallel-syncs”<br>   36) “1”<br>127.0.0.1:26379&gt; SENTINEL slaves master1<br>    1) “name”<br>    2) “192.168.40.18:6380”<br>    3) “ip”<br>    4) “192.168.40.18”<br>    5) “port”<br>    6) “6380”<br>    7) “runid”<br>    8) “7087b2cf81bcb53da6603ed5d7bc6509a632d11a”<br>    9) “flags”<br>   10) “slave”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “843”<br>   15) “last-ping-reply”<br>   16) “842”<br>   17) “info-refresh”<br>   18) “7765”<br>   19) “role-reported”<br>   20) “slave”<br>   21) “role-reported-time”<br>   22) “88238”<br>   23) “master-link-down-time”<br>   24) “0”<br>   25) “master-link-status”<br>   26) “ok”<br>   27) “master-host”<br>   28) “192.168.40.17”<br>   29) “master-port”<br>   30) “6379”<br>   31) “slave-priority”<br>   32) “100”<br>   33) “slave-repl-offset”<br>   34) “6114”</p>
-<p>#查看当前Master<br>127.0.0.1:26379&gt; SENTINEL get-master-addr-by-name master1<br>1) “192.168.40.17”<br>2) “6379”<br>三、验证：</p>
-<p>#停止主服务器<br>[root@localhost ~]# kill -9 2793</p>
-<p>#登陆sentinel查看6380从服务器已经自动转为主服务器<br>[root@localhost ~]# redis-cli -p 26379<br>127.0.0.1:26379&gt; SENTINEL get-master-addr-by-name master1<br>1) “127.0.0.1”<br>2) “6380”</p>
-<p>#6379主服务器转为从服务器，状态为down<br>127.0.0.1:26379&gt;  SENTINEL slaves master1<br>1)  1) “name”<br>    2) “127.0.0.1:6379”<br>    3) “ip”<br>    4) “127.0.0.1”<br>    5) “port”<br>    6) “6379”<br>    7) “runid”<br>    8) “”<br>    9) “flags”<br>   10) “s_down,slave,disconnected”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “47310”<br>   15) “last-ping-reply”<br>   16) “47310”<br>   17) “s-down-time”<br>   18) “45778”<br>   19) “info-refresh”<br>   20) “1488253183255”<br>   21) “role-reported”<br>   22) “slave”<br>   23) “role-reported-time”<br>   24) “47310”<br>   25) “master-link-down-time”<br>   26) “0”<br>   27) “master-link-status”<br>   28) “err”<br>   29) “master-host”<br>   30) “?”<br>   31) “master-port”<br>   32) “0”<br>   33) “slave-priority”<br>   34) “100”<br>   35) “slave-repl-offset”<br>   36) “0”</p>
-<p>#/etc/redis/6379.conf配置文件自动增加slaveof 127.0.0.1 6380</p>
-<p>#/etc/redis/6380.conf配置文件里面的slaveof 127.0.0.1 6379自动消失</p>
-<p>#如果需要将6379在此变为主服务器，需要手动更改slaveof配置即可。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/Redis_Sentinel主从复制自动切换方案/">展开全文 >></a>
         </p>
       
 
