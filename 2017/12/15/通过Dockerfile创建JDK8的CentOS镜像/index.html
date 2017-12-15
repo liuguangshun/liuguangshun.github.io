@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>通过Dockerfile创建JDK8的CentOS镜像 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="通过Dockerfile创建JDK8的CentOS镜像[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/准备jdk安装包[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz[root@node4 jdk8_centos]# vi">
+  <meta name="description" content="通过Dockerfile创建JDK8的CentOS镜像12[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/ 准备jdk安装包12[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz 1234567891011121314151">
 <meta property="og:type" content="article">
 <meta property="og:title" content="通过Dockerfile创建JDK8的CentOS镜像">
 <meta property="og:url" content="http://yoursite.com/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="通过Dockerfile创建JDK8的CentOS镜像[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/准备jdk安装包[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz[root@node4 jdk8_centos]# vi">
-<meta property="og:updated_time" content="2017-12-15T16:56:28.648Z">
+<meta property="og:description" content="通过Dockerfile创建JDK8的CentOS镜像12[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/ 准备jdk安装包12[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz 1234567891011121314151">
+<meta property="og:updated_time" content="2017-12-15T21:44:26.914Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="通过Dockerfile创建JDK8的CentOS镜像">
-<meta name="twitter:description" content="通过Dockerfile创建JDK8的CentOS镜像[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/准备jdk安装包[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz[root@node4 jdk8_centos]# vi">
+<meta name="twitter:description" content="通过Dockerfile创建JDK8的CentOS镜像12[root@node4 ~]# mkdir jdk8_centos[root@node4 ~]# cd jdk8_centos/ 准备jdk安装包12[root@node4 jdk8_centos]# lsDockerfile  server-jre-8u152-linux-x64.tar.gz 1234567891011121314151">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -152,21 +152,17 @@
 
         
         <a href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:56:28.681Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+  	<time datetime="2017-12-15T21:44:27.117Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>通过Dockerfile创建JDK8的CentOS镜像<br>[root@node4 ~]# mkdir jdk8_centos<br>[root@node4 ~]# cd jdk8_centos/<br>准备jdk安装包<br>[root@node4 jdk8_centos]# ls<br>Dockerfile  server-jre-8u152-linux-x64.tar.gz<br>[root@node4 jdk8_centos]# vim Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM sshd_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#添加jdk安装包<br>RUN mkdir /usr/java<br>ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</p>
-<p>#安装jdk<br>RUN sed -i ‘$a\export LANG=en_US.UTF-8’ /etc/profile<br>RUN sed -i ‘$a\JAVA_HOME=/usr/java/jdk1.8.0_152’ /etc/profile<br>RUN sed -i ‘$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre’ /etc/profile<br>RUN sed -i ‘$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin’ /etc/profile<br>RUN sed -i ‘$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib’ /etc/profile<br>RUN sed -i ‘$a\export JAVA_HOME JRE_HOME PATH CLASSPATH’ /etc/profile</p>
-<p>#开放窗口的22端口<br>EXPOSE 22</p>
-<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>[root@node4 jdk8_centos]# docker build -t jdk8_dockerfile .<br>[root@node4 jdk8_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 jdk8_centos]# docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</p>
+        <p>通过Dockerfile创建JDK8的CentOS镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 ~]<span class="comment"># mkdir jdk8_centos</span></span><br><span class="line">[root@node4 ~]<span class="comment"># cd jdk8_centos/</span></span><br></pre></td></tr></table></figure></p>
+<p>准备jdk安装包<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># ls</span></span><br><span class="line">Dockerfile  server-jre-8u152-linux-x64.tar.gz</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># vim Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM sshd_dockerfile</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#添加jdk安装包</span></span><br><span class="line">RUN mkdir /usr/java</span><br><span class="line">ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</span><br><span class="line"><span class="comment">#安装jdk</span></span><br><span class="line">RUN sed -i <span class="string">'$a\export LANG=en_US.UTF-8'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\JAVA_HOME=/usr/java/jdk1.8.0_152'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\export JAVA_HOME JRE_HOME PATH CLASSPATH'</span> /etc/profile</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line"><span class="comment">#运行脚本，启动sshd服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker build -t jdk8_dockerfile .</span></span><br><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB</span><br><span class="line">sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB</span><br><span class="line">sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure>
 
       
 
@@ -270,8 +266,8 @@
     </a>
   
   
-    <a href="/2017/12/15/mysql主从同步(4)-Slave延迟状态监控/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">mysql主从同步(4)-Slave延迟状态监控</div>
+    <a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Centos6.5搭建L2TP_VPN</div>
       <i class="icon-circle-right"></i>
     </a>
   

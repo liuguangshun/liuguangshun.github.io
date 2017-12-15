@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>通过Dockerfile创建支持SSH服务的CentOS镜像 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。[root@node4 sshd_centos]# vim run.sh #!/bin/bash/usr/sbin/sshd –D3、在宿主机上生成RSA密钥[root@node4 sshd_centos]# cp /etc/ssh/ssh_">
+  <meta name="description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。123[root@node4 sshd_centos]# vim run.sh#!/bin/bash/usr/sbin/sshd –D 3、在宿主机上生成RSA密钥123456789101112131415161718192021222324">
 <meta property="og:type" content="article">
 <meta property="og:title" content="通过Dockerfile创建支持SSH服务的CentOS镜像">
 <meta property="og:url" content="http://yoursite.com/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。[root@node4 sshd_centos]# vim run.sh #!/bin/bash/usr/sbin/sshd –D3、在宿主机上生成RSA密钥[root@node4 sshd_centos]# cp /etc/ssh/ssh_">
-<meta property="og:updated_time" content="2017-12-15T16:58:25.126Z">
+<meta property="og:description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。123[root@node4 sshd_centos]# vim run.sh#!/bin/bash/usr/sbin/sshd –D 3、在宿主机上生成RSA密钥123456789101112131415161718192021222324">
+<meta property="og:updated_time" content="2017-12-15T22:11:49.132Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="通过Dockerfile创建支持SSH服务的CentOS镜像">
-<meta name="twitter:description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。[root@node4 sshd_centos]# vim run.sh #!/bin/bash/usr/sbin/sshd –D3、在宿主机上生成RSA密钥[root@node4 sshd_centos]# cp /etc/ssh/ssh_">
+<meta name="twitter:description" content="通过Dockerfile创建支持SSH服务的CentOS镜像 1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。123[root@node4 sshd_centos]# vim run.sh#!/bin/bash/usr/sbin/sshd –D 3、在宿主机上生成RSA密钥123456789101112131415161718192021222324">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -152,7 +152,7 @@
 
         
         <a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:58:25.152Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+  	<time datetime="2017-12-15T22:11:49.159Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
@@ -160,19 +160,11 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>通过Dockerfile创建支持SSH服务的CentOS镜像</p>
-<p>1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。<br>[root@node4 sshd_centos]# vim run.sh</p>
-<p>#!/bin/bash<br>/usr/sbin/sshd –D<br>3、在宿主机上生成RSA密钥<br>[root@node4 sshd_centos]# cp /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub /root/sshd_centos<br>[root@node4 sshd_centos]# cat ssh_host_rsa_key.pub&gt;authorized_keys<br>[root@node4 sshd_centos]# cat Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM centos<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#安装openssh-server<br>RUN yum -y install openssh-server</p>
-<p>#修改/etc/ssh/sshd_config<br>RUN sed -i ‘s/UsePAM yes/UsePAM no/g’ /etc/ssh/sshd_config</p>
-<p>#将密钥文件复制到/etc/ssh/目录中<br>ADD ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key<br>ADD ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub<br>RUN mkdir -p /root/.ssh<br>ADD authorized_keys /root/.ssh/authorized_keys<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key.pub</p>
-<p>#将ssh服务启动脚本复制到/usr/local/sbin目录中，并改变权限为755<br>ADD run.sh /usr/local/sbin/run.sh<br>RUN chmod 755 /usr/local/sbin/run.sh</p>
-<p>#变更root密码为147258<br>RUN echo “root:123456”|chpasswd</p>
-<p>#开放窗口的22端口<br>EXPOSE 22</p>
-<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>此时 /root/sshd_centos目录下应该存在如下文件：<br>[root@node4 sshd_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>sshd_dockerfile     latest              421be3ddedab        2 minutes ago       335.4 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</p>
-<p>7、以新创建的镜像新建容器<br>[root@node4 sshd_centos]# docker run -p 10022:22 -d /usr/local/sbin/run.sh<br>将宿主机的10022端口映射到容器的22端口，并启动sshd服务。<br>现在就可以使用ssh工具远程通过宿主机的10022端口访问容器了。</p>
+<p>1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># vim run.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/usr/sbin/sshd –D</span><br></pre></td></tr></table></figure></p>
+<p>3、在宿主机上生成RSA密钥<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># cp /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub /root/sshd_centos</span></span><br><span class="line">[root@node4 sshd_centos]<span class="comment"># cat ssh_host_rsa_key.pub&gt;authorized_keys</span></span><br><span class="line">[root@node4 sshd_centos]<span class="comment"># cat Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM centos</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#安装openssh-server</span></span><br><span class="line">RUN yum -y install openssh-server</span><br><span class="line"><span class="comment">#修改/etc/ssh/sshd_config</span></span><br><span class="line">RUN sed -i <span class="string">'s/UsePAM yes/UsePAM no/g'</span> /etc/ssh/sshd_config</span><br><span class="line"><span class="comment">#将密钥文件复制到/etc/ssh/目录中</span></span><br><span class="line">ADD ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key</span><br><span class="line">ADD ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub</span><br><span class="line">RUN mkdir -p /root/.ssh</span><br><span class="line">ADD authorized_keys /root/.ssh/authorized_keys</span><br><span class="line">RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key</span><br><span class="line">RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key.pub</span><br><span class="line"><span class="comment">#将ssh服务启动脚本复制到/usr/local/sbin目录中，并改变权限为755</span></span><br><span class="line">ADD run.sh /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line">RUN chmod 755 /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line"><span class="comment">#变更root密码为147258</span></span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"root:123456"</span>|chpasswd</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line"><span class="comment">#运行脚本，启动sshd服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure></p>
+<p>此时 /root/sshd_centos目录下应该存在如下文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">sshd_dockerfile     latest              421be3ddedab        2 minutes ago       335.4 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br></pre></td></tr></table></figure></p>
+<p>7、以新创建的镜像新建容器<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># docker run -p 10022:22 -d /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure></p>
+<p>将宿主机的10022端口映射到容器的22端口，并启动sshd服务。<br>现在就可以使用ssh工具远程通过宿主机的10022端口访问容器了。</p>
 
       
 
@@ -266,11 +258,11 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/15/nginx访问量统计/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/zabbix通过jmx监控tomcat/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          nginx访问量统计
+          zabbix通过jmx监控tomcat
         
       </div>
     </a>

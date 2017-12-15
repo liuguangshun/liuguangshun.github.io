@@ -137,6 +137,417 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-zabbix通过jmx监控tomcat" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/zabbix通过jmx监控tomcat/" class="archive-article-date">
+  	<time datetime="2017-12-15T22:27:13.620Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、服务端配置<br>1、安装jdk（版本1.8.0_91）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh jdk-8u91-linux-x64.rpm</span><br><span class="line">vi /etc/profile</span><br><span class="line">最后添加：</span><br><span class="line">JAVA_HOME=/usr/java/jdk1.8.0_91</span><br><span class="line">CLASSPATH=.:<span class="variable">$JAVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME</span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"><span class="built_in">export</span> CLASSPATH</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
+<p>安装与配置比较简单，过程省略。执行java -version命令，出现类似界面表示成功。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25kscmkn3Z ~]<span class="comment"># java -version</span></span><br><span class="line">java version <span class="string">"1.8.0_91"</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_91-b14)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<p>2、安装Zabbix-Java-gateway<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/src/zabbix-3.0.0/</span><br><span class="line">./configure --<span class="built_in">enable</span>-java -prefix=/usr/<span class="built_in">local</span>/zabbix/zabbix_java</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/zabbix/zabbix_java/sbin/zabbix_java/</span><br><span class="line">ls</span><br><span class="line">bin  lib  settings.sh  shutdown.sh  startup.sh</span><br></pre></td></tr></table></figure></p>
+<p>3、修改Java-gateway的配置文件并启动它<br>配置文件路径为/data/zabbix/zabbix_java/sbin/zabbix_java/settings.sh<br>启用以下参数：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi settings.sh</span><br><span class="line">LISTEN_IP=<span class="string">"0.0.0.0"</span></span><br><span class="line">LISTEN_PORT=10052</span><br><span class="line">START_POLLERS=5</span><br></pre></td></tr></table></figure></p>
+<p>4、修改zabbix_server的配置文件并重启<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/<span class="built_in">local</span>/zabbix/etc/zabbix_server.conf</span><br><span class="line">JavaGateway=127.0.0.1</span><br><span class="line">JavaGatewayPort=10052</span><br><span class="line">StartJavaPollers=5</span><br></pre></td></tr></table></figure></p>
+<p>启动zabbix_java<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/zabbix/zabbix_java/sbin/zabbix_java/</span><br><span class="line">./startup.sh</span><br></pre></td></tr></table></figure></p>
+<p>重启zabbix_server<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/init.d/zabbix_server restart</span></span><br></pre></td></tr></table></figure></p>
+<p>二、Tomcat服务端<br>1、给tomcat启动脚本添加参数，开启JMX<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/<span class="built_in">local</span>/site/bin/catalina.sh</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">添加如下内容：</span><br><span class="line">CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Djava.rmi.server.hostname=10.44.21.14&quot;  ----备注（10.44.21.14是客户端ip地址）</span><br><span class="line">CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Djavax.management.builder.initial=&quot;</span><br><span class="line">CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Dcom.sun.management.jmxremote=true&quot;</span><br><span class="line">#CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Dcom.sun.management.jmxremote.port=12345&quot;#端口配置不用了</span><br><span class="line">CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Dcom.sun.management.jmxremote.ssl=false&quot;</span><br><span class="line">CATALINA_OPTS=&quot;$&#123;CATALINA_OPTS&#125; -Dcom.sun.management.jmxremote.authenticate=false&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi conf/server.xml(tomcat8.5版本不要在conf/server.xml增加以下内容，tomcat会起不来)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">省略...  </span><br><span class="line">&lt;Server port=&quot;8005&quot; shutdown=&quot;SHUTDOWN&quot;&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.startup.VersionLoggerListener&quot; /&gt;  </span><br><span class="line">	 &lt;!-- Security listener. Documentation at /docs/config/listeners.html  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.security.SecurityListener&quot; /&gt;  </span><br><span class="line">	 --&gt;  </span><br><span class="line">	 &lt;!--APR library loader. Documentation at /docs/apr.html --&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.core.AprLifecycleListener&quot; SSLEngine=&quot;on&quot; /&gt;  </span><br><span class="line">	 &lt;!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html --&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.core.JasperListener&quot; /&gt;  </span><br><span class="line">	 &lt;!-- Prevent memory leaks due to use of particular java/javax APIs--&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.core.JreMemoryLeakPreventionListener&quot; /&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.mbeans.GlobalResourcesLifecycleListener&quot; /&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.core.ThreadLocalLeakPreventionListener&quot; /&gt;  </span><br><span class="line">	 &lt;Listener className=&quot;org.apache.catalina.mbeans.JmxRemoteLifecycleListener&quot;  </span><br><span class="line">	          rmiRegistryPortPlatform=&quot;10052&quot; rmiServerPortPlatform=&quot;10053&quot; /&gt;     ----默认添加最后两行</span><br><span class="line">省略..</span><br></pre></td></tr></table></figure>
+<p>2、下载catalina-jmx-remote.jar<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget  http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar  <span class="comment">#我的tomcat版本是7.0.56</span></span><br></pre></td></tr></table></figure></p>
+<p>将下载后后的jar包放到被监控的tomcat实例的lib目录下。<br>3、重启tomcat<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/site/bin/shutdown.sh</span><br><span class="line">/usr/<span class="built_in">local</span>/site/bin/startup.sh</span><br></pre></td></tr></table></figure></p>
+<p>4、测试是否可以获取数据<br>下载cmdline-jmxclient-0.10.3.jar工具<br>在服务器端进行测试<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">java -jar cmdline-jmxclient-0.10.3.jar -  10.44.21.143:10052 java.lang:<span class="built_in">type</span>=Memory NonHeapMemoryUsage</span><br><span class="line">08/29/2016 17:40:15 +0800 org.archive.jmx.Client NonHeapMemoryUsage: </span><br><span class="line">committed: 105644032</span><br><span class="line">init: 2555904</span><br><span class="line">max: -1</span><br><span class="line">used: 101895192</span><br></pre></td></tr></table></figure></p>
+<p>问题：<br>web界面上显示cannot connect to [[192.168.18.20]:10052]: [111] Connection refused  ，192.168.18.20是我一个agent端的ip地址。debug级别已经调整为4，没有看到报错。 </p>
+<p>tomcat8.5只需要在bin/catalina.sh增加，重启tomcat服务<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CATALINA_OPTS=&quot;-Dcom.sun.management.jmxremote</span><br><span class="line">-Dcom.sun.management.jmxremote.authenticate=false</span><br><span class="line">-Dcom.sun.management.jmxremote.ssl=false</span><br><span class="line">-Dcom.sun.management.jmxremote.port=12345</span><br><span class="line">-Djava.rmi.server.hostname=10.27.242.110&quot;</span><br></pre></td></tr></table></figure></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/zabbix通过jmx监控tomcat/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建支持SSH服务的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T22:11:49.159Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建支持SSH服务的CentOS镜像</p>
+<p>1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># vim run.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/usr/sbin/sshd –D</span><br></pre></td></tr></table></figure></p>
+<p>3、在宿主机上生成RSA密钥<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># cp /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub /root/sshd_centos</span></span><br><span class="line">[root@node4 sshd_centos]<span class="comment"># cat ssh_host_rsa_key.pub&gt;authorized_keys</span></span><br><span class="line">[root@node4 sshd_centos]<span class="comment"># cat Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM centos</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#安装openssh-server</span></span><br><span class="line">RUN yum -y install openssh-server</span><br><span class="line"><span class="comment">#修改/etc/ssh/sshd_config</span></span><br><span class="line">RUN sed -i <span class="string">'s/UsePAM yes/UsePAM no/g'</span> /etc/ssh/sshd_config</span><br><span class="line"><span class="comment">#将密钥文件复制到/etc/ssh/目录中</span></span><br><span class="line">ADD ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key</span><br><span class="line">ADD ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub</span><br><span class="line">RUN mkdir -p /root/.ssh</span><br><span class="line">ADD authorized_keys /root/.ssh/authorized_keys</span><br><span class="line">RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key</span><br><span class="line">RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key.pub</span><br><span class="line"><span class="comment">#将ssh服务启动脚本复制到/usr/local/sbin目录中，并改变权限为755</span></span><br><span class="line">ADD run.sh /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line">RUN chmod 755 /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line"><span class="comment">#变更root密码为147258</span></span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"root:123456"</span>|chpasswd</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line"><span class="comment">#运行脚本，启动sshd服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure></p>
+<p>此时 /root/sshd_centos目录下应该存在如下文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">sshd_dockerfile     latest              421be3ddedab        2 minutes ago       335.4 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br></pre></td></tr></table></figure></p>
+<p>7、以新创建的镜像新建容器<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 sshd_centos]<span class="comment"># docker run -p 10022:22 -d /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure></p>
+<p>将宿主机的10022端口映射到容器的22端口，并启动sshd服务。<br>现在就可以使用ssh工具远程通过宿主机的10022端口访问容器了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建Tomcat的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T22:10:44.834Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建Tomcat的CentOS镜像<br>准备tomcat安装包<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 tomcat_centos]<span class="comment"># ls</span></span><br><span class="line">apache-tomcat-8.5.23.tar.gz  Dockerfile</span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># cat Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM jdk8_dockerfile</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#添加tomcat安装包</span></span><br><span class="line">ADD apache-tomcat-8.5.23.tar.gz /usr/<span class="built_in">local</span>/</span><br><span class="line">RUN mv /usr/<span class="built_in">local</span>/apache-tomcat-8.5.23 /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line"><span class="comment">#配置tomcat数据目录</span></span><br><span class="line">RUN sed -i <span class="string">'/"%r"/a\        &lt;Context docBase="/data/" path="/" reloadable="true" /&gt;'</span> /usr/<span class="built_in">local</span>/tomcat/conf/server.xml</span><br><span class="line">RUN mkdir /data</span><br><span class="line"><span class="comment">#删除tomcat默认目录</span></span><br><span class="line">RUN rm -rf /usr/<span class="built_in">local</span>/tomcat/webapps/*</span><br><span class="line">RUN sed -i <span class="string">'/$var _must_ be set to either true or false./aJAVA_OPTS="-Xms1024m -Xmx4096m -Xss4096K -XX:PermSize=512m -XX:MaxPermSize=1024m"'</span> /usr/<span class="built_in">local</span>/tomcat/bin/catalina.sh</span><br><span class="line"><span class="comment">#定义CATALINA_HOME和JAVA_HOME环境变量</span></span><br><span class="line">ENV CATALINA_HOME /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line">ENV JAVA_HOME /usr/java/jdk1.8.0_152</span><br><span class="line">ENV PATH <span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin</span><br><span class="line">RUN sed -i <span class="string">'/sshd -D/i/usr/bin/sh /usr/local/tomcat/bin/startup.sh'</span> /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line">EXPOSE 8080</span><br><span class="line"><span class="comment">#运行脚本，启动sshd和tomcat服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker build -t tomcat_jdk8 .</span></span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">tomcat_jdk8         latest              044cd7aa7211        About an hour ago   606.1 MB</span><br><span class="line">jdk7_dockerfile     latest              6545ebc02443        About an hour ago   577.6 MB</span><br><span class="line">jdk8_dockerfile     latest              0324608bf1c3        25 hours ago        488.7 MB</span><br><span class="line">sshd_dockerfile     latest              eaae6e1fb5de        30 hours ago        335.4 MB</span><br><span class="line">sshd-centos         latest              ae76d4ad6e0c        30 hours ago        314.6 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker run -v /data/weixin:/data  -p 80:8080 -p 10024:22 -d tomcat_jdk8 /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建nginx服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">通过Dockerfile创建nginx服务的Centos镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T22:08:24.215Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile生成镜像<br>在宿主机上准备的文件清单：<br>Dockerfile</p>
+<p>#启动ssh和apache服务的角本<br>run.sh<br>以上文件都放到/root/nginx_centos目录下<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /root/nginx_centos</span><br><span class="line"><span class="built_in">cd</span> /root/nginx_centos</span><br></pre></td></tr></table></figure></p>
+<p>一、准备run.sh文件<br>在/root/nginx_centos目录新建run.sh<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim run.sh</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/usr/sbin/sshd &amp;</span><br><span class="line">/usr/<span class="built_in">local</span>/nginx/sbin/nginx</span><br></pre></td></tr></table></figure></p>
+<p>二、准备Dockerfile<br>在/root/nginx_centos目录新建Dockerfile<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">cat Dockerfile</span><br><span class="line"><span class="comment">#新生成的镜像是基于sshd:dockerfile镜像</span></span><br><span class="line">FROM sshd-centos</span><br><span class="line">MAINTAINER by cmzsteven</span><br><span class="line">WORKDIR /usr/<span class="built_in">local</span>/src</span><br><span class="line"><span class="comment">#安装wget</span></span><br><span class="line">RUN yum install -y  wget</span><br><span class="line"><span class="comment">#下载并解压源码包</span></span><br><span class="line">RUN wget http://nginx.org/download/nginx-1.12.1.tar.gz</span><br><span class="line">RUN tar zxvf nginx-1.12.1.tar.gz</span><br><span class="line">WORKDIR nginx-1.12.1</span><br><span class="line"><span class="comment">#编译安装nginx</span></span><br><span class="line">RUN yum -y install gcc gcc-c++ pcre-devel zlib-devel openssl*</span><br><span class="line">RUN useradd -M -u 40 -s /sbin/nologin  nginx</span><br><span class="line">RUN ./configure --prefix=/usr/<span class="built_in">local</span>/nginx --user=nginx --group=nginx --with-file-aio --with-http_stub_status_module --with-http_gzip_static_module --with-http_flv_module --with-http_ssl_module --with-http_realip_module</span><br><span class="line">RUN make</span><br><span class="line">RUN make install</span><br><span class="line"><span class="comment">#启动Nginx服务</span></span><br><span class="line">RUN ln -s /usr/<span class="built_in">local</span>/nginx/sbin/* /usr/<span class="built_in">local</span>/sbin/</span><br><span class="line">RUN /usr/<span class="built_in">local</span>/nginx/sbin/nginx</span><br><span class="line"><span class="comment">#修改Nginx配置文件,以非daemon方式启动</span></span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"daemon off;"</span>&gt;&gt;/usr/<span class="built_in">local</span>/nginx/conf/nginx.conf</span><br><span class="line"><span class="comment">#复制服务启动脚本并设置权限</span></span><br><span class="line">ADD run.sh /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line">RUN chmod 755 /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line"><span class="comment">#设置生成容器时需要执行的脚本</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br><span class="line"><span class="comment">#开放22、80、443端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line">EXPOSE 80</span><br><span class="line">EXPOSE 443</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是：在Dockerfile文件中更换当前目录不可以用“cd”命令，而要改用“WORKDIR”.<br>三、根据Dockerfile生成镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker build -t nginx_dockerfile:centos .</span><br><span class="line">查看镜像：</span><br><span class="line">ocker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">nginx_dockerfile    centos              28d333149027        6 minutes ago       692MB</span><br><span class="line">nginx               centos              bb2863c49d58        2 hours ago         586MB</span><br><span class="line">sshd-centos         latest              0742cfe06535        3 hours ago         328MB</span><br><span class="line">centos              latest              36540f359ca3        3 weeks ago         193MB</span><br></pre></td></tr></table></figure></p>
+<p>四、根据镜像生成的容器并进行测试<br>1、生成新的容器<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 2224:22 -p 8001:80 -p 4443:443 nginx_dockerfile:centos /usr/<span class="built_in">local</span>/sbin/run.sh</span><br></pre></td></tr></table></figure></p>
+<p>将容器的22端口、80端口和443端口分别映射到到宿主机上的2224端口、8001端口和4443端口,并运行服务脚本。<br>2、测试</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建Mysql服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T21:55:32.291Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>创建Mysql服务的Centos Docker镜像<br>一、准备dockerfile<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir mysql_centos</span><br><span class="line"><span class="built_in">cd</span> mysql_centos</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cat Dockerfile</span><br><span class="line">FROM nginx_dockerfile:centos</span><br><span class="line">RUN yum -y install gcc gcc-c++ make automake cmake</span><br><span class="line">RUN groupadd mysql; useradd -r -M -u 39 -s /sbin/nologin -g mysql mysql</span><br><span class="line">RUN mkdir /usr/<span class="built_in">local</span>/mysql; mkdir /data/mysql/db -p</span><br><span class="line">RUN yum install gcc gcc-c++ ncurses-devel bison bison-devel -y</span><br><span class="line">RUN wget http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz</span><br><span class="line">RUN tar zxf mysql-5.6.29.tar.gz -C /usr/src/</span><br><span class="line">WORKDIR /usr/src/mysql-5.6.29</span><br><span class="line">RUN cmake . -DCMAKE_INSTALL_PREFIX=/usr/<span class="built_in">local</span>/mysql -DMYSQL_DATADIR=/data/mysql/db -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DEXTRA_CHARSETS=all -DDEFAULT_COLLATION=utf8_general_ci -DWITH-MYSQLD-LDFLAGS=-all-static -DWITH-CLIENT-LD-FLAGS=-all-static -DWITH_DEBUG=0 &amp;&amp; gmake &amp;&amp; gmake install</span><br><span class="line">RUN chown -R root:mysql /usr/<span class="built_in">local</span>/mysql/ &amp;&amp; chown -R mysql:mysql /data/mysql/db/</span><br><span class="line">RUN chmod 775 /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh</span><br><span class="line">RUN /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh --basedir=/usr/<span class="built_in">local</span>/mysql --datadir=/data/mysql/db --no-defaults --user=mysql</span><br><span class="line">RUN cp /usr/src/mysql-5.6.29/support-files/my-default.cnf /etc/my.cnf</span><br><span class="line">RUN cp /usr/src/mysql-5.6.29/support-files/mysql.server /etc/init.d/mysqld</span><br><span class="line">RUN chmod -R 775 /etc/init.d/mysqld &amp;&amp; /etc/init.d/mysqld start</span><br><span class="line">RUN <span class="built_in">echo</span> -e <span class="string">'#!/bin/bash\nexport PATH=$PATH:/usr/local/mysql/bin'</span> &gt;/etc/profile.d/mysql.sh</span><br><span class="line">RUN <span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
+<p>二、根据Dockerfile生成镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker build -t mysql_dockerfile:nginx_dockerfile .</span><br><span class="line"></span><br><span class="line">docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">mysql_dockerfile    nginx_dockerfile    e8fcca4ad7b0        11 minutes ago      5.54GB</span><br><span class="line">nginx_dockerfile    centos              28d333149027        3 days ago          692MB</span><br><span class="line">nginx               centos              bb2863c49d58        3 days ago          586MB</span><br><span class="line">sshd-centos         latest              0742cfe06535        3 days ago          328MB</span><br><span class="line">centos              latest              36540f359ca3        3 weeks ago         193MB</span><br></pre></td></tr></table></figure></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建JDK8的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
+  	<time datetime="2017-12-15T21:44:27.117Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建JDK8的CentOS镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 ~]<span class="comment"># mkdir jdk8_centos</span></span><br><span class="line">[root@node4 ~]<span class="comment"># cd jdk8_centos/</span></span><br></pre></td></tr></table></figure></p>
+<p>准备jdk安装包<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># ls</span></span><br><span class="line">Dockerfile  server-jre-8u152-linux-x64.tar.gz</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># vim Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM sshd_dockerfile</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#添加jdk安装包</span></span><br><span class="line">RUN mkdir /usr/java</span><br><span class="line">ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</span><br><span class="line"><span class="comment">#安装jdk</span></span><br><span class="line">RUN sed -i <span class="string">'$a\export LANG=en_US.UTF-8'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\JAVA_HOME=/usr/java/jdk1.8.0_152'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib'</span> /etc/profile</span><br><span class="line">RUN sed -i <span class="string">'$a\export JAVA_HOME JRE_HOME PATH CLASSPATH'</span> /etc/profile</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line"><span class="comment">#运行脚本，启动sshd服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker build -t jdk8_dockerfile .</span></span><br><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB</span><br><span class="line">sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB</span><br><span class="line">sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br><span class="line">[root@node4 jdk8_centos]<span class="comment"># docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Centos6.5搭建L2TP_VPN" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -396,83 +807,6 @@
 
 
   
-    <article id="post-zabbix通过jmx监控tomcat" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-15T18:50:53.189Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>一、服务端配置<br>1、安装jdk（版本1.8.0_91）<br>rpm -ivh jdk-8u91-linux-x64.rpm<br>vi /etc/profile<br>最后添加：<br>JAVA_HOME=/usr/java/jdk1.8.0_91<br>CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>export JAVA_HOME<br>export PATH<br>export CLASSPATH</p>
-<p>source /etc/profile<br>安装与配置比较简单，过程省略。执行java -version命令，出现类似界面表示成功。<br>[root@iZ25kscmkn3Z ~]# java -version<br>java version “1.8.0_91”<br>Java(TM) SE Runtime Environment (build 1.8.0_91-b14)<br>Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)</p>
-<p>2、安装Zabbix-Java-gateway<br>cd /usr/src/zabbix-3.0.0/<br>./configure –enable-java -prefix=/usr/local/zabbix/zabbix_java<br>make &amp;&amp; make install</p>
-<p>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>ls<br>bin  lib  settings.sh  shutdown.sh  startup.sh<br>3、修改Java-gateway的配置文件并启动它<br>配置文件路径为/data/zabbix/zabbix_java/sbin/zabbix_java/settings.sh<br>启用以下参数：<br>vi settings.sh<br>LISTEN_IP=”0.0.0.0”<br>LISTEN_PORT=10052<br>START_POLLERS=5</p>
-<p>4、修改zabbix_server的配置文件并重启<br>vi /usr/local/zabbix/etc/zabbix_server.conf<br>JavaGateway=127.0.0.1<br>JavaGatewayPort=10052<br>StartJavaPollers=5</p>
-<p>启动zabbix_java<br>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>./startup.sh<br>重启zabbix_server</p>
-<h1 id="etc-init-d-zabbix-server-restart"><a href="#etc-init-d-zabbix-server-restart" class="headerlink" title="/etc/init.d/zabbix_server restart"></a>/etc/init.d/zabbix_server restart</h1><p>二、Tomcat服务端<br>1、给tomcat启动脚本添加参数，开启JMX<br>vi /usr/local/site/bin/catalina.sh<br>添加如下内容：<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djava.rmi.server.hostname=10.44.21.14”  —-备注（10.44.21.14是客户端ip地址）<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djavax.management.builder.initial=”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote=true”</p>
-<p>#CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.port=12345”#端口配置不用了<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.ssl=false”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.authenticate=false”  </p>
-<p>vi conf/server.xml(tomcat8.5版本不要在conf/server.xml增加以下内容，tomcat会起不来)<br>省略…  </p>
-<p><server port="8005" shutdown="SHUTDOWN"><br>     <listener classname="org.apache.catalina.startup.VersionLoggerListener"><br>     <!-- Security listener. Documentation at /docs/config/listeners.html  
-     <Listener className="org.apache.catalina.security.SecurityListener" />  
-     --><br>     <!--APR library loader. Documentation at /docs/apr.html --><br>     <listener classname="org.apache.catalina.core.AprLifecycleListener" sslengine="on"><br>     <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html --><br>     <listener classname="org.apache.catalina.core.JasperListener"><br>     <!-- Prevent memory leaks due to use of particular java/javax APIs--><br>     <listener classname="org.apache.catalina.core.JreMemoryLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"><br>     <listener classname="org.apache.catalina.core.ThreadLocalLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" rmiregistryportplatform="10052" rmiserverportplatform="10053">     —-默认添加最后两行<br>省略..</listener></listener></listener></listener></listener></listener></listener></server></p>
-<p>2、下载catalina-jmx-remote.jar<br>wget  <a href="http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar" target="_blank" rel="noopener">http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar</a>  #我的tomcat版本是7.0.56<br>将下载后后的jar包放到被监控的tomcat实例的lib目录下。<br>3、重启tomcat<br>/usr/local/site/bin/shutdown.sh<br>/usr/local/site/bin/startup.sh<br>4、测试是否可以获取数据<br>下载cmdline-jmxclient-0.10.3.jar工具<br>在服务器端进行测试<br>java -jar cmdline-jmxclient-0.10.3.jar -  10.44.21.143:10052 java.lang:type=Memory NonHeapMemoryUsage<br>08/29/2016 17:40:15 +0800 org.archive.jmx.Client NonHeapMemoryUsage:<br>committed: 105644032<br>init: 2555904<br>max: -1<br>used: 101895192</p>
-<p>问题：<br>web界面上显示cannot connect to [[192.168.18.20]:10052]: [111] Connection refused  ，192.168.18.20是我一个agent端的ip地址。debug级别已经调整为4，没有看到报错。 </p>
-<p>tomcat8.5只需要在bin/catalina.sh增加，重启tomcat服务<br>CATALINA_OPTS=”-Dcom.sun.management.jmxremote<br>-Dcom.sun.management.jmxremote.authenticate=false<br>-Dcom.sun.management.jmxremote.ssl=false<br>-Dcom.sun.management.jmxremote.port=12345<br>-Djava.rmi.server.hostname=10.27.242.110”</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/zabbix通过jmx监控tomcat/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -521,447 +855,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/12/15/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-利用mk-table-checksum监测Mysql主从数据一致性操作记录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/利用mk-table-checksum监测Mysql主从数据一致性操作记录/">利用mk-table-checksum监测Mysql主从数据一致性操作记录</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/利用mk-table-checksum监测Mysql主从数据一致性操作记录/" class="archive-article-date">
-  	<time datetime="2017-12-15T18:42:50.357Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>前面已经提到了mysql主从环境下数据一致性检查：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理<br>今天这里再介绍另一种Mysql数据一致性自动检测工具:Maatkit。（不过Maatkit工具现在已经不维护了，推荐还是使用percona-toolkit工具吧！）</p>
-<p>Maatkit是一个开源的工具包，为mySQL日常管理提供了帮助，它包含很多工具，这里主要说下面两个：<br>1）mk-table-checksum                     用来检测master和slave上的表结构和数据是否一致的；<br>2）mk-table-sync                             在主从数据不一致时，用来修复数据的；先主后从有效保证表一致的工具，不必重载从表而能够保证一致。 </p>
-<h2 id="上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。"><a href="#上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。" class="headerlink" title="上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。"></a>上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。</h2><p>下面记录了这一操作过程：<br>基本信息：<br>master：192.168.1.101<br>slave：192.168.1.102<br>版本：mysql5.6<br>同步的库：huanqiu、huanpc</p>
-<p>Maatkit安装过程：（主库和从库服务器上都可以安装，因为数据一致性检查操作在主库或从库机器上都可以运行；建议主从机器上都安装）<br>1）安装该工具依赖的软件包<br>[root@master-server src]# yum install perl-IO-Socket-SSL perl-DBD-MySQL perl-Time-HiRes perl perl-DBI -y</p>
-<p>2）maatkit下载安装    [需要FQ到官网下载：<a href="https://code.google.com/archive/p/maatkit/downloads" target="_blank" rel="noopener">https://code.google.com/archive/p/maatkit/downloads</a>]<br>百度云盘下载地址：<a href="https://pan.baidu.com/s/1c1AufW8" target="_blank" rel="noopener">https://pan.baidu.com/s/1c1AufW8</a>    （提取密码：vbi1）<br>[root@master-server ~]# tar -zvxf maatkit-7540.tar.gz  &amp;&amp; cd maatkit-7540<br>[root@master-server maatkit-7540]# perl Makefile.PL<br>Checking if your kit is complete…<br>Looks good</p>
-<h2 id="Writing-Makefile-for-maatkit"><a href="#Writing-Makefile-for-maatkit" class="headerlink" title="Writing Makefile for maatkit"></a>Writing Makefile for maatkit</h2><p>如有报错：<br>Can’t locate ExtUtils/MakeMaker.pm in @INC (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at Makefile.PL line 1.<br>BEGIN failed–compilation aborted at Makefile.PL line 1.<br>解决办法：</p>
-<h2 id="root-slave-server-maatkit-4334-yum-install-perl-ExtUtils-Embed-perl-ExtUtils-CBuilder-perl-ExtUtils-MakeMaker-y"><a href="#root-slave-server-maatkit-4334-yum-install-perl-ExtUtils-Embed-perl-ExtUtils-CBuilder-perl-ExtUtils-MakeMaker-y" class="headerlink" title="[root@slave-server maatkit-4334]# yum install perl-ExtUtils-Embed perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker -y"></a>[root@slave-server maatkit-4334]# yum install perl-ExtUtils-Embed perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker -y</h2><p>[root@master-server maatkit-4334]# make &amp;&amp; make install</p>
-<p>[root@master-server ~]# mk-               //按TAB键补全，可以查看到Maatkit的所有命令</p>
-<p>mk-archiver               mk-find                   mk-parallel-dump          mk-show-grants            mk-table-sync<br>mk-checksum-filter        mk-heartbeat              mk-parallel-restore       mk-slave-delay            mk-table-usage<br>mk-config-diff            mk-index-usage            mk-profile-compact        mk-slave-find             mk-tcp-model<br>mk-deadlock-logger        mk-kill                   mk-purge-logs             mk-slave-move             mk-upgrade<br>mk-duplicate-key-checker  mk-loadavg                mk-query-advisor          mk-slave-prefetch         mk-variable-advisor<br>mk-error-log              mk-log-player             mk-query-digest           mk-slave-restart          mk-visual-explain<br>mk-fifo-split             mk-merge-mqd-results      mk-query-profiler         mk-table-checksum<br>安装完成后，一定要在被校验的主从服务器上创建只有SELECT权限的帐号（最好保持主从上创建的账号和密码一样，方便操作）</p>
-<p>mysql&gt; GRANT SELECT ON <em>.</em> TO ‘data_check’@’%’ IDENTIFIED BY ‘check@123’;<br>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; flush privileges;<br>Query OK, 0 rows affected (0.01 sec)<br>使用mk-table-checksum检查主从数据一致性<br>1）在主库服务器上运行数据一致性检查操作（也可以在从库服务器上进行数据一致性检查操作，命令跟下面一样）<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306</p>
-<p>DATABASE TABLE                     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>mysql    columns_priv                  0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    columns_priv                  0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    db                            0 192.168.1.101 MyISAM       NULL       4197331717    0    0 NULL NULL<br>mysql    db                            0 192.168.1.102 MyISAM       NULL       4197331717    0    0 NULL NULL<br>mysql    event                         0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    event                         0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    func                          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    func                          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    general_log                   0 192.168.1.101 CSV          NULL                0    0    0 NULL NULL<br>mysql    general_log                   0 192.168.1.102 CSV          NULL                0    0    0 NULL NULL<br>mysql    help_category                 0 192.168.1.101 MyISAM       NULL       2621154011    0    0 NULL NULL<br>mysql    help_category                 0 192.168.1.102 MyISAM       NULL       2621154011    0    0 NULL NULL<br>mysql    help_keyword                  0 192.168.1.101 MyISAM       NULL       2791798352    0    0 NULL NULL<br>mysql    help_keyword                  0 192.168.1.102 MyISAM       NULL        578891347    0    0 NULL NULL<br>mysql    help_relation                 0 192.168.1.101 MyISAM       NULL       3733405838    0    0 NULL NULL<br>mysql    help_relation                 0 192.168.1.102 MyISAM       NULL       1649042165    0    0 NULL NULL<br>mysql    help_topic                    0 192.168.1.101 MyISAM       NULL       1795841156    0    0 NULL NULL<br>mysql    help_topic                    0 192.168.1.102 MyISAM       NULL       2642710534    0    0 NULL NULL<br>mysql    innodb_index_stats            0 192.168.1.101 InnoDB       NULL       1853713685    0    0 NULL NULL<br>mysql    innodb_index_stats            0 192.168.1.102 InnoDB       NULL        213249811    0    0 NULL NULL<br>mysql    innodb_table_stats            0 192.168.1.101 InnoDB       NULL       2028951538    0    0 NULL NULL<br>mysql    innodb_table_stats            0 192.168.1.102 InnoDB       NULL       4163315044    0    0 NULL NULL<br>mysql    ndb_binlog_index              0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    ndb_binlog_index              0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    plugin                        0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    plugin                        0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    proc                          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    proc                          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    procs_priv                    0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    procs_priv                    0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    proxies_priv                  0 192.168.1.101 MyISAM       NULL       3956276869    0    0 NULL NULL<br>mysql    proxies_priv                  0 192.168.1.102 MyISAM       NULL       2040113179    0    0 NULL NULL<br>mysql    servers                       0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    servers                       0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    slave_master_info             0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slave_master_info             0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slave_relay_log_info          0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slave_relay_log_info          0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slave_worker_info             0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slave_worker_info             0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL<br>mysql    slow_log                      0 192.168.1.101 CSV          NULL                0    0    0 NULL NULL<br>mysql    slow_log                      0 192.168.1.102 CSV          NULL                0    0    0 NULL NULL<br>mysql    tables_priv                   0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    tables_priv                   0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone                     0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone                     0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_leap_second         0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_leap_second         0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_name                0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_name                0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_transition          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_transition          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_transition_type     0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    time_zone_transition_type     0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL<br>mysql    user                          0 192.168.1.101 MyISAM       NULL        882367917    0    0 NULL NULL<br>mysql    user                          0 192.168.1.102 MyISAM       NULL        883514797    0    0 NULL NULL<br>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanqiu  checksums     0 192.168.1.101 InnoDB       NULL       1230819712    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB       NULL       3864574229    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB       NULL       1378115040    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB       NULL       1378115040    0    0 NULL NULL<br>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanpc   checksums     0 192.168.1.101 InnoDB       NULL       2427682155    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB       NULL        289696409    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB       NULL       1446184115    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB       NULL       1956266704    0    0 NULL NULL<br>上面命令中参数解释：<br>第一个h：   填写主库ip<br>第一个u：   主库授权的用户名<br>第一个p：   主库授权的密码<br>第二个h：   填写从库ip<br>第二个u：   从库授权的用户名<br>第二个p：   从库授权的密码<br>P：   mysql的端口</p>
-<p>上面的命令所示检查主从的所有库的数据一致性；一般我们检查的是同步的库。这就需要添加参数：<br>-d(或者–database)    后接数据库名，注意后面不需要加=号，多个数据库之间用逗号隔开，比如-dhuanqiu,huanpc;如果不加-d，校验的是所有库；<br>–count    会计算出表的行数</p>
-<p>如下操作：<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu –count                //针对单个库huanqiu，检查主从数据一致性</p>
-<p>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanpc –count               //针对单个库huanpc，检查主从数据一致性</p>
-<p>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc –count        //针对多个库huaniu、huanpc，检查主从数据一致性</p>
-<p>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL<br>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL<br>上述结果中的参数解释：<br>DATABASE：     检查的库名<br>TABLE：           检查的库中的表名<br>CHUNK：          checksum时的近似数值<br>HOST：            主从MYSQL的地址<br>ENGINE：         表引擎<br>COUNT：         表的行数<br>CHECKSUM：  校验值<br>TIME：            所用时间<br>WAIT：           等待时间<br>STAT：           MASTER_POS_WAIT()返回值<br>LAG：            slave的延时时间</p>
-<p>mk-checksum-filter过滤工具的使用<br>如果只想知道huanqiu库中哪些表不是一致的，那么只需要加一个管道符即可，如下：<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu –count | mk-checksum-filter                   //如下表示huanqiu库下只有haha表的数据，主从不一致</p>
-<p>huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanpc –count  | mk-checksum-filter                 //如下表示huanqiu库下只有haha表的数据，主从不一致</p>
-<p>huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc –count | mk-checksum-filter                    //如下表示huanqiu库下只有haha表的数据，主从不一致</p>
-<p>huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL<br>使用mk-table-sync修复主从不同步的数据<br>顾名思义，mk-table-sync用来修复多个实例之间数据的不一致。它可以让主从的数据修复到最终一致，也可以使通过应用双写或多写的多个不相关的数据库实例修复到一致。同时它还内部集成了pt-table-checksum的校验功能，可以一边校验一边修复，也可以基于pt-table-checksum的计算结果来进行修复。<br>mk-table-sync工作原理<br>1）单行数据checksum值的计算<br>计算逻辑与pt-table-checksum一样，也是先检查表结构，并获取每一列的数据类型，把所有数据类型都转化为字符串，然后用concat_ws()函数进行连接，由此计算出该行的checksum值。checksum默认采用crc32计算。</p>
-<p>2）数据块checksum值的计算<br>同pt-table-checksum工具一样，pt-table-sync会智能分析表上的索引，然后把表的数据split成若干个chunk，计算的时候以chunk为单位。可以理解为把chunk内所有行的数据拼接起来，再计算crc32的值，即得到该chunk的checksum值。</p>
-<p>3）坏块检测和修复<br>前面两步，pt-table-sync与pt-table-checksum的算法和原理一样。再往下，就开始有所不同：<br>pt-table-checksum只是校验，所以它把checksum结果存储到统计表，然后把执行过的sql语句记录到binlog中，任务就算完成。语句级的复制把计算逻辑传递到从库，并在从库执行相同的计算。pt-table-checksum的算法本身并不在意从库的延迟，延迟多少都一样计算(有同事对此不理解，可以参考我的前一篇文章)，不会影响计算结果的正确性(但是我们还是会检测延迟，因为延迟太多会影响业务，所以总是要加上—max-lag来限流)。<br>pt-table-sync则不同。它首先要完成chunk的checksum值的计算，一旦发现主从上同样的chunk的checksum值不同，就深入到该chunk内部，逐行比较并修复有问题的行。其计算逻辑描述如下(以修复主从结构的数据不一致为例，业务双写的情况修复起来更复杂—因为涉及到冲突解决和基准选择的问题，限于篇幅，这里不介绍)：<br>    1）对每一个从库，每一个表，循环进行如下校验和修复过程。<br>    2）对每一个chunk，在校验时加上for update锁。一旦获得锁，就记录下当前主库的show master status值。<br>    3）在从库上执行select master_pos_wait()函数，等待从库sql线程执行到show master status得到的位置。以此保证，主从上关于这个chunk的内容均不再改变。<br>    4）对这个chunk执行checksum，然后与主库的checksum进行比较。<br>    5）如果checksum相同，说明主从数据一致，就继续下一个chunk。<br>    6）如果checksum不同，说明该chunk有不一致。深入chunk内部，逐行计算checksum并比较(单行checksum比较过程与chunk的比较过程一样，单行实际是chunk的size为1的特例)。<br>    7）如果发现某行不一致，则标记下来。继续检测剩余行，直到这个chunk结束。<br>    8）对找到的主从不一致的行，采用replace into语句，在主库执行一遍以生成该行全量的binlog，并同步到从库，这会以主库数据为基准来修复从库；对于主库有的行而从库没有的行，采用replace在主库上插入(必须不能是insert)；对于从库有而主库没有的行，通过在主库执行delete来删除(pt-table-sync强烈建议所有的数据修复都只在主库进行，而不建议直接修改从库数据；但是也有特例，后面会讲到)。<br>    9）直到修复该chunk所有不一致的行。继续检查和修复下一个chunk。<br>   10）直到这个从库上所有的表修复结束。开始修复下一个从库。</p>
-<p>重要选项<br>–print                    显示同步需要执行的语句<br>–execute               执行数据同步<br>–charset=utf8        设置字符集，避免从库乱码。</p>
-<p>实例说明：<br>mk-table-sync的工作方式是：先一行一行检查主从库的表是否一样，如果哪里不一样，就执行删除，更新，插入等操作，使其达到一致。<br>通过上面mk-table-checksum的检查结果可以看出，同步的两个库huanqiu和huanpc的数据并不一致，这时就可以使用mk-table-sync进行数据修复了。</p>
-<p>数据修复命令如下：（如果mysql端口是默认的3306，则下面命令中的P=3306可以省略）<br>由于上面在mk-table-checksum检查时用的data_check只有select权限，权限太小，不能用于mk-table-sync修复数据只用。<br>所以还需要在主库和从库数据库里创建用于mk-table-sync修复数据之用的账号权限</p>
-<p>mysql&gt; GRANT ALL ON <em>.</em> to mksync@’%’ identified by “sync@123”;<br>Query OK, 0 rows affected (0.01 sec)</p>
-<p>mysql&gt; flush privileges;<br>Query OK, 0 rows affected (0.00 sec)<br>[root@master-server lib]# mk-table-sync –execute –charset=utf8 –print –no-check-slave –databases huanqiu,huanpc h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306</p>
-<p>UPDATE <code>huanpc</code>.<code>checksums</code> SET <code>chunk_time</code>=’0.002821’, <code>chunk_index</code>=NULL, <code>lower_boundary</code>=NULL, <code>upper_boundary</code>=NULL, <code>this_crc</code>=’5681c480’, <code>this_cnt</code>=’7’, <code>master_crc</code>=’5681c480’, <code>master_cnt</code>=’7’, <code>ts</code>=’2017-01-12 14:29:14’ WHERE <code>db</code>=’huanpc’ AND <code>tbl</code>=’heihei’ AND <code>chunk</code>=’1’ LIMIT 1 /<em>maatkit src_db:huanpc src_tbl:checksums src_dsn:A=utf8,P=3306,h=192.168.1.101,p=…,u=mksync dst_db:huanpc dst_tbl:checksums dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=…,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server</em>/;<br>DELETE FROM <code>huanpc</code>.<code>heihei</code> WHERE <code>member</code>=’90’ LIMIT 1 /<em>maatkit src_db:huanpc src_tbl:heihei src_dsn:A=utf8,P=3306,h=192.168.1.101,p=…,u=mksync dst_db:huanpc dst_tbl:heihei dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=…,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server</em>/;<br>UPDATE <code>huanqiu</code>.<code>checksums</code> SET <code>chunk_time</code>=’0.002495’, <code>chunk_index</code>=NULL, <code>lower_boundary</code>=NULL, <code>upper_boundary</code>=NULL, <code>this_crc</code>=’ecb4850b’, <code>this_cnt</code>=’5’, <code>master_crc</code>=’ecb4850b’, <code>master_cnt</code>=’5’, <code>ts</code>=’2017-01-12 14:27:45’ WHERE <code>db</code>=’huanqiu’ AND <code>tbl</code>=’haha’ AND <code>chunk</code>=’1’ LIMIT 1 /<em>maatkit src_db:huanqiu src_tbl:checksums src_dsn:A=utf8,P=3306,h=192.168.1.101,p=…,u=mksync dst_db:huanqiu dst_tbl:checksums dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=…,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server</em>/;<br>DELETE FROM <code>huanqiu</code>.<code>haha</code> WHERE <code>id</code>=’90’ LIMIT 1 /<em>maatkit src_db:huanqiu src_tbl:haha src_dsn:A=utf8,P=3306,h=192.168.1.101,p=…,u=mksync dst_db:huanqiu dst_tbl:haha dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=…,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server</em>/;<br>上面那条命令执行后，再次检查主从数据，发现主从已经同步：</p>
-<p>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc –count<br>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  checksums     0 192.168.1.102 InnoDB          1         705c5e2e    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.101 InnoDB          3         b9b29a07    0    0 NULL NULL<br>huanqiu  haha          0 192.168.1.102 InnoDB          3         b9b29a07    0    0 NULL NULL<br>DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG<br>huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   checksums     0 192.168.1.102 InnoDB          1          5af891e    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.101 InnoDB          7         22a57b1c    0    0 NULL NULL<br>huanpc   heihei        0 192.168.1.102 InnoDB          7         22a57b1c    0    0 NULL NULL</p>
-<p>或者加mk-checksum-filter<br>[root@master-server ~]# mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc –count | mk-checksum-filter</p>
-<h2 id="root-master-server"><a href="#root-master-server" class="headerlink" title="[root@master-server ~]#"></a>[root@master-server ~]#</h2><p>如有报错：<br>DBD::mysql::db do failed: Access denied; you need (at least one of) the SUPER privilege(s) for this operation [for Statement “/<em>!50105 SET @@binlog_format=”STATEMENT”</em>/“] at /usr/local/bin/mk-table-sync line 8568.<br>Issuing rollback() due to DESTROY without explicit disconnect() of DBD::mysql::db handle ;host=192.168.1.101;port=3306;mysql_read_default_group=client at /usr/local/bin/mk-table-sync line 8568.</p>
-<p>解决办法：安装DBI和DBD-MySQL<br>下载地址：<br><a href="http://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/T/TI/TIMB/" target="_blank" rel="noopener">http://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/T/TI/TIMB/</a><br><a href="http://search.cpan.org/dist/DBD-mysql/" target="_blank" rel="noopener">http://search.cpan.org/dist/DBD-mysql/</a><br>或者百度云盘下载：<a href="https://pan.baidu.com/s/1miv0S8g" target="_blank" rel="noopener">https://pan.baidu.com/s/1miv0S8g</a> （提取密码：fh24）</p>
-<p>[root@master-server src]# tar -zvxf DBI-1.634.tar.gz<br>[root@master-server src]# cd DBI-1.634<br>[root@master-server DBI-1.634]# perl Makefile.PL<br>[root@master-server DBI-1.634]# make &amp;&amp; make install</p>
-<p>[root@master-server src]# tar -zvxf DBD-mysql-4.041_01.tar.gz<br>[root@master-server src]# cd DBD-mysql-4.041_01<br>[root@master-server DBD-mysql-4.041_01]# perl Makefile.PL –mysql_config=/usr/local/mysql/bin/mysql_config         //主库mysql安装路径/usr/local/mysql<br>[root@master-server DBD-mysql-4.041_01]# make</p>
-<h2 id="root-master-server-DBD-mysql-4-041-01-make-install"><a href="#root-master-server-DBD-mysql-4-041-01-make-install" class="headerlink" title="[root@master-server DBD-mysql-4.041_01]# make install"></a>[root@master-server DBD-mysql-4.041_01]# make install</h2><p>这里要说明一下：<br>主从数据库表和表结构必须一致,否则会报错！<br>–no-check-slave这个参数，如果不加这个参数，会提示报错，因为此工具默认不允许在从库上修改数据，但这里为了不在主库上dump出来，再到从库上导入进去，加了这个参数。</p>
-<p>特别注意的是：<br>1）如果想要看下到底哪些数据不同步，可以这样做：（如果不跟-t参数，就是说同步整个库的所有表的数据）<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave –databases huanqiu,huanpc h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result<br>2）如果有好几个从库的话，建议分开同步，除非几个从库的checksum一样！<br>因为每个从库同步的步调不一定都一致，如果几个从库一块同步的话，很容易造成主键冲突，导致主从同步中断。<br>举个例子来说：<br>主库：192.168.1.101<br>从库1: 192.168.1.102<br>从库2: 192.168.1.103<br>从库3: 192.168.1.104</p>
-<p>建议(分开同步，一个个操作)：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result1<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.103,u=mksync,p=sync@123,P=3306 &gt; /root/result2<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.104,u=mksync,p=sync@123,P=3306 &gt; /root/result3<br>不建议（放在一起同步）：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 h=192.168.1.103,u=mksync,p=sync@123,P=3306 h=192.168.1.104,u=data_check,p=check@123,P=3306 &gt; /root/result</p>
-<p>4）为了减少重复操作，也可以一次同步好几个表，多个表时可以在-t后加=号，即-t=tables1,tables2,table3…比如：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t=haha,heihei,hehe,name h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/利用mk-table-checksum监测Mysql主从数据一致性操作记录/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Top命令详解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/Top命令详解/">Top命令详解</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/Top命令详解/" class="archive-article-date">
-  	<time datetime="2017-12-15T18:41:17.031Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>TOP是一个动态显示过程,即可以通过用户按键来不断刷新当前状态.如果在前台执行该命令,它将独占前台,直到用户终止该程序为止.比较准确的说,top命令提供了实时的对系统处理器的状态监视.它将显示系统中CPU最“敏感”的任务列表.该命令可以按CPU使用.内存使用和执行时间对任务进行排序；而且该命令的很多特性都可以通过交互式命令或者在个人定制文件中进行设定.<br>top - 12:38:33 up 50 days, 23:15,  7 users,  load average: 60.58, 61.14, 61.22<br>Tasks: 203 total,  60 running, 139 sleeping,   4 stopped,   0 zombie<br>Cpu(s)  : 27.0%us, 73.0%sy,  0.0%ni,  0.0%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st<br>Mem:   1939780k total,  1375280k used,   564500k free,   109680k buffers<br>Swap:  4401800k total,   497456k used,  3904344k free,   848712k cached<br>PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND<br> 4338 oracle    25   0  627m 209m 207m R    0 11.0 297:14.76 oracle<br> 4267 oracle    25   0  626m 144m 143m R    6  7.6  89:16.62 oracle<br> 3458 oracle    25   0  672m 133m 124m R    0  7.1   1283:08 oracle<br> 3478 oracle    25   0  672m 124m 115m R    0  6.6   1272:30 oracle<br> 3395 oracle    25   0  672m 122m 113m R    0  6.5   1270:03 oracle<br> 3480 oracle    25   0  672m 122m 109m R    8  6.4   1274:13 oracle<br> 3399 oracle    25   0  672m 121m 110m R    0  6.4   1279:37 oracle<br> 4261 oracle    25   0  634m 100m  99m R    0  5.3  86:13.90 oracle<br>25737 oracle    25   0  632m  81m  74m R    0  4.3 272:35.42 oracle<br> 7072 oracle    25   0  626m  72m  71m R    0  3.8   6:35.68 oracle<br>16073 oracle    25   0  630m  68m  63m R    8  3.6 175:20.36 oracle<br>16140 oracle    25   0  630m  66m  60m R    0  3.5 175:13.42 oracle<br>16122 oracle    25   0  630m  66m  60m R    0  3.5 176:47.73 oracle<br>  786 oracle    25   0  627m  63m  63m R    0  3.4   1:54.93 oracle<br> 4271 oracle    25   0  627m  59m  58m R    8  3.1  86:09.64 oracle<br> 4273 oracle    25   0  627m  57m  56m R    8  3.0  84:38.20 oracle<br>22670 oracle    25   0  626m  50m  49m R    0  2.7  84:55.82 oracle<br>一.  TOP前五行统计信息<br>统计信息区前五行是系统整体的统计信息。</p>
-<ol>
-<li>第一行是任务队列信息<br>同 uptime  命令的执行结果:<br>[root@localhost ~]# uptime<br>13:22:30 up 8 min,  4 users,  load average: 0.14, 0.38, 0.25<br>其内容如下：<br>12:38:33<br>当前时间<br>up 50days<br>系统运行时间，格式为时:分<br>1 user<br>当前登录用户数<br>load average: 0.06, 0.60, 0.48<br>系统负载，即任务队列的平均长度。 三个数值分别为  1分钟、5分钟、15分钟前到现在的平均值。</li>
-<li>第二、三行为进程和CPU的信息<br>当有多个CPU时，这些内容可能会超过两行。内容如下：<br>Tasks: 29 total<br>进程总数<br>1 running<br>正在运行的进程数<br>28 sleeping<br>睡眠的进程数<br>0 stopped<br>停止的进程数<br>0 zombie<br>僵尸进程数<br>Cpu(s): 0.3% us<br>用户空间占用CPU百分比<br>1.0% sy<br>内核空间占用CPU百分比<br>0.0% ni<br>用户进程空间内改变过优先级的进程占用CPU百分比<br>98.7% id<br>空闲CPU百分比<br>0.0% wa<br>等待输入输出的CPU时间百分比<br>0.0% hi</li>
-</ol>
-<p>0.0% si</p>
-<ol>
-<li>第四五行为内存信息。<br>内容如下：<br>Mem: 191272k total<br>物理内存总量<br>173656k used<br>使用的物理内存总量<br>17616k free<br>空闲内存总量<br>22052k buffers<br>用作内核缓存的内存量<br>Swap: 192772k total<br>交换区总量<br>0k used<br>使用的交换区总量<br>192772k free<br>空闲交换区总量<br>123988k cached<br>缓冲的交换区总量。 内存中的内容被换出到交换区，而后又被换入到内存，但使用过的交换区尚未被覆盖， 该数值即为这些内容已存在于内存中的交换区的大小。相应的内存再次被换出时可不必再对交换区写入。<br>二.  进程信息<br>列名<br>含义<br>PID<br>进程id<br>PPID<br>父进程id<br>RUSER<br>Real user name<br>UID<br>进程所有者的用户id<br>USER<br>进程所有者的用户名<br>GROUP<br>进程所有者的组名<br>TTY<br>启动进程的终端名。不是从终端启动的进程则显示为 ?<br>PR<br>优先级<br>NI<br>nice值。负值表示高优先级，正值表示低优先级<br>P<br>最后使用的CPU，仅在多CPU环境下有意义<br>%CPU<br>上次更新到现在的CPU时间占用百分比<br>TIME<br>进程使用的CPU时间总计，单位秒<br>TIME+<br>进程使用的CPU时间总计，单位1/100秒<br>%MEM<br>进程使用的物理内存百分比<br>VIRT<br>进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES<br>SWAP<br>进程使用的虚拟内存中，被换出的大小，单位kb。<br>RES<br>进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA<br>CODE<br>可执行代码占用的物理内存大小，单位kb<br>DATA<br>可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb<br>SHR<br>共享内存大小，单位kb<br>nFLT<br>页面错误次数<br>nDRT<br>最后一次写入到现在，被修改过的页面数。<br>S<br>进程状态。<pre><code>D=不可中断的睡眠状态
-R=运行
-S=睡眠
-T=跟踪/停止
-Z=僵尸进程
-</code></pre>COMMAND<br>命令名/命令行<br>WCHAN<br>若该进程在睡眠，则显示睡眠中的系统函数名<br>Flags<br>任务标志，参考 sched.h<br>top 的man 命令解释如下：<br> Listed below are top’s available fields.  They are always associated with the  letter  shown,  regardless  of the position you may have established for them with the ‘o’ (Order fields) interactive command.Any field is selectable as the sort field, and you control whether they are  sorted high-to-low  or  low-to-high.   For  additional  information on sort provisions see  topic 3c. TASK Area Commands.<br>a: PID  –  Process Id<pre><code>The task&apos;s unique process ID, which periodically wraps, though never  restarting at zero.
-</code></pre>b: PPID  –  Parent Process Pid<pre><code>The process ID of a task&apos;s parent.
-</code></pre>c: RUSER  –  Real User Name<pre><code>The real user name of the task&apos;s owner.
-</code></pre>d: UID  –  User Id<pre><code>The effective user ID of the task&apos;s owner.
-</code></pre>e: USER  –  User Name<pre><code>The effective user name of the task&apos;s owner.
-</code></pre>f: GROUP  –  Group Name<pre><code>The effective group name of the task&apos;s owner.
-</code></pre>g: TTY  –  Controlling Tty<pre><code>The  name of the controlling terminal.  This is usually the device (serial port, pty, etc.) from which the process was started, and which it uses  for  input  oroutput.   However,  a task need not be associated with a terminal, in which case you&apos;ll see &apos;?&apos; displayed.
-</code></pre>h: PR  –  Priority<pre><code>The priority of the task.
-</code></pre>i: NI  –  Nice value<pre><code>The nice value of the task.   A  negative  nice  value  means  higher  priority, whereas  a  positive nice value means lower priority.  Zero in this field simply means priority will not be adjusted in determining a task&apos;s dispatchability.
-</code></pre>j: P  –  Last used CPU (SMP)<pre><code>A number representing the last used processor.  In a true SMP  environment  this will likely change frequently since the kernel intentionally uses weak affinity. Also, the very act of running top may break this weak affinity  and  cause  more processes  to change CPUs more often (because of the extra demand for cpu time).
-</code></pre>k: %CPU  –  CPU usage<pre><code>The task&apos;s share of the elapsed CPU time since the last screen update, expressed as a percentage of total CPU time.  In a true SMP environment, if &apos;Irix mode&apos; is Off, top will operate in &apos;Solaris mode&apos; where a task&apos;s cpu usage will be divided by  the  total  number  of  CPUs.   You toggle &apos;Irix/Solaris&apos; modes with the &apos;I&apos; interactive command.
-</code></pre>l: TIME  –  CPU Time<pre><code>Total CPU time the task has used since it started.  When  &apos;Cumulative  mode&apos;  is On,  each  process is listed with the cpu time that it and its dead children has used.  You toggle &apos;Cumulative mode&apos; with &apos;S&apos;, which is a command-line option and an interactive command.  See the &apos;S&apos; interactive command for additional information regarding this mode.
-</code></pre>m: TIME+  –  CPU Time, hundredths<pre><code>The same as &apos;TIME&apos;, but reflecting more granularity through hundredths of a sec          ond.
-</code></pre>n: %MEM  –  Memory usage (RES)<pre><code>A task&apos;s currently used share of available physical memory.
-</code></pre>o: VIRT  –  Virtual Image (kb)<pre><code>The total amount of virtual memory used by the task.  It includes all code, data and shared libraries plus pages that have  been  swapped  out.  (Note:  you  can define  the STATSIZE=1 environment variable and the VIRT will be calculated from the /proc/#/state VmSize field.)
-VIRT = SWAP + RES.
-</code></pre>p: SWAP  –  Swapped size (kb)<pre><code>The swapped out portion of a task&apos;s total virtual memory image.
-</code></pre>q: RES  –  Resident size (kb)<pre><code>The non-swapped physical memory a task has used.
-RES = CODE + DATA.
-</code></pre>r: CODE  –  Code size (kb)<pre><code>The amount of physical memory devoted to executable  code,  also  known  as  the&apos;text resident set&apos; size or TRS.
-</code></pre>s: DATA  –  Data+Stack size (kb)<pre><code>The  amount of physical memory devoted to other than executable code, also known the &apos;data resident set&apos; size or DRS.
-</code></pre>t: SHR  –  Shared Mem size (kb)<pre><code>The amount of shared memory used by a task.   It  simply  reflects  memory  that could be potentially shared with other processes.
-</code></pre>u: nFLT  –  Page Fault count<pre><code>The  number  of  major  page faults that have occurred for a task.  A page fault occurs when a process attempts to read from or write to a virtual page  that  is not  currently  present  in  its address space.  A major page fault is when disk access is involved in making that page available.
-</code></pre>v: nDRT  –  Dirty Pages count<pre><code>The number of pages that have been modified since  they  were  last  written  to disk.   Dirty  pages  must  be written to disk before the corresponding physical memory location can be used for some other virtual page.
-</code></pre>w: S  –  Process Status<pre><code>The status of the task which can be one of:
-      &apos;D&apos; = uninterruptible sleep
-      &apos;R&apos; = running
-      &apos;S&apos; = sleeping
-      &apos;T&apos; = traced or stopped
-      &apos;Z&apos; = zombie
-Tasks shown as running should be more properly thought of as &apos;ready to run&apos;  --their  task_struct is simply represented on the Linux run-queue.  Even without a true SMP machine, you may see numerous tasks in this state  depending  on  top&apos;s delay interval and nice value.
-</code></pre>x: Command  –  Command line or Program name<pre><code>Display the command line used to start a task or the name of the associated program.  You toggle between command line and name with &apos;c&apos;, which is both  a  command-line option and an interactive command. When  you&apos;ve  chosen  to display command lines, processes without a command line (like kernel threads) will be shown with only the program name  in  parentheses, as in this example:                ( mdrecoveryd ) Either  form  of  display is subject to potential truncation if it&apos;s too long to fit in this field&apos;s  current  width.   That  width  depends  upon  other  fields  selected, their order and the current screen width.
-Note: The &apos;Command&apos; field/column is unique, in that it is not fixed-width.  When displayed, this column will be allocated all remaining screen width (up  to  the maximum  512  characters)  to  provide for the potential growth of program names into command lines.
-</code></pre>y: WCHAN  –  Sleeping in Function<pre><code>Depending on the availability of the kernel link map (&apos;System.map&apos;), this  field will  show  the  name or the address of the kernel function in which the task is currently sleeping.  Running tasks will display a dash (&apos;-&apos;) in this column.
-Note: By displaying this field, top&apos;s own working set will be increased by  over 700Kb.   Your  only  means of reducing that overhead will be to stop and restart          top.
-</code></pre>z: Flags  –  Task Flags<pre><code>This column represents the task&apos;s current scheduling flags which  are  expressed in  hexadecimal  notation and with zeros suppressed.  These flags are officially documented in &lt;linux/sched.h&gt;.  Less formal documentation can also be  found  on the &apos;Fields select&apos; and &apos;Order fields&apos; screens.
-默认情况下仅显示比较重要的  PID、USER、PR、NI、VIRT、RES、SHR、S、%CPU、%MEM、TIME+、COMMAND  列。
-</code></pre>2.1 用快捷键更改显示内容。<br>（1）更改显示内容通过 f键可以选择显示的内容。<pre><code>按 f 键之后会显示列的列表，按 a-z  即可显示或隐藏对应的列，最后按回车键确定。
-</code></pre>（2）按o键可以改变列的显示顺序。<pre><code>按小写的 a-z 可以将相应的列向右移动，而大写的 A-Z  可以将相应的列向左移动。最后按回车键确定。
-按大写的 F 或 O 键，然后按 a-z 可以将进程按照相应的列进行排序。而大写的  R 键可以将当前的排序倒转。
-设置完按回车返回界面。
-</code></pre>三.  命令使用<br>详细内容可以参考MAN 帮助文档。这里列举部分内容：<br>命令格式：<br>top [-] [d] [p] [q] [c] [C] [S]    [n]<br>参数说明：<br>d：  指定每两次屏幕信息刷新之间的时间间隔。当然用户可以使用s交互命令来改变之。<br>p：  通过指定监控进程ID来仅仅监控某个进程的状态。<br>q：该选项将使top没有任何延迟的进行刷新。如果调用程序有超级用户权限，那么top将以尽可能高的优先级运行。<br>S： 指定累计模式<br>s ： 使top命令在安全模式中运行。这将去除交互命令所带来的潜在危险。<br>i：  使top不显示任何闲置或者僵死进程。<br>c：  显示整个命令行而不只是显示命令名<br>在top命令的显示窗口，我们还可以输入以下字母，进行一些交互：<br>帮助文档如下：<br>Help for Interactive Commands - procps version 3.2.7<br>Window 1:Def: Cumulative mode Off.  System: Delay 4.0 secs; Secure mode Off.<br>Z,B       Global: ‘Z’ change color mappings; ‘B’ disable/enable bold<br>l,t,m     Toggle Summaries: ‘l’ load avg; ‘t’ task/cpu stats; ‘m’ mem info<br>1,I       Toggle SMP view: ‘1’ single/separate states; ‘I’ Irix/Solaris mode<br>f,o     . Fields/Columns: ‘f’ add or remove; ‘o’ change display order<br>F or O  . Select sort field<br>&lt;,&gt;     . Move sort field: ‘&lt;’ next col left; ‘&gt;’ next col right<br>R,H     . Toggle: ‘R’ normal/reverse sort; ‘H’ show threads<br>c,i,S   . Toggle: ‘c’ cmd name/line; ‘i’ idle tasks; ‘S’ cumulative time<br>x,y     . Toggle highlights: ‘x’ sort field; ‘y’ running tasks<br>z,b     . Toggle: ‘z’ color/mono; ‘b’ bold/reverse (only if ‘x’ or ‘y’)<br>u       . Show specific user only<br>n or #  . Set maximum tasks displayed<br>k,r       Manipulate tasks: ‘k’ kill; ‘r’ renice<br>d or s    Set update interval<br>W         Write configuration file<br>q         Quit<pre><code>( commands shown with &apos;.&apos; require a visible task display window )
-</code></pre>Press ‘h’ or ‘?’ for help with Windows,<br>h或者?  : 显示帮助画面，给出一些简短的命令总结说明。<br>k  ：终止一个进程。系统将提示用户输入需要终止的进程PID，以及需要发送给该进程什么样的信号。一般的终止进程可以使用15信号；如果不能正常结束那就使用信号9强制结束该进程。默认值是信号15。在安全模式中此命令被屏蔽。<br>i：忽略闲置和僵死进程。这是一个开关式命令。<br>q：  退出程序。<br>r：  重新安排一个进程的优先级别。系统提示用户输入需要改变的进程PID以及需要设置的进程优先级值。输入一个正值将使优先级降低，反之则可以使该进程拥有更高的优先权。默认值是10。<br>S：切换到累计模式。<br>s :  改变两次刷新之间的延迟时间。系统将提示用户输入新的时间，单位为s。如果有小数，就换算成ms。输入0值则系统将不断刷新，默认值是5 s。需要注意的是如果设置太小的时间，很可能会引起不断刷新，从而根本来不及看清显示的情况，而且系统负载也会大大增加。<br>f或者F :从当前显示中添加或者删除项目。<br>o或者O  :改变显示项目的顺序。<br>l: 切换显示平均负载和启动时间信息。即显示影藏第一行<br>m： 切换显示内存信息。即显示影藏内存行<br>t ： 切换显示进程和CPU状态信息。即显示影藏CPU行<br>c：  切换显示命令名称和完整命令行。 显示完整的命令。 这个功能很有用。<br>M ： 根据驻留内存大小进行排序。<br>P：根据CPU使用百分比大小进行排序。<br>T： 根据时间/累计时间进行排序。<br>W：  将当前设置写入~/.toprc文件中。这是写top配置文件的推荐方法。<br>总结：<br>（1）使用top命令查看负载，在top下按“1”查看CPU核心数量，shift+”c”按cpu使用率大小排序，shif+”p”按内存使用率高低排序；<br>（2）使用iostat -x 命令来监控io的输入输出是否过大</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/Top命令详解/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-nginx访问量统计" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/nginx访问量统计/">nginx访问量统计</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/nginx访问量统计/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:58:55.912Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。<br>UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。<br>IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。</p>
-<p>1.根据访问IP统计UV<br>awk ‘{print $1}’  access.log|sort | uniq -c |wc -l</p>
-<p>2.统计访问URL统计PV<br>awk ‘{print $7}’ access.log|wc -l</p>
-<p>3.查询访问最频繁的URL<br>awk ‘{print $7}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
-<p>4.查询访问最频繁的IP<br>awk ‘{print $1}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
-<p>5.根据时间段统计查看日志<br>cat  access.log| sed -n ‘/14\/Mar\/2015:21/,/14\/Mar\/2015:22/p’|more</p>
-<p>6.统计IP访问个数（和根据访问IP统计UV一样）<br>cat access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort -nr | wc -l</p>
-<p>7.查看3点-6点之间的Ip访问个数<br>grep “2016:0[3-6]” access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort –nr | wc -l</p>
-<p>8.查看3点-6点之间的ip访问数，并且访问数&gt;=200的ip.<br>grep ‘2016:0[3-12]’ access.log | awk ‘{ips[$1]+=1}END{for(ip in ips) if(ips[ip]&gt;=200) print ips[ip],ip}’ | sort -nr</p>
-<p>9.查看并发连接数<br>netstat -nat|grep ESTABLISHED|wc -l</p>
-<p>10.获取每分钟的请求数量，输出成csv文件<br>cat /usr/local/nginx/logs/access.log  | awk ‘{print substr($4,14,5)}’ | uniq -c | awk ‘{print $2”,”$1}’ &gt; access.csv</p>
-<p>11.获取最耗时的请求时间、url、耗时，前10名, 可以修改后面的数字获取更多，不加则获取全部。<br>cat /usr/local/nginx/logs/access.log | awk ‘{print $4,$7,$NF}’ | awk -F ‘“‘ ‘{print $1,$2,$3}’ | sort -k3 -rn | head -10</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/nginx访问量统计/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-通过Dockerfile创建支持SSH服务的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:58:25.152Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>通过Dockerfile创建支持SSH服务的CentOS镜像</p>
-<p>1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。<br>[root@node4 sshd_centos]# vim run.sh</p>
-<p>#!/bin/bash<br>/usr/sbin/sshd –D<br>3、在宿主机上生成RSA密钥<br>[root@node4 sshd_centos]# cp /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub /root/sshd_centos<br>[root@node4 sshd_centos]# cat ssh_host_rsa_key.pub&gt;authorized_keys<br>[root@node4 sshd_centos]# cat Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM centos<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#安装openssh-server<br>RUN yum -y install openssh-server</p>
-<p>#修改/etc/ssh/sshd_config<br>RUN sed -i ‘s/UsePAM yes/UsePAM no/g’ /etc/ssh/sshd_config</p>
-<p>#将密钥文件复制到/etc/ssh/目录中<br>ADD ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key<br>ADD ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub<br>RUN mkdir -p /root/.ssh<br>ADD authorized_keys /root/.ssh/authorized_keys<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key.pub</p>
-<p>#将ssh服务启动脚本复制到/usr/local/sbin目录中，并改变权限为755<br>ADD run.sh /usr/local/sbin/run.sh<br>RUN chmod 755 /usr/local/sbin/run.sh</p>
-<p>#变更root密码为147258<br>RUN echo “root:123456”|chpasswd</p>
-<p>#开放窗口的22端口<br>EXPOSE 22</p>
-<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>此时 /root/sshd_centos目录下应该存在如下文件：<br>[root@node4 sshd_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>sshd_dockerfile     latest              421be3ddedab        2 minutes ago       335.4 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</p>
-<p>7、以新创建的镜像新建容器<br>[root@node4 sshd_centos]# docker run -p 10022:22 -d /usr/local/sbin/run.sh<br>将宿主机的10022端口映射到容器的22端口，并启动sshd服务。<br>现在就可以使用ssh工具远程通过宿主机的10022端口访问容器了。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-通过Dockerfile创建Tomcat的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        
-        <a href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-15T16:58:01.756Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>通过Dockerfile创建Tomcat的CentOS镜像<br>准备tomcat安装包<br>[root@node4 tomcat_centos]# ls<br>apache-tomcat-8.5.23.tar.gz  Dockerfile<br>[root@node4 tomcat_centos]# cat Dockerfile</p>
-<p>#生成的新镜像以centos镜像为基础<br>FROM jdk8_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
-<p>#升级系统<br>RUN yum -y update</p>
-<p>#添加tomcat安装包<br>ADD apache-tomcat-8.5.23.tar.gz /usr/local/<br>RUN mv /usr/local/apache-tomcat-8.5.23 /usr/local/tomcat</p>
-<p>#配置tomcat数据目录<br>RUN sed -i ‘/“%r”/a\        <context docbase="/data/" path="/" reloadable="true">‘ /usr/local/tomcat/conf/server.xml<br>RUN mkdir /data</context></p>
-<p>#删除tomcat默认目录<br>RUN rm -rf /usr/local/tomcat/webapps/*<br>RUN sed -i ‘/$var <em>must</em> be set to either true or false./aJAVA_OPTS=”-Xms1024m -Xmx4096m -Xss4096K -XX:PermSize=512m -XX:MaxPermSize=1024m”‘ /usr/local/tomcat/bin/catalina.sh</p>
-<p>#定义CATALINA_HOME和JAVA_HOME环境变量<br>ENV CATALINA_HOME /usr/local/tomcat<br>ENV JAVA_HOME /usr/java/jdk1.8.0_152<br>ENV PATH $PATH:$JAVA_HOME/bin<br>RUN sed -i ‘/sshd -D/i/usr/bin/sh /usr/local/tomcat/bin/startup.sh’ /usr/local/sbin/run.sh</p>
-<p>#开放窗口的22端口<br>EXPOSE 22<br>EXPOSE 8080</p>
-<p>#运行脚本，启动sshd和tomcat服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
-<p>[root@node4 tomcat_centos]# docker build -t tomcat_jdk8 .<br>[root@node4 tomcat_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>tomcat_jdk8         latest              044cd7aa7211        About an hour ago   606.1 MB<br>jdk7_dockerfile     latest              6545ebc02443        About an hour ago   577.6 MB<br>jdk8_dockerfile     latest              0324608bf1c3        25 hours ago        488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        30 hours ago        335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        30 hours ago        314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 tomcat_centos]# docker run -v /data/weixin:/data  -p 80:8080 -p 10024:22 -d tomcat_jdk8 /usr/local/sbin/run.sh</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">展开全文 >></a>
         </p>
       
 
