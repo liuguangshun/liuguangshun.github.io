@@ -137,107 +137,105 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-centos_6x系统下源码安装mysql操作记录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Mysql主从同步(1)-主从_主主环境部署梳理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/">centos 6x系统下源码安装mysql操作记录</a>
+      <a class="article-title" href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/">Mysql主从同步(1)-主从_主主环境部署梳理</a>
     </h1>
   
 
         
-        <a href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/" class="archive-article-date">
-  	<time datetime="2017-12-14T22:39:21.402Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:51:33.065Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在运维工作中经常部署各种运维环境，涉及mysql数据库的安装也是时常需要的。mysql数据库安装可以选择yum在线安装，但是这种安装的mysql一般是系统自带的，版本方面可能跟需求不太匹配。</p>
-<h2 id="可以通过源码安装的方式，自定义安装自己所需版本的mysql。"><a href="#可以通过源码安装的方式，自定义安装自己所需版本的mysql。" class="headerlink" title="可以通过源码安装的方式，自定义安装自己所需版本的mysql。"></a>可以通过源码安装的方式，自定义安装自己所需版本的mysql。</h2><p>mysql数据库yum在线安装：<br>[root@host-test-huanqiu ~]# yum -y install mysql mysql-server<br>[root@host-test-huanqiu ~]# /etc/init.d/mysqld start<br>[root@host-test-huanqiu ~]# mysqladmin password “123456”<br>[root@host-test-huanqiu ~]# mysql -p123456<br>mysql&gt; select version();<br>+———–+<br>| version() |<br>+———–+<br>| 5.1.73 |<br>+———–+</p>
-<h2 id="1-row-in-set-0-00-sec"><a href="#1-row-in-set-0-00-sec" class="headerlink" title="1 row in set (0.00 sec"></a>1 row in set (0.00 sec</h2><p>废话不多说，以下是centos6x系统下源码安装Mysql的操作记录，方便参考~</p>
-<p>1、卸载旧版本<br>[root@host-test-huanqiu ~]# rpm -qa | grep mysql<br>mysql-5.1.73-7.el6.x86_64<br>mysql-libs-5.1.73-7.el6.x86_64<br>mysql-server-5.1.73-7.el6.x86_64</p>
-<p>#普通删除模式<br>[root@host-test-huanqiu ~]# rpm -e mysql-5.1.73-7.el6.x86_64 mysql-libs-5.1.73-7.el6.x86_64 mysql-server-5.1.73-7.el6.x86_64 </p>
-<h1 id="强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除"><a href="#强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除" class="headerlink" title="强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除"></a>强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除</h1><p>[root@host-test-huanqiu ~]# rpm -e –nodeps mysql-5.1.73-7.el6.x86_64 mysql-libs-5.1.73-7.el6.x86_64 mysql-server-5.1.73-7.el6.x86_64</p>
-<p>#删除/etc/my.cnf<br>[root@host-test-huanqiu ~]# rm /etc/my.cnf</p>
-<p>2、安装编译代码需要的包<br>[root@host-test-huanqiu ~]# yum -y install make gcc-c++ cmake bison-devel ncurses-devel</p>
-<p>3、创建mysql用户，不建立mysql用户家目录（加-M参数），也就是禁用mysql账号登陆系统<br>[root@host-test-huanqiu ~]# groupadd mysql<br>[root@host-test-huanqiu ~]# useradd -g mysql mysql -M -s /sbin/nologin</p>
-<p>4、下载MySQL，源码编译安装</p>
-<p>[root@host-test-huanqiu ~]# cd /usr/local/src<br>[root@host-test-huanqiu src]# wget -c <a href="http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.34.tar.gz" target="_blank" rel="noopener">http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.34.tar.gz</a></p>
-<p>[root@host-test-huanqiu src]# tar -zxvf mysql-5.6.34.tar.gz<br>[root@host-test-huanqiu src]# cd mysql-5.6.34/<br>[root@host-test-huanqiu mysql-5.6.34]# cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/data -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci<br>[root@host-test-huanqiu mysql-5.6.34]# make &amp;&amp; make install<br>5、配置MySQL</p>
-<p>修改/usr/local/mysql权限<br>[root@host-test-huanqiu mysql-5.6.34]# mkdir -p /data/mysql/data<br>[root@host-test-huanqiu mysql-5.6.34]# chown -R mysql:mysql /usr/local/mysql<br>[root@host-test-huanqiu mysql-5.6.34]# chown -R mysql:mysql /data/mysql/data</p>
-<p>执行初始化配置脚本，创建系统自带的数据库和表<br>[root@host-test-huanqiu mysql-5.6.34]# cd /usr/local/mysql<br>[root@host-test-huanqiu mysql]# ./scripts/mysql_install_db –basedir=/usr/local/mysql –datadir=/data/mysql/data –user=mysql   //如果后续不小心删除了这个数据目录或这个目录下的文件被误操作删除了，还可以利用这个命令重新初始化<br>需要特别注意：<br>在启动MySQL服务时，会按照一定次序搜索my.cnf，先在/etc目录下找，找不到则会搜索”$basedir/my.cnf”，在本例中就是 /usr/local/mysql/my.cnf，这是新版MySQL的配置文件的默认位置！</p>
-<p>另外：<br>在CentOS 6.4版操作系统最小安装完成后，默认会在/etc目录下存在一个my.cnf，需要将此文件更名为其他的名字，如：/etc/my.cnf.bak，否则，该文件会干扰源码安装的MySQL的正确配置，造成无法启动。</p>
-<h2 id="在使用”yum-update”更新系统后，需要检查下-etc目录下是否会多出一个my-cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。"><a href="#在使用”yum-update”更新系统后，需要检查下-etc目录下是否会多出一个my-cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。" class="headerlink" title="在使用”yum update”更新系统后，需要检查下/etc目录下是否会多出一个my.cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。"></a>在使用”yum update”更新系统后，需要检查下/etc目录下是否会多出一个my.cnf，如果多出，将它重命名成别的。否则，MySQL将使用这个配置文件启动，可能造成无法正常启动等问题。</h2><p>启动MySQL<br>添加服务，拷贝服务脚本到init.d目录，并设置开机启动<br>[root@host-test-huanqiu mysql]# cp support-files/mysql.server /etc/init.d/mysql<br>[root@host-test-huanqiu mysql]# chkconfig mysql on<br>[root@host-test-huanqiu mysql]# service mysql start   //启动前，要先配置my.cnf文件（如下）， 并确保/data/mysql/data和/usr/local/mysql的mysql权限</p>
-<p>如果启动报错：<br>[root@slave-server mysql]# service mysql start<br>Starting MySQL.Logging to ‘/data/mysql/data/mysql-error.log’.<br>170416 12:55:28 mysqld_safe Directory ‘/usr/local/mysql/var’ for UNIX socket file don’t exists.<br> ERROR! The server quit without updating PID file (/data/mysql/data/mysql.pid).</p>
-<p>解决办法：<br>[root@slave-server mysql]# mkdir ／usr/local/mysql/var<br>[root@slave-server mysql]# chown -R mysql:mysql /usr/local/mysql<br>[root@slave-server mysql]# service mysql start<br>Starting MySQL.. SUCCESS!<br>配置用户和环境变量</p>
-<p>MySQL启动成功后，root默认没有密码，需要设置root密码，设置之前，需要先设置PATH，否则不能直接调用mysql<br>修改/etc/profile文件，在文件末尾添加<br>[root@host-test-huanqiu mysql]# vim /etc/profile<br>……..<br>export PATH=$PATH:/usr/local/mysql/bin<br>[root@host-test-huanqiu mysql]# source /etc/profile</p>
-<p>到此，就可以直接mysql登陆了<br>[root@host-test-huanqiu mysql]# mysql -uroot<br>…….<br>mysql&gt; select version();<br>+———–+<br>| version() |<br>+———–+<br>| 5.6.33 |<br>+———–+<br>1 row in set (0.00 sec)<br>登陆mysql，若是报错如下：</p>
-<p>[root@test2-235 mysql]# mysql<br>ERROR 2002 (HY000): Can’t connect to local MySQL server through socket ‘/var/lib/mysql/mysql.sock’ (2)</p>
-<p>解决办法<br>[root@test2-235 mysql]# mkdir /var/lib/mysql/<br>[root@test2-235 mysql]# ln -s /usr/local/mysql/var/mysql.sock /var/lib/mysql/mysql.sock<br>修改root密码，执行命令如下</p>
-<p>mysql&gt; SET PASSWORD = PASSWORD(‘123456’);</p>
-<p>若要设置root用户可以远程访问，执行<br>mysql&gt; GRANT ALL PRIVILEGES ON <em>.</em> TO ‘root’@’%’ IDENTIFIED BY ‘password’ WITH GRANT OPTION;<br>使授权立即生效<br>mysql&gt; FLUSH PRIVILEGES;</p>
-<p>也可以使用mysqladmin命令设置mysql密码<br>[root@host-test-huanqiu mysql]# mysqladmin password 123456 #安装mysql后第一次设置密码<br>[root@host-test-huanqiu mysql]# mysqladmin -p 旧密码 password 新密码 #重置密码<br>最后配置防火墙</p>
-<p>默认防火墙的3306端口默认没有开启，若要远程访问，需要开启这个端口.也可以做下白名单，比如只允许192.168.1.0/24网段的客户机访问本机的mysql。<br>[root@host-test-huanqiu mysql]# vim /etc/sysconfig/iptables<br>…….</p>
-<h2 id="A-INPUT-s-192-168-1-0-24-p-tcp-m-tcp-m-state-–state-NEW-dport-3306-j-ACCEPT"><a href="#A-INPUT-s-192-168-1-0-24-p-tcp-m-tcp-m-state-–state-NEW-dport-3306-j-ACCEPT" class="headerlink" title="-A INPUT -s 192.168.1.0/24 -p tcp -m tcp -m state –state NEW -dport 3306 -j ACCEPT"></a>-A INPUT -s 192.168.1.0/24 -p tcp -m tcp -m state –state NEW -dport 3306 -j ACCEPT</h2><p>下面贴下mysql6.x的my.cnf配置</p>
-<p>[client]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
-<p>[mysqld]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
-<p>basedir = /usr/local/mysql/<br>datadir = /data/mysql/data<br>pid-file = /data/mysql/data/mysql.pid<br>user = mysql<br>bind-address = 0.0.0.0<br>server-id = 1<br>sync_binlog=1<br>log_bin = mysql-bin</p>
-<p>skip-name-resolve</p>
-<p>back_log = 600</p>
-<p>max_connections = 3000<br>max_connect_errors = 3000</p>
-<p>table_open_cache = 512<br>max_allowed_packet = 16M<br>binlog_cache_size = 16M<br>max_heap_table_size = 16M<br>tmp_table_size = 256M</p>
-<p>read_buffer_size = 1024M<br>read_rnd_buffer_size = 1024M<br>sort_buffer_size = 1024M<br>join_buffer_size = 1024M<br>key_buffer_size = 8192M</p>
-<p>thread_cache_size = 8</p>
-<p>query_cache_size = 512M<br>query_cache_limit = 1024M</p>
-<p>ft_min_word_len = 4</p>
-<p>binlog_format = mixed<br>expire_logs_days = 30</p>
-<p>log_error = /data/mysql/data/mysql-error.log<br>slow_query_log = 1<br>long_query_time = 1<br>slow_query_log_file = /data/mysql/data/mysql-slow.log</p>
-<p>performance_schema = 0<br>explicit_defaults_for_timestamp</p>
-<p>skip-external-locking</p>
-<p>default_storage_engine = InnoDB<br>innodb_file_per_table = 1<br>innodb_open_files = 500<br>innodb_buffer_pool_size = 1024M<br>innodb_write_io_threads = 1000<br>innodb_read_io_threads = 1000<br>innodb_thread_concurrency = 8<br>innodb_purge_threads = 1<br>innodb_flush_log_at_trx_commit = 2<br>innodb_log_buffer_size = 4M<br>innodb_log_file_size = 32M<br>innodb_log_files_in_group = 3<br>innodb_max_dirty_pages_pct = 90<br>innodb_lock_wait_timeout = 120</p>
-<p>bulk_insert_buffer_size = 8M<br>myisam_sort_buffer_size = 8M<br>myisam_max_sort_file_size = 10G<br>myisam_repair_threads = 1</p>
-<p>interactive_timeout = 28800<br>wait_timeout = 28800</p>
-<p>[mysqldump]<br>quick<br>max_allowed_packet = 16M</p>
-<p>[myisamchk]<br>key_buffer_size = 8M<br>sort_buffer_size = 8M<br>read_buffer = 4M<br>write_buffer = 4M</p>
-<p>sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES<br>port = 3306<br>针对上面的部署过程，为了便于以后安装mysql环境，编写了下面的安装脚本，直接运行这个脚本就能自动化构建mysql环境了。<br>[root@slave-server ~]# cat mysqlinstall.sh                    （下载地址：<a href="https://pan.baidu.com/s/1gfEKC9d" target="_blank" rel="noopener">https://pan.baidu.com/s/1gfEKC9d</a>    密码：6ec3）</p>
-<p>#!/bin/bash</p>
-<p>#卸载系统自带的Mysql<br>/bin/rpm -e $(/bin/rpm -qa | grep mysql|xargs) –nodeps<br>/bin/rm -f /etc/my.cnf</p>
-<p>#安装编译代码需要的包<br>/usr/bin/yum -y install make gcc-c++ cmake bison-devel ncurses-devel</p>
-<p>#编译安装mysql5.6<br>/usr/sbin/groupadd mysql<br>/usr/sbin/useradd -g mysql mysql -M -s /sbin/nologin</p>
-<p>cd /usr/local/src<br>wget -c <a href="http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.37.tar.gz" target="_blank" rel="noopener">http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.6/mysql-5.6.37.tar.gz</a><br>/bin/tar -zxvf mysql-5.6.37.tar.gz<br>cd mysql-5.6.37/<br>/usr/bin/cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/data -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci<br>make &amp;&amp; make install</p>
-<p>#修改/usr/local/mysql权限<br>mkdir -p /data/mysql/data<br>/bin/chown -R mysql:mysql /usr/local/mysql<br>/bin/chown -R mysql:mysql /data/mysql/data</p>
-<p>#执行初始化配置脚本，创建系统自带的数据库和表<br>/usr/local/mysql/scripts/mysql_install_db –basedir=/usr/local/mysql –datadir=/data/mysql/data –user=mysql</p>
-<p>#配置my.cnf<br>cat &gt; /usr/local/mysql/my.cnf &lt;&lt; EOF<br>[client]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
-<p>[mysqld]<br>port = 3306<br>socket = /usr/local/mysql/var/mysql.sock</p>
-<p>basedir = /usr/local/mysql/<br>datadir = /data/mysql/data<br>pid-file = /data/mysql/data/mysql.pid<br>user = mysql<br>bind-address = 0.0.0.0<br>server-id = 1<br>sync_binlog=1<br>log_bin = mysql-bin</p>
-<p>skip-name-resolve</p>
-<p>#skip-networking<br>back_log = 600</p>
-<p>max_connections = 3000<br>max_connect_errors = 3000</p>
-<p>##open_files_limit = 65535<br>table_open_cache = 512<br>max_allowed_packet = 16M<br>binlog_cache_size = 16M<br>max_heap_table_size = 16M<br>tmp_table_size = 256M</p>
-<p>read_buffer_size = 1024M<br>read_rnd_buffer_size = 1024M<br>sort_buffer_size = 1024M<br>join_buffer_size = 1024M<br>key_buffer_size = 8192M</p>
-<p>thread_cache_size = 8</p>
-<p>query_cache_size = 512M<br>query_cache_limit = 1024M</p>
-<p>ft_min_word_len = 4</p>
-<p>binlog_format = mixed<br>expire_logs_days = 30</p>
-<p>log_error = /data/mysql/data/mysql-error.log<br>slow_query_log = 1<br>long_query_time = 1<br>slow_query_log_file = /data/mysql/data/mysql-slow.log</p>
-<p>performance_schema = 0<br>explicit_defaults_for_timestamp</p>
-<p>##lower_case_table_names = 1</p>
-<p>skip-external-locking</p>
-<p>default_storage_engine = InnoDB</p>
-<p>##default-storage-engine = MyISAM<br>innodb_file_per_table = 1<br>innodb_open_files = 500<br>innodb_buffer_pool_size = 1024M<br>innodb_write_io_threads = 1000<br>innodb_read_io_threads = 1000<br>innodb_thread_concurrency = 8<br>innodb_purge_threads = 1<br>innodb_flush_log_at_trx_commit = 2<br>innodb_log_buffer_size = 4M<br>innodb_log_file_size = 32M<br>innodb_log_files_in_group = 3<br>innodb_max_dirty_pages_pct = 90<br>innodb_lock_wait_timeout = 120</p>
-<p>bulk_insert_buffer_size = 8M<br>myisam_sort_buffer_size = 8M<br>myisam_max_sort_file_size = 10G<br>myisam_repair_threads = 1</p>
-<p>interactive_timeout = 28800<br>wait_timeout = 28800</p>
-<p>[mysqldump]<br>quick<br>max_allowed_packet = 16M</p>
-<p>[myisamchk]<br>key_buffer_size = 8M<br>sort_buffer_size = 8M<br>read_buffer = 4M<br>write_buffer = 4M</p>
-<p>sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES<br>port = 3306<br>EOF</p>
-<p>#启动mysql服务<br>cd /usr/local/mysql<br>/bin/mkdir var<br>/bin/chown -R mysql.mysql var<br>cp support-files/mysql.server /etc/init.d/mysql<br>/sbin/chkconfig mysql on<br>service mysql start</p>
-<p>#设置环境变量<br>echo “export PATH=$PATH:/usr/local/mysql/bin” &gt;&gt; /etc/profile<br>source /etc/profile</p>
-<p>#设置mysql登陆密码,初始密码为123456<br>/bin/mkdir -p /var/lib/mysql<br>ln -s /usr/local/mysql/var/mysql.sock /var/lib/mysql/mysql.sock<br>mysql -e “SET PASSWORD = PASSWORD(‘123456’);”<br>mysql -p123456 -e “GRANT ALL PRIVILEGES ON <em>.</em> TO ‘root’@’%’ IDENTIFIED BY ‘password’ WITH GRANT OPTION;”<br>mysql -p123456 -e “FLUSH PRIVILEGES;”</p>
+        <p>Mysql复制概念说明<br>Mysql内建的复制功能是构建大型，高性能应用程序的基础。将Mysql的数据分布到多个系统上去，这种分布的机制，是通过将Mysql的某一台主机的数据复制到其它主机（slaves）上，并重新执行一遍来实现的。复制过程中一个服务器充当主服务器，而一个或多个其它服务器充当从服务器。主服务器将更新写入二进制日志文件，并维护文件的一个索引以跟踪日志循环。这些日志可以记录发送到从服务器的更新。当一个从服务器连接主服务器时，它通知主服务器从服务器在日志中读取的最后一次成功更新的位置。从服务器接收从那时起发生的任何更新，然后封锁并等待主服务器通知新的更新。</p>
+<p>需要注意的是：<br>在进行mysql复制时，所有对复制中的表的更新必须在主服务器上进行。否则必须要小心，以避免用户对主服务器上的表进行的更新与对从服务器上的表所进行的更新之间的冲突。</p>
+<p>1）Mysql支持那些复制<br>    1–基于语句的复制： 在主服务器上执行的SQL语句，在从服务器上执行同样的语句。MySQL默认采用基于语句的复制，效率比较高。一旦发现没法精确复制时，会自动选着基于行的复制。<br>    2–基于行的复制：把改变的内容复制过去，而不是把命令在从服务器上执行一遍. 从mysql5.0开始支持<br>    3–混合类型的复制: 默认采用基于语句的复制，一旦发现基于语句的无法精确的复制时，就会采用基于行的复制。</p>
+<p>2）Mysql复制能解决的问题<br>    1–数据分布 (Data distribution )<br>    2–负载平衡(load balancing)<br>    3–数据备份(Backups) ，保证数据安全<br>    4–高可用性和容错行(High availability and failover)<br>    5–实现读写分离，缓解数据库压力</p>
+<p>3）Mysql主从复制原理<br>     master服务器将数据的改变记录二进制binlog日志，当master上的数据发生改变时，则将其改变写入二进制日志中；salve服务器会在一定时间间隔内对master二进制日志进行探测其是否发生改变，如果发生改变，则开始一个I/OThread请求master二进制事件，同时主节点为每个I/O线程启动一个dump线程，用于向其发送二进制事件，并保存至从节点本地的中继日志中，从节点将启动SQL线程从中继日志中读取二进制日志，在本地重放，使得其数据和主节点的保持一致，最后I/OThread和SQLThread将进入睡眠状态，等待下一次被唤醒。<br>注意几点：<br>     1–master将操作语句记录到binlog日志中，然后授予slave远程连接的权限（master一定要开启binlog二进制日志功能；通常为了数据安全考虑，slave也开启binlog功能）。<br>     2–slave开启两个线程：IO线程和SQL线程。其中：IO线程负责读取master的binlog内容到中继日志relay log里；SQL线程负责从relay log日志里读出binlog内容，并更新到slave的数据库里，这样就能保证slave数据和master数据保持一致了。<br>     3–Mysql复制至少需要两个Mysql的服务，当然Mysql服务可以分布在不同的服务器上，也可以在一台服务器上启动多个服务。<br>     4–Mysql复制最好确保master和slave服务器上的Mysql版本相同（如果不能满足版本一致，那么要保证master主节点的版本低于slave从节点的版本）<br>     5–master和slave两节点间时间需同步</p>
+<p>Mysql复制的流程图如下：<br><img src="http://img.blog.csdn.net/20171215113545895?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>如上图所示：<br>     Mysql复制过程的第一部分就是master记录二进制日志。在每个事务更新数据完成之前，master在二日志记录这些改变。MySQL将事务串行的写入二进制日志，即使事务中的语句都是交叉执行的。在事件写入二进制日志完成后，master通知存储引擎提交事务。<br>    第二部分就是slave将master的binary log拷贝到它自己的中继日志。首先，slave开始一个工作线程——I/O线程。I/O线程在master上打开一个普通的连接，然后开始binlog dump process。Binlog dump process从master的二进制日志中读取事件，如果已经跟上master，它会睡眠并等待master产生新的事件。I/O线程将这些事件写入中继日志。<br>    SQL slave thread（SQL从线程）处理该过程的最后一步。SQL线程从中继日志读取事件，并重放其中的事件而更新slave的数据，使其与master中的数据一致。只要该线程与I/O线程保持一致，中继日志通常会位于OS的缓存中，所以中继日志的开销很小。<br>   此外，在master中也有一个工作线程：和其它MySQL的连接一样，slave在master中打开一个连接也会使得master开始一个线程。复制过程有一个很重要的限制——复制在slave上是串行化的，也就是说master上的并行更新操作不能在slave上并行操作。</p>
+<p>4）Mysql复制的模式<br>    1–主从复制：主库授权从库远程连接，读取binlog日志并更新到本地数据库的过程；主库写数据后，从库会自动同步过来（从库跟着主库变）；<br>    2–主主复制：主从相互授权连接，读取对方binlog日志并更新到本地数据库的过程；只要对方数据改变，自己就跟着改变；</p>
+<p>5）Mysql主从复制的优点<br>    1–在从服务器可以执行查询工作(即我们常说的读功能)，降低主服务器压力;（主库写，从库读，降压）<br>    2–在从主服务器进行备份，避免备份期间影响主服务器服务;（确保数据安全）<br>    3–当主服务器出现问题时，可以切换到从服务器。（提升性能）</p>
+<p>6）Mysql主从复制工作流程细节<br>    1）MySQL支持单向、异步复制，复制过程中一个服务器充当主服务器，而一个或多个其它服务器充当从服务器。MySQL复制基于主服务器在二进制日志中跟踪所有对数据库的更改(更新、删除等等)。因此，要进行复制，必须在主服务器上启用二进制日志。每个从服务器从主服务器接收主服务器上已经记录到其二进制日志的保存的更新。当一个从服务器连接主服务器时，它通知主服务器定位到从服务器在日志中读取的最后一次成功更新的位置。从服务器接收从那时起发生的任何更新，并在本机上执行相同的更新。然后封锁并等待主服务器通知新的更新。从服务器执行备份不会干扰主服务器，在备份过程中主服务器可以继续处理更新。<br>    2）MySQL使用3个线程来执行复制功能，其中两个线程(Sql线程和IO线程)在从服务器，另外一个线程(IO线程)在主服务器。<br>当发出START SLAVE时，从服务器创建一个I/O线程，以连接主服务器并让它发送记录在其二进制日志中的语句。主服务器创建一个线程将二进制日志中的内容发送到从服务器。该线程可以即为主服务器上SHOW PROCESSLIST的输出中的Binlog Dump线程。从服务器I/O线程读取主服务器Binlog Dump线程发送的内容并将该数据拷贝到从服务器数据目录中的本地文件中，即中继日志。第3个线程是SQL线程，由从服务器创建，用于读取中继日志并执行日志中包含的更新。在从服务器上，读取和执行更新语句被分成两个独立的任务。当从服务器启动时，其I/O线程可以很快地从主服务器索取所有二进制日志内容，即使SQL线程执行更新的远远滞后。</p>
+<p>7）几点总结</p>
+<p>主从数据完成同步的过程：<br>1）在Slave 服务器上执行sart slave命令开启主从复制开关，开始进行主从复制。<br>2）此时，Slave服务器的IO线程会通过在master上已经授权的复制用户权限请求连接master服务器，并请求从执行binlog日志文件的指定位置（日志文件名和位置就是在配置主从<br>  复制服务时执行change master命令指定的）之后开始发送binlog日志内容<br>3）Master服务器接收到来自Slave服务器的IO线程的请求后，其上负责复制的IO线程会根据Slave服务器的IO线程请求的信息分批读取指定binlog日志文件指定位置之后的binlog<br>  日志信息，然后返回给Slave端的IO线程。返回的信息中除了binlog日志内容外，还有在Master服务器端记录的IO线程。返回的信息中除了binlog中的下一个指定更新位置。</p>
+<p>4）当Slave服务器的IO线程获取到Master服务器上IO线程发送的日志内容、日志文件及位置点后，会将binlog日志内容依次写到Slave端自身的Relay Log（即中继日志）文件<br> （Mysql-relay-bin.xxx）的最末端，并将新的binlog文件名和位置记录到master-info文件中，以便下一次读取master端新binlog日志时能告诉Master服务器从新binlog<br>  日志的指定文件及位置开始读取新的binlog日志内容</p>
+<p>5）Slave服务器端的SQL线程会实时检测本地Relay Log 中IO线程新增的日志内容，然后及时把Relay LOG 文件中的内容解析成sql语句，并在自身Slave服务器上按解析SQL语句<br>  的位置顺序执行应用这样sql语句，并在relay-log.info中记录当前应用中继日志的文件名和位置点</p>
+<p>主从复制条件<br>1）开启Binlog功能<br>2）主库要建立账号<br>3）从库要配置master.info（CHANGE MASTER to…相当于配置密码文件和Master的相关信息）<br>4）start slave 开启复制功能</p>
+<p>需要了解的：<br>1）3个线程，主库IO，从库IO和SQL及作用<br>2）master.info（从库）作用<br>3）relay-log 作用<br>4）异步复制<br>5）binlog作用（如果需要级联需要开启Binlog）</p>
+<p>需要注意：<br>1）主从复制是异步的逻辑的SQL语句级的复制<br>2）复制时，主库有一个I/O线程，从库有两个线程，I/O和SQL线程<br>3）实现主从复制的必要条件是主库要开启记录binlog功能<br>4）作为复制的所有Mysql节点的server-id都不能相同<br>5）binlog文件只记录对数据库有更改的SQL语句（来自主库内容的变更），不记录任何查询（select，show）语句<br>………………………………………………………………………………………<br>彻底解除主从复制关系<br>1)stop slave;<br>2)reset slave; 或直接删除master.info和relay-log.info这两个文件；<br>3)修改my.cnf删除主从相关配置参数。</p>
+<p>让slave不随MySQL自动启动<br>修改my.cnf 在[mysqld]中增加 skip-slave-start 选项。</p>
+<p>做了MySQL主从复制以后，使用mysqldump对数据备份时，一定要注意按照如下方式：<br>mysqldump –master-data –single-transaction –user=username –password=password dbname&gt; dumpfilename<br>这样就可以保留 file 和 position 的信息，在新搭建一个slave的时候，还原完数据库， file 和 position 的信息也随之更新，接着再start slave 就可以很迅速<br>的完成增量同步！</p>
+<p>需要限定同步哪些数据库，有3个思路：<br>1）在执行grant授权的时候就限定数据库；<br>2）在主服务器上限定binlog_do_db = 数据库名；<br>3）主服务器上不限定数据库，在从服务器上限定replicate-do-db = 数据库名；</p>
+<p>如果想实现 主-从（主）-从 这样的链条式结构，需要设置：<br>log-slave-updates      只有加上它，从前一台机器上同步过来的数据才能同步到下一台机器。<br>当然，二进制日志也是必须开启的：<br>log-bin=/opt/mysql/binlogs/bin-log<br>log-bin-index=/opt/mysql/binlogs/bin-log.index</p>
+<p>还可以设置一个log保存周期：<br>expire_logs_days=14<br>————————–下面记录下mysql主从／主主同步环境的实施过程————————-<br>1）环境描述</p>
+<p>mysql的安装可以参考：<a href="http://blog.csdn.net/qq_33285112/article/details/78794985" target="_blank" rel="noopener">http://blog.csdn.net/qq_33285112/article/details/78794985</a><br>Centos6.8版本<br>master：182.148.15.238<br>slave: 182.148.15.237  </p>
+<p>注意下面几点：<br>1）要保证同步服务期间之间的网络联通。即能相互ping通，能使用对方授权信息连接到对方数据库（防火墙开放3306端口）。<br>2）关闭selinux。<br>3）同步前，双方数据库中需要同步的数据要保持一致。这样，同步环境实现后，再次更新的数据就会如期同步了。<br>2）主从复制实现过程记录</p>
+<p>为了测试效果，先在master机器上创建测试库<br>mysql&gt; CREATE DATABASE huanqiu CHARACTER SET utf8 COLLATE utf8_general_ci;<br>Query OK, 1 row affected (0.00 sec)</p>
+<p>mysql&gt; use huanqiu;<br>Database changed<br>mysql&gt; create table if not exists haha (id int(10) PRIMARY KEY AUTO_INCREMENT,name varchar(50) NOT NULL);<br>Query OK, 0 rows affected (0.02 sec)</p>
+<p>mysql&gt; insert into huanqiu.haha values(1,”wangshibo”),(2,”guohuihui”);<br>Query OK, 2 rows affected (0.00 sec)<br>Records: 2  Duplicates: 0  Warnings: 0</p>
+<p>mysql&gt; select * from huanqiu.haha;<br>+—-+———–+<br>| id | name      |<br>+—-+———–+<br>|  1 | wangshibo |<br>|  2 | guohuihui |<br>+—-+———–+<br>2 rows in set (0.00 sec)</p>
+<hr>
+<p>温馨提示：<br>修改库或表的字符集<br>mysql&gt; alter database huanqiu default character set utf8;    //修改huanqiu库的字符集<br>mysql&gt; alter table huanqiu.haha default character set utf8;  //修改huanqiu.haha表的字符集</p>
+<p>添加主键<br>mysql&gt; Alter table huanqiu.haha add primary key(id);     //将huanqiu.haha表的id添加主键<br>mysql&gt; Alter table huanqiu.haha change id id int(10) not null auto_increment;  //自增长属性</p>
+<p>删除主键时要先删除自增长，再删除主键<br>mysql&gt; Alter table huanqiu.haha change id id int(10);    //删除自增长</p>
+<h2 id="mysql-gt-Alter-table-huanqiu-haha-drop-primary-key-删除主建"><a href="#mysql-gt-Alter-table-huanqiu-haha-drop-primary-key-删除主建" class="headerlink" title="mysql&gt; Alter table huanqiu.haha drop primary key;     //删除主建"></a>mysql&gt; Alter table huanqiu.haha drop primary key;     //删除主建</h2><p>下面是master数据库上的操作：<br>1）设置master数据库的my.cnf文件（在[mysqld]配置区域添加下面内容）<br>[root@master ~]# vim /usr/local/mysql/my.cnf<br>…….<br>server-id=1        #数据库唯一ID，主从的标识号绝对不能重复。<br>log-bin=mysql-bin    #开启bin-log，并指定文件目录和文件名前缀<br>binlog-do-db=huanqiu  #需要同步的数据库。如果是多个同步库，就以此格式另写几行即可。如果不指明对某个具体库同步，就去掉此行，表示同步所有库（除了ignore忽略的库）。<br>binlog-ignore-db=mysql  #不同步mysql系统数据库。如果是多个不同步库，就以此格式另写几行；也可以在一行，中间逗号隔开。<br>sync_binlog = 1      ＃确保binlog日志写入后与硬盘同步<br>binlog_checksum = none  ＃跳过现有的采用checksum的事件，mysql5.6.5以后的版本中binlog_checksum=crc32,而低版本都是binlog_checksum=none<br>binlog_format = mixed   ＃bin-log日志文件格式，设置为MIXED可以防止主键重复。</p>
+<hr>
+<p>温馨提示：在主服务器上最重要的二进制日志设置是sync_binlog，这使得mysql在每次提交事务的时候把二进制日志的内容同步到磁盘上，即使服务器崩溃也会把事件写入日志中。<br>sync_binlog这个参数是对于MySQL系统来说是至关重要的，他不仅影响到Binlog对MySQL所带来的性能损耗，而且还影响到MySQL中数据的完整性。对于”sync_binlog”参数的各种设置的说明如下：<br>sync_binlog=0，当事务提交之后，MySQL不做fsync之类的磁盘同步指令刷新binlog_cache中的信息到磁盘，而让Filesystem自行决定什么时候来做同步，或者cache满了之后才同步到磁盘。<br>sync_binlog=n，当每进行n次事务提交之后，MySQL将进行一次fsync之类的磁盘同步指令来将binlog_cache中的数据强制写入磁盘。</p>
+<p>在MySQL中系统默认的设置是sync_binlog=0，也就是不做任何强制性的磁盘刷新指令，这时候的性能是最好的，但是风险也是最大的。因为一旦系统Crash，在binlog_cache中的所有binlog信息都会被丢失。而当设置为“1”的时候，是最安全但是性能损耗最大的设置。因为当设置为1的时候，即使系统Crash，也最多丢失binlog_cache中未完成的一个事务，对实际数据没有任何实质性影响。</p>
+<h2 id="从以往经验和相关测试来看，对于高并发事务的系统来说，“sync-binlog”设置为0和设置为1的系统写入性能差距可能高达5倍甚至更多。"><a href="#从以往经验和相关测试来看，对于高并发事务的系统来说，“sync-binlog”设置为0和设置为1的系统写入性能差距可能高达5倍甚至更多。" class="headerlink" title="从以往经验和相关测试来看，对于高并发事务的系统来说，“sync_binlog”设置为0和设置为1的系统写入性能差距可能高达5倍甚至更多。"></a>从以往经验和相关测试来看，对于高并发事务的系统来说，“sync_binlog”设置为0和设置为1的系统写入性能差距可能高达5倍甚至更多。</h2><p>2）导出master数据库多余slave数据库中的数据，然后导入到slave数据库中。保证双方在同步环境实现前的数据一致。<br>  导出数据库之前先锁定数据库<br>  mysql&gt; flush tables with read lock;    #数据库只读锁定命令，防止导出数据库的时候有数据写入。unlock tables命令解除锁定</p>
+<p>  导出master数据库中多余的huanqiu库(master数据库的root用户登陆密码：123456)<br>  [root@master ~]# mysqldump -uroot huanqiu -p123456 &gt;/opt/huanqiu.sql<br>  [root@master ~]# rsync  -e “ssh -p22” -avpgolr /opt/huanqiu.sql 182.148.15.237:/opt/   ＃将导出的sql文件上传到slave机器上</p>
+<p>3）设置数据同步权限<br>  mysql&gt; grant replication slave,replication client on <em>.</em> to slave@’182.148.15.237’ identified by “slave@123”;<br>  Query OK, 0 rows affected (0.02 sec)<br>  mysql&gt; flush privileges;<br>  Query OK, 0 rows affected (0.00 sec)</p>
+<hr>
+<p>温馨提示：<br>权限查看方式<br>mysql&gt; show grants;</p>
+<h2 id="mysql-gt-show-grants-for-slave-’182-148-1115-237’"><a href="#mysql-gt-show-grants-for-slave-’182-148-1115-237’" class="headerlink" title="mysql&gt; show grants for slave@’182.148.1115.237’;"></a>mysql&gt; show grants for slave@’182.148.1115.237’;</h2><p>4）查看主服务器master状态(注意File与Position项，从服务器需要这两项参数)<br>mysql&gt; show master status;<br>+——————+———-+————–+——————+——————-+<br>| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |<br>+——————+———-+————–+——————+——————-+<br>| mysql-bin.000007 |      120 | huanqiu      | mysql            |                   |<br>+——————+———-+————–+——————+——————-+<br>1 row in set (0.00 sec)</p>
+<p>下面是slave数据库上的操作：<br>1）设置slave数据库的my.cnf配置文件<br>[root@master ~]# vim /usr/local/mysql/my.cnf<br>…….<br>server-id=2   #设置从服务器id，必须于主服务器不同<br>log-bin=mysql-bin   #启动MySQ二进制日志系统<br>replicate-do-db=huanqiu  #需要同步的数据库名。如果不指明同步哪些库，就去掉这行，表示所有库的同步（除了ignore忽略的库）。<br>replicate-ignore-db=mysql  #不同步mysql系统数据库<br>slave-skip-errors = all   #跳过所有的错误错误，继续执行复制操作</p>
+<hr>
+<p>温馨提示：<br>当只针对某些库的某张表进行同步时，如下，只同步huanqiu库的haha表和huanpc库的heihei表：<br>replicate-do-db = huanqiu<br>replicate-wild-do-table = huanqiu.haha       //当只同步几个或少数表时，可以这样设置。注意这要跟上面的库指定配合使用；<br>replicate-do-db = huanpc</p>
+<h2 id="replicate-wild-do-table-huanpc-heihei-如果同步的库的表比较多时，就不能这样一一指定了，就把这个选项配置去掉，直接根据指定的库进行同步。"><a href="#replicate-wild-do-table-huanpc-heihei-如果同步的库的表比较多时，就不能这样一一指定了，就把这个选项配置去掉，直接根据指定的库进行同步。" class="headerlink" title="replicate-wild-do-table = huanpc.heihei      //如果同步的库的表比较多时，就不能这样一一指定了，就把这个选项配置去掉，直接根据指定的库进行同步。"></a>replicate-wild-do-table = huanpc.heihei      //如果同步的库的表比较多时，就不能这样一一指定了，就把这个选项配置去掉，直接根据指定的库进行同步。</h2><p>2）在slave数据库中导入从master传过来的数据。<br>mysql&gt; CREATE DATABASE huanqiu CHARACTER SET utf8 COLLATE utf8_general_ci;   #先创建一个huanqiu空库，否则下面导入数据时会报错说此库不存在。<br>mysql&gt; use huanqiu;<br>mysql&gt; source /opt/huanqiu.sql;   ＃导入master中多余的数据。<br>…….</p>
+<p>3）配置主从同步指令<br>mysql&gt; stop slave;   ＃执行同步前，要先关闭slave<br>mysql&gt; change  master to master_host=’182.148.15.238’,master_user=’slave’,master_password=’slave@123’,master_log_file=’mysql-bin.000007’,master_log_pos=120;</p>
+<p>mysql&gt; start slave;<br>mysql&gt; show slave status \G;<br>…….<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>               Slave_IO_State: Waiting for master to send event<br>                  Master_Host: 182.148.15.238<br>                  Master_User: slave<br>                  Master_Port: 3306<br>                Connect_Retry: 60<br>              Master_Log_File: mysql-bin.000007<br>          Read_Master_Log_Pos: 120<br>               Relay_Log_File: mysql-relay-bin.000002<br>                Relay_Log_Pos: 279<br>        Relay_Master_Log_File: mysql-bin.000007<br>             Slave_IO_Running: Yes<br>            Slave_SQL_Running: Yes<br>              Replicate_Do_DB: huanqiu<br>          Replicate_Ignore_DB: mysql<br>           ………….<br>        Seconds_Behind_Master: 0</p>
+<p>如上，当IO和SQL线程的状态均为Yes，则表示主从已实现同步了！</p>
+<p>查看slave数据库中的数据情况<br>mysql&gt; show databases;<br>+——————–+<br>| Database           |<br>+——————–+<br>| information_schema |<br>| huanqiu            |<br>| mysql              |<br>| performance_schema |<br>| test               |<br>+——————–+<br>5 rows in set (0.00 sec)</p>
+<p>mysql&gt; select * from huanqiu.haha;<br>+—-+———–+<br>| id | name      |<br>+—-+———–+<br>|  1 | wangshibo |<br>|  2 | guohuihui |<br>+—-+———–+<br>2 rows in set (0.00 sec)</p>
+<p>下面测试下Mysql主从同步的效果<br>现在主数据库上写入新数据<br>mysql&gt; unlock tables;    #解锁，否则新数据无法写入<br>mysql&gt; insert into huanqiu.haha values(100,”anhui”);<br>Query OK, 1 row affected (0.00 sec)</p>
+<p>然后在slave数据库上查看，发现master上新写入的数据已经同步过来了<br>mysql&gt; select * from huanqiu.haha;<br>+—–+———–+<br>| id  | name      |<br>+—–+———–+<br>|   1 | wangshibo |<br>|   2 | guohuihui |<br>| 100 | anhui     |<br>+—–+———–+<br>3 rows in set (0.00 sec)</p>
+<h2 id="至此，主从同步环境已经实现！"><a href="#至此，主从同步环境已经实现！" class="headerlink" title="至此，主从同步环境已经实现！"></a>至此，主从同步环境已经实现！</h2><p>注意：<br>Mysql主从环境部署一段时间后，发现主从不同步时，如何进行数据同步至一致？<br>有以下两种做法：<br>1）参考：mysql主从同步(2)-问题梳理 中的第（4）步的第二种方法</p>
+<h2 id="2）参考：mysql主从同步-3-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理"><a href="#2）参考：mysql主从同步-3-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理" class="headerlink" title="2）参考：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理"></a>2）参考：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理</h2><p>3）主主复制实现过程记录</p>
+<p>根据上面的主从环境部署，master和slave已经实现同步，即在master上写入新数据，自动同步到slave。而从库只能读不能写，一旦从库有写入数据，就会造成主从数据不一致！</p>
+<h2 id="下面就说下Mysql主主复制环境，在slave上更新数据时，master也能自动同步过来。"><a href="#下面就说下Mysql主主复制环境，在slave上更新数据时，master也能自动同步过来。" class="headerlink" title="下面就说下Mysql主主复制环境，在slave上更新数据时，master也能自动同步过来。"></a>下面就说下Mysql主主复制环境，在slave上更新数据时，master也能自动同步过来。</h2><p>温馨提示：<br>在做主主同步前，提醒下需要特别注意的一个问题：<br>主主复制和主从复制有一些区别，因为多主中都可以对服务器有写权限，所以设计到自增长重复问题，例如：<br>出现的问题（多主自增长ID重复）<br>1）首先在A和B两个库上创建test表结构;<br>2）停掉A，在B上对数据表test(存在自增长属性的ID字段)执行插入操作，返回插入ID为1;<br>3）然后停掉B，在A上对数据表test(存在自增长属性的ID字段)执行插入操作，返回的插入ID也是1;<br>4）然后 同时启动A,B，就会出现主键ID重复</p>
+<p>解决方法：<br>只要保证两台服务器上的数据库里插入的自增长数据不同就可以了<br>如：A插入奇数ID，B插入偶数ID，当然如果服务器多的话，还可以自定义算法，只要不同就可以了<br>在下面例子中，在两台主主服务器上加入参数，以实现奇偶插入！<br>记住:在做主主同步时需要设置自增长的两个相关配置，如下：<br>auto_increment_offset       表示自增长字段从那个数开始，取值范围是1 .. 65535。这个就是序号。如果有n台mysql机器，则从第一台开始分为设1，2…n<br>auto_increment_increment    表示自增长字段每次递增的量，其默认值是1，取值范围是1 .. 65535。如果有n台mysql机器，这个值就设置为n。</p>
+<p>在主主同步配置时，需要将两台服务器的：<br>auto_increment_increment     增长量都配置为2<br>auto_increment_offset        分别配置为1和2。这是序号，第一台从1开始，第二台就是2，以此类推…..</p>
+<h2 id="这样才可以避免两台服务器同时做更新时自增长字段的值之间发生冲突。（针对的是有自增长属性的字段）"><a href="#这样才可以避免两台服务器同时做更新时自增长字段的值之间发生冲突。（针对的是有自增长属性的字段）" class="headerlink" title="这样才可以避免两台服务器同时做更新时自增长字段的值之间发生冲突。（针对的是有自增长属性的字段）"></a>这样才可以避免两台服务器同时做更新时自增长字段的值之间发生冲突。（针对的是有自增长属性的字段）</h2><p>现在记录下主主同步的操作过程：<br>1）在master上的my.cnf配置：<br>[root@master ~]# vim /usr/local/mysql/my.cnf<br>server-id = 1<br>log-bin = mysql-bin<br>binlog-ignore-db = mysql,information_schema<br>sync_binlog = 1<br>binlog_checksum = none<br>binlog_format = mixed<br>auto-increment-increment = 2<br>auto-increment-offset = 1<br>slave-skip-errors = all     </p>
+<p>[root@master ~]# /etc/init.d/mysql restart<br>Shutting down MySQL. SUCCESS!<br>Starting MySQL.. SUCCESS!</p>
+<p>数据同步授权（iptables防火墙开启3306端口，要确保对方机器能使用下面权限连接到本机mysql）<br>mysql&gt; grant replication slave,replication client on <em>.</em> to slave@’182.148.15.237’ identified by “slave@123”;<br>mysql&gt; flush privileges;</p>
+<p>最好将库锁住，仅仅允许读，以保证数据一致性；待主主同步环境部署后再解锁；锁住后，就不能往表里写数据，但是重启mysql服务后就会自动解锁！<br>mysql&gt; FLUSH TABLES WITH READ LOCK;    //注意该参数设置后，如果自己同步对方数据，同步前一定要记得先解锁！<br>Query OK, 0 rows affected (0.00 sec)</p>
+<p>mysql&gt; show master status;<br>+——————+———-+————–+——————+——————-+<br>| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |<br>+——————+———-+————–+——————+——————-+<br>| mysql-bin.000001 |     1970 |              |                  |                   |<br>+——————+———-+————–+——————+——————-+<br>1 row in set (0.00 sec)</p>
+<p>2）slave数据库上<br>[root@slave ~]# vim /usr/local/mysql/my.cnf<br>server-id = 2<br>log-bin = mysql-bin<br>binlog-ignore-db = mysql,information_schema<br>sync_binlog = 1<br>binlog_checksum = none<br>binlog_format = mixed<br>auto-increment-increment = 2<br>auto-increment-offset = 2<br>slave-skip-errors = all</p>
+<p>[root@slave ~]# /etc/init.d/mysql restart<br>Shutting down MySQL. SUCCESS!<br>Starting MySQL.. SUCCESS!</p>
+<p>数据同步授权（iptables防火墙开启3306端口，要确保对方机器能使用下面权限连接到本机mysql）<br>同理，slave也要授权给master机器远程同步数据的权限<br>mysql&gt; grant replication slave ,replication client on <em>.</em> to slave@’182.148.15.238’ identified by “slave@123”;<br>mysql&gt; flush privileges;</p>
+<p>mysql&gt; FLUSH TABLES WITH READ LOCK;<br>mysql&gt; show master status;<br>+——————+———-+————–+——————+——————-+<br>| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |<br>+——————+———-+————–+——————+——————-+<br>| mysql-bin.000001 |     4136 |              |                  |                   |<br>+——————+———-+————–+——————+——————-+<br>1 row in set (0.00 sec)</p>
+<p>3）执行主张同步操作<br>先在slave数据库上做同步master的设置。（确保slave上要同步的数据，提前在master上存在。最好双方数据保持一致）<br>mysql&gt; unlock tables;     //先解锁，将对方数据同步到自己的数据库中<br>mysql&gt; slave stop；<br>mysql&gt; change master to master_host=’182.148.15.238’,master_user=’slave’,master_password=’slave@123’,master_log_file=’master-bin.000001’,master_log_pos=1970;</p>
+<p>mysql&gt; start slave;<br>mysql&gt; show slave status \G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>               Slave_IO_State: Waiting for master to send event<br>                  Master_Host: 182.148.15.238<br>                  Master_User: slave<br>                  Master_Port: 3306<br>                Connect_Retry: 60<br>              Master_Log_File: mysql-bin.000001<br>          Read_Master_Log_Pos: 1970<br>               Relay_Log_File: mysql-relay-bin.000003<br>                Relay_Log_Pos: 750<br>        Relay_Master_Log_File: mysql-bin.000001<br>             Slave_IO_Running: Yes<br>            Slave_SQL_Running: Yes<br>            ………………</p>
+<p>这样就实现了slave－&gt;master的同步环境。</p>
+<p>再在master数据库上做同步slave的设置。（确保slave上要同步的数据，提前在master上存在。最好双方数据保持一致）<br>mysql&gt; unlock tables;<br>mysql&gt; slave stop；<br>mysql&gt; change master to master_host=’182.148.15.237’,master_user=’slave’,master_password=’slave@123’,master_log_file=’master-bin.000001’,master_log_pos=4136;</p>
+<p>mysql&gt; start slave;<br>mysql&gt; show slave status \G;<br><strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong> 1. row <strong><strong><strong><strong><strong><strong><em>*</em></strong></strong></strong></strong></strong></strong><br>               Slave_IO_State: Waiting for master to send event<br>                  Master_Host: 182.148.15.237<br>                  Master_User: slave<br>                  Master_Port: 3306<br>                Connect_Retry: 60<br>              Master_Log_File: mysql-bin.000001<br>          Read_Master_Log_Pos: 4136<br>               Relay_Log_File: mysql-relay-bin.000003<br>                Relay_Log_Pos: 750<br>        Relay_Master_Log_File: mysql-bin.000001<br>             Slave_IO_Running: Yes<br>            Slave_SQL_Running: Yes<br>            ………………</p>
+<p>这样就实现了master－&gt;slave的同步环境。至此，主主双向同步环境已经实现！<br>4）最后测试下Mysql主主同步的效果</p>
+<p>在master上写入新数据<br>mysql&gt; select * from huanqiu.haha;<br>+—–+———–+<br>| id  | name      |<br>+—–+———–+<br>|   1 | wangshibo |<br>|   2 | guohuihui |<br>| 100 | anhui     |<br>+—–+———–+<br>3 rows in set (0.00 sec)</p>
+<p>mysql&gt; insert into huanqiu.haha values(15,”guocongcong”);</p>
+<p>在slave数据库中查看，发现master新写入的数据已经同步过来了<br>mysql&gt; select * from huanqiu.haha;<br>+—–+————+<br>| id  | name       |<br>+—–+————+<br>|   1 | wangshibo  |<br>|   2 | guohuihui  |<br>|  15 | guocongcong|<br>| 100 | anhui      |<br>+—–+————+<br>3 rows in set (0.00 sec)</p>
+<p>在slave上删除数据<br>mysql&gt; delete from huanqiu.haha where id=100;</p>
+<p>在master数据库中查看<br>mysql&gt; select * from huanqiu.haha;<br>+—–+————+<br>| id  | name       |<br>+—–+————+<br>|   1 | wangshibo  |<br>|   2 | guohuihui  |<br>|  15 | guocongcong|<br>+—–+————+<br>3 rows in set (0.00 sec)</p>
 
       
 
@@ -250,7 +248,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/">展开全文 >></a>
         </p>
       
 
@@ -280,28 +278,87 @@
 
 
   
-    <article id="post-将Web应用性能提高十倍的10条建议" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-linux_查看当前系统的负载情况" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/14/将Web应用性能提高十倍的10条建议/">将Web应用性能提高十倍的10条建议</a>
+      <a class="article-title" href="/2017/12/15/linux_查看当前系统的负载情况/">linux_查看当前系统的负载情况</a>
     </h1>
   
 
         
-        <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:23:07.511Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/linux_查看当前系统的负载情况/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:50:43.121Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>举一个例子，一份亚马逊十年前做过的研究可以证明，甚至在那个时候，网页加载时间每减少100毫秒，收入就会增加1%。另一个最近的研究特别强调一个事实，即超过一半的网站拥有者在调查中承认它们会因为应用程序性能的问题流失用户。<br>网站到底需要多快呢？对于页面加载，每增加1秒钟就有4%的用户放弃使用。顶级的电子商务站点的页面在第一次交互时可以做到1秒到3秒加载时间，而这是提供最高舒适度的速度。很明显这种利害关系对于 web 应用来说很高，而且在不断的增加。<br>想要提高效率很简单，但是看到实际结果很难。为了在你的探索之旅上帮助到你，这篇文章会给你提供10条最高可以提升10倍网站性能的建议。这是一系列介绍提高应用程序性能的第一篇文章，包括充分测试的优化技术和一点 NGINX 的帮助。这个系列也给出了潜在的提高安全性的帮助。<br>1: 通过反向代理来提高性能和增加安全性<br>如果你的 web 应用运行在单个机器上，那么这个办法会明显的提升性能：只需要换一个更快的机器，更好的处理器，更多的内存，更快的磁盘阵列，等等。然后新机器就可以更快的运行你的 WordPress 服务器, Node.js 程序, Java 程序，以及其它程序。（如果你的程序要访问数据库服务器，那么解决方法依然很简单：添加两个更快的机器，以及在两台电脑之间使用一个更快的链路。）<br>问题是，机器速度可能并不是问题。web 程序运行慢经常是因为计算机一直在不同的任务之间切换：通过成千上万的连接和用户交互，从磁盘访问文件，运行代码，等等。应用服务器可能会抖动thrashing-比如说内存不足、将内存数据交换到磁盘，以及有多个请求要等待某个任务完成，如磁盘I/O。<br>你可以采取一个完全不同的方案来替代升级硬件：添加一个反向代理服务器来分担部分任务。反向代理服务器位于运行应用的机器的前端，是用来处理网络流量的。只有反向代理服务器是直接连接到互联网的；和应用服务器的通讯都是通过一个快速的内部网络完成的。<br>使用反向代理服务器可以将应用服务器从等待用户与 web 程序交互解放出来，这样应用服务器就可以专注于为反向代理服务器构建网页，让其能够传输到互联网上。而应用服务器就不需要等待客户端的响应，其运行速度可以接近于优化后的性能水平。<br>添加反向代理服务器还可以给你的 web 服务器安装带来灵活性。比如，一个某种类型的服务器已经超载了，那么就可以轻松的添加另一个相同的服务器；如果某个机器宕机了，也可以很容易替代一个新的。<br>因为反向代理带来的灵活性，所以反向代理也是一些性能加速功能的必要前提，比如：<br>1.负载均衡 (参见 Tip #2) – 负载均衡运行在反向代理服务器上，用来将流量均衡分配给一批应用。有了合适的负载均衡，你就可以添加应用服务器而根本不用修改应用。<br>2.缓存静态文件 (参见 Tip #3) – 直接读取的文件，比如图片或者客户端代码，可以保存在反向代理服务器，然后直接发给客户端，这样就可以提高速度、分担应用服务器的负载，可以让应用运行的更快。<br>3.网站安全 – 反向代理服务器可以提高网站安全性，以及快速的发现和响应攻击，保证应用服务器处于被保护状态。<br>NGINX 软件为用作反向代理服务器而专门设计，也包含了上述的多种功能。NGINX 使用事件驱动的方式处理请求，这会比传统的服务器更加有效率。NGINX plus 添加了更多高级的反向代理特性，比如应用的健康度检查，专门用来处理请求路由、高级缓冲和相关支持。<br>NGINX Worker Process helps increase application performance<br>2: 添加负载平衡<br>添加一个负载均衡服务器 是一个相当简单的用来提高性能和网站安全性的的方法。与其将核心 Web 服务器变得越来越大和越来越强，不如使用负载均衡将流量分配到多个服务器。即使程序写的不好，或者在扩容方面有困难，仅是使用负载均衡服务器就可以很好的提高用户体验。<br>负载均衡服务器首先是一个反向代理服务器（参见Tip #1）——它接受来自互联网的流量，然后转发请求给另一个服务器。特别是负载均衡服务器支持两个或多个应用服务器，使用分配算法将请求转发给不同服务器。最简单的负载均衡方法是轮转法round robin，每个新的请求都会发给列表里的下一个服务器。其它的复制均衡方法包括将请求发给活动连接最少的服务器。NGINX plus 拥有将特定用户的会话分配给同一个服务器的能力。<br>负载均衡可以很好的提高性能是因为它可以避免某个服务器过载而另一些服务器却没有需要处理的流量。它也可以简单的扩展服务器规模，因为你可以添加多个价格相对便宜的服务器并且保证它们被充分利用了。<br>可以进行负载均衡的协议包括 HTTP、HTTPS、SPDY、HTTP/2、WebSocket、FastCGI、SCGI、uwsgi、 memcached 等，以及几种其它的应用类型，包括基于 TCP 的应用和其它的第4层协议的程序。分析你的 web 应用来决定你要使用哪些以及哪些地方性能不足。<br>相同的服务器或服务器群可以被用来进行负载均衡，也可以用来处理其它的任务，如 SSL 末端服务器，支持客户端的 HTTP/1.x 和 HTTP/2 请求，以及缓存静态文件。<br>3: 缓存静态和动态的内容<br>缓存可以通过加速内容的传输速度来提高 web 应用的性能。它可以采用以下几种策略：当需要的时候预处理要传输的内容，保存数据到速度更快的设备，把数据存储在距离客户端更近的位置，或者将这几种方法结合起来使用。<br>有两种不同类型数据的缓存：<br>1.静态内容缓存。不经常变化的文件，比如图像(JPEG、PNG) 和代码(CSS,JavaScript)，可以保存在外围服务器上，这样就可以快速的从内存和磁盘上提取。<br>2.动态内容缓存。很多 web 应用会针对每次网页请求生成一个新的 HTML 页面。在短时间内简单的缓存生成的 HTML 内容，就可以很好的减少要生成的内容的数量，而且这些页面足够新，可以满足你的需要。<br>举个例子，如果一个页面每秒会被浏览10次，你将它缓存 1 秒，90%请求的页面都会直接从缓存提取。如果你分开缓存静态内容，甚至新生成的页面可能都是由这些缓存构成的。<br>下面由是 web 应用发明的三种主要的缓存技术：<br>1.缩短数据与用户的网络距离。把一份内容的拷贝放的离用户更近的节点来减少传输时间。<br>2.提高内容服务器的速度。内容可以保存在一个更快的服务器上来减少提取文件的时间。<br>3.从过载服务器上移走数据。机器经常因为要完成某些其它的任务而造成某个任务的执行速度比测试结果要差。将数据缓存在不同的机器上可以提高缓存资源和非缓存资源的性能，而这是因为主机没有被过度使用。<br>对 web 应用的缓存机制可以在 web 应用服务器内部实现。首先，缓存动态内容是用来减少应用服务器加载动态内容的时间。其次，缓存静态内容（包括动态内容的临时拷贝）是为了更进一步的分担应用服务器的负载。而且缓存之后会从应用服务器转移到对用户而言更快、更近的机器，从而减少应用服务器的压力，减少提取数据和传输数据的时间。<br>改进过的缓存方案可以极大的提高应用的速度。对于大多数网页来说，静态数据，比如大图像文件，构成了超过一半的内容。如果没有缓存，那么这可能会花费几秒的时间来提取和传输这类数据，但是采用了缓存之后不到1秒就可以完成。<br>举一个在实际中缓存是如何使用的例子， NGINX 和 NGINX Plus 使用了两条指令来设置缓存机制：proxy_cache_path 和proxy_cache。你可以指定缓存的位置和大小、文件在缓存中保存的最长时间和其它一些参数。使用第三条（而且是相当受欢迎的一条）指令 proxy_cache_use_stale，如果提供新鲜内容的服务器忙碌或者挂掉了，你甚至可以让缓存提供较旧的内容，这样客户端就不会一无所得。从用户的角度来看这可以很好的提高你的网站或者应用的可用时间。<br>NGINX plus 有个高级缓存特性，包括对缓存清除的支持和在仪表盘上显示缓存状态信息。<br>要想获得更多关于 NGINX 的缓存机制的信息可以浏览 NGINX Plus 管理员指南中的《参考文档》和《NGINX 内容缓存》。<br>注意：缓存机制分布于应用开发者、投资决策者以及实际的系统运维人员之间。本文提到的一些复杂的缓存机制从 DevOps 的角度来看很具有价值，即对集应用开发者、架构师以及运维操作人员的功能为一体的工程师来说可以满足它们对站点功能性、响应时间、安全性和商业结果（如完成的交易数）等需要。<br>4: 压缩数据<br>压缩是一个具有很大潜力的提高性能的加速方法。现在已经有一些针对照片（JPEG 和PNG）、视频（MPEG-4）和音乐（MP3）等各类文件精心设计和高压缩率的标准。每一个标准都或多或少的减少了文件的大小。<br>文本数据 —— 包括HTML（包含了纯文本和 HTML 标签），CSS 和代码，比如 Javascript —— 经常是未经压缩就传输的。压缩这类数据会在对应用程序性能的感觉上，特别是处于慢速或受限的移动网络的客户端，产生更大的影响。<br>这是因为文本数据经常是用户与网页交互的有效数据，而多媒体数据可能更多的是起提供支持或者装饰的作用。智能的内容压缩可以减少HTML，Javascript，CSS和其它文本内容对带宽的要求，通常可以减少 30% 甚至更多的带宽和相应的页面加载时间。<br>如果你使用 SSL，压缩可以减少需要进行 SSL 编码的的数据量，而这些编码操作会占用一些 CPU 时间而抵消了压缩数据减少的时间。<br>压缩文本数据的方法很多，举个例子，在 HTTP/2 中，小说文本的压缩模式就特别调整了头部数据。另一个例子是可以在 NGINX 里打开使用 GZIP压缩。你在你的服务里预先压缩文本数据之后，你就可以直接使用 gzip_static 指令来处理压缩过的 .gz 版本。<br>5: 优化 SSL/TLS<br>安全套接字（SSL) 协议和它的下一代版本传输层安全（TLS）协议正在被越来越多的网站采用。SSL/TLS 对从原始服务器发往用户的数据进行加密提高了网站的安全性。影响这个趋势的部分原因是 Google 正在使用 SSL/TLS，这在搜索引擎排名上是一个正面的影响因素。<br>尽管 SSL/TLS 越来越流行，但是使用加密对速度的影响也让很多网站望而却步。SSL/TLS 之所以让网站变的更慢，原因有二：<br>1.任何一个连接第一次连接时的握手过程都需要传递密钥。而采用 HTTP/1.x 协议的浏览器在建立多个连接时会对每个连接重复上述操作。<br>2.数据在传输过程中需要不断的服务器端加密、客户端解密。<br>为了鼓励使用 SSL/TLS，HTTP/2 和 SPDY（在下一章会描述）的作者设计了新的协议来让浏览器只需要对一个浏览器会话使用一个连接。这会大大的减少上述第一个原因所浪费的时间。然而现在可以用来提高应用程序使用 SSL/TLS 传输数据的性能的方法不止这些。<br>web 服务器有对应的机制优化 SSL/TLS 传输。举个例子，NGINX 使用 OpenSSL运行在普通的硬件上提供了接近专用硬件的传输性能。NGINX的 SSL 性能 有详细的文档，而且把对 SSL/TLS 数据进行加解密的时间和 CPU 占用率降低了很多。<br>更进一步，参考这篇文章了解如何提高 SSL/TLS 性能的更多细节，可以总结为一下几点：<br>1.会话缓冲。使用指令 ssl_session_cache 可以缓存每个新的 SSL/TLS 连接使用的参数。<br>2.会话票据或者 ID。把 SSL/TLS 的信息保存在一个票据或者 ID 里可以流畅的复用而不需要重新握手。<br>3.OCSP 分割。通过缓存 SSL/TLS 证书信息来减少握手时间。<br>NGINX 和 NGINX Plus 可以被用作 SSL/TLS 服务端，用于处理客户端流量的加密和解密，而同时以明文方式和其它服务器进行通信。<br>6: 使用 HTTP/2 或 SPDY<br>对于已经使用了 SSL/TLS 的站点，HTTP/2 和 SPDY 可以很好的提高性能，因为每个连接只需要一次握手。而对于没有使用 SSL/TLS 的站点来说，从响应速度的角度来说 HTTP/2 和 SPDY 将让迁移到 SSL/TLS 没有什么压力（原本会降低效率）。<br>Google 在2012年开始把 SPDY 作为一个比 HTTP/1.x 更快速的协议来推荐。HTTP/2 是目前 IETF 通过的标准，是基于 SPDY 的。SPDY 已经被广泛的支持了，但是很快就会被 HTTP/2 替代。<br>SPDY 和 HTTP/2 的关键是用单一连接来替代多路连接。单个连接是被复用的，所以它可以同时携带多个请求和响应的分片。<br>通过使用单一连接，这些协议可以避免像在实现了 HTTP/1.x 的浏览器中一样建立和管理多个连接。单一连接在对 SSL 特别有效，这是因为它可以最小化 SSL/TLS 建立安全链接时的握手时间。<br>SPDY 协议需要使用 SSL/TLS，而 HTTP/2 官方标准并不需要，但是目前所有支持 HTTP/2 的浏览器只有在启用了 SSL/TLS 的情况下才能使用它。这就意味着支持 HTTP/2 的浏览器只有在网站使用了 SSL 并且服务器接收 HTTP/2 流量的情况下才会启用 HTTP/2。否则的话浏览器就会使用HTTP/1.x 协议。<br>当你实现 SPDY 或者 HTTP/2 时，你不再需要那些常规的 HTTP 性能优化方案，比如按域分割、资源聚合，以及图像拼合。这些改变可以让你的代码和部署变得更简单和更易于管理。<br>NGINX Supports SPDY and HTTP/2 for increased web application performance<br>作为支持这些协议的一个样例，NGINX 已经从一开始就支持了 SPDY，而且大部分使用 SPDY 协议的网站都运行的是 NGINX。NGINX 同时也很早对 HTTP/2 的提供了支持，从2015 年9月开始，开源版 NGINX 和 NGINX Plus 就支持它了。<br>经过一段时间，我们 NGINX 希望更多的站点完全启用 SSL 并且向 HTTP/2 迁移。这将会提高安全性，同时也会找到并实现新的优化手段，简化的代码表现的会更加优异。<br>7: 升级软件版本<br>一个提高应用性能的简单办法是根据软件的稳定性和性能的评价来选在你的软件栈。进一步说，因为高性能组件的开发者更愿意追求更高的性能和解决 bug ，所以值得使用最新版本的软件。新版本往往更受开发者和用户社区的关注。更新的版本往往会利用到新的编译器优化，包括对新硬件的调优。<br>稳定的新版本通常比旧版本具有更好的兼容性和更高的性能。一直进行软件更新，可以非常简单的保持软件保持最佳的优化，解决掉 bug，以及提高安全性。<br>一直使用旧版软件也会阻止你利用新的特性。比如上面说到的 HTTP/2，目前要求 OpenSSL 1.0.1。在2016 年中期开始将会要求1.0.2 ，而它是在2015年1月才发布的。<br>NGINX 用户可以开始迁移到 NGINX 最新的开源软件 或者 NGINX Plus；它们都包含了最新的能力，如 socket 分割和线程池（见下文），这些都已经为性能优化过了。然后好好看看的你软件栈，把它们升级到你能升级到的最新版本吧。<br>8: Linux 系统性能调优<br>Linux 是大多数 web 服务器使用的操作系统，而且作为你的架构的基础，Linux 显然有不少提高性能的可能。默认情况下，很多 Linux 系统都被设置为使用很少的资源，以符合典型的桌面应用使用。这就意味着 web 应用需要一些微调才能达到最大效能。<br>这里的 Linux 优化是专门针对 web 服务器方面的。以 NGINX 为例，这里有一些在加速 Linux 时需要强调的变化：<br>1.缓冲队列。如果你有挂起的连接，那么你应该考虑增加 net.core.somaxconn 的值，它代表了可以缓存的连接的最大数量。如果连接限制太小，那么你将会看到错误信息，而你可以逐渐的增加这个参数直到错误信息停止出现。<br>2.文件描述符。NGINX 对一个连接使用最多2个文件描述符。如果你的系统有很多连接请求，你可能就需要提高sys.fs.file_max，以增加系统对文件描述符数量整体的限制，这样才能支持不断增加的负载需求。<br>3.临时端口。当使用代理时，NGINX 会为每个上游服务器创建临时端口。你可以设置net.ipv4.ip_local_port_range 来提高这些端口的范围，增加可用的端口号。你也可以减少非活动的端口的超时判断来重复使用端口，这可以通过net.ipv4.tcp_fin_timeout 来设置，这可以快速的提高流量。<br>9: web 服务器性能调优<br>无论你是用哪种 web 服务器，你都需要对它进行优化来提高性能。下面的推荐手段可以用于任何 web 服务器，但是一些设置是针对 NGINX 的。关键的优化手段包括：<br>1.访问日志。不要把每个请求的日志都直接写回磁盘，你可以在内存将日志缓存起来然后批量写回磁盘。对于NGINX 来说，给指令access_log 添加参数 buffer=size 可以让系统在缓存满了的情况下才把日志写到磁盘。如果你添加了参数flush=time ，那么缓存内容会每隔一段时间再写回磁盘。<br>2.缓存。缓存会在内存中存放部分响应，直到满了为止，这可以让与客户端的通信更加高效。内存放不下的响应会写回磁盘，而这就会降低效能。当 NGINX 启用了缓存机制后，你可以使用指令 proxy_buffer_size 和 proxy_buffers 来管理缓存。<br>3.客户端保活。保活连接可以减少开销，特别是使用 SSL/TLS 时。对于 NGINX 来说，你可以从 keepalive_requests 的默认值 100开始增加最大连接数，这样一个客户端就可以在一个指定的连接上请求多次，而且你也可以通过增加keepalive_timeout的值来允许保活连接存活更长时间，这样就可以让后来的请求处理的更快速。<br>4.上游保活。上游的连接——即连接到应用服务器、数据库服务器等机器的连接——同样也会受益于连接保活。对于上游连接来说，你可以增加 keepalive，即每个工人进程的空闲保活连接个数。这就可以提高连接的复用次数，减少需要重新打开全新连接的次数。更多关于保活连接的信息可以参见这篇“ HTTP 保活连接和性能”。<br>5.限制。限制客户端使用的资源可以提高性能和安全性。对于 NGINX 来说，指令 limit_conn 和 limit_conn_zone 限制了给定来源的连接数量，而 limit_rate 限制了带宽。这些限制都可以阻止合法用户扒取资源，同时也避免了攻击。指令limit_req 和limit_req_zone 限制了客户端请求。对于上游服务器来说，可以在 upstream 的配置块里的 server 指令使用 max_conns参数来限制连接到上游服务器的连接数。 这样可以避免服务器过载。关联的 queue 指令会创建一个队列来在连接数抵达max_connS 限制时在指定长度的时间内保存特定数量的请求。<br>6.工人进程。工人进程负责处理请求。NGINX 采用事件驱动模型和操作系统特定的机制来有效的将请求分发给不同的工人进程。这条建议推荐设置 worker_processes 为每个 CPU 一个 。worker_connections 的最大数（默认512）可以在大部分系统上根据需要增加，实验性地找到最适合你的系统的值。<br>7.套接字分割。通常一个套接字监听器会把新连接分配给所有工人进程。套接字分割会为每个工人进程创建一个套接字监听器，这样一来以当套接字监听器可用时，内核就会将连接分配给它。这可以减少锁竞争，并且提高多核系统的性能，要启用套接字分隔需要在 listen 指令里面加上 reuseport 参数。<br>8.线程池。计算机进程可能被一个单一的缓慢的操作所占用。对于 web 服务器软件来说，磁盘访问会影响很多更快的操作，比如计算或者在内存中拷贝。使用了线程池之后慢操作可以分配到不同的任务集，而主进程可以一直运行快速操作。当磁盘操作完成后结果会返回给主进程的循环。在 NGINX 里有两个操作——read() 系统调用和 sendfile() ——被分配到了线程池<br>Thread pools help increase application performance by assigning a slow operation to a separate set of tasks<br>技巧。当改变任何操作系统或支持服务的设置时，一次只改变一个参数然后测试性能。如果修改引起问题了，或者不能让你的系统更快，那么就改回去。<br>10: 监视系统活动来解决问题和瓶颈<br>在应用开发中要使得系统变得非常高效的关键是监视你的系统在现实世界运行的性能。你必须能通过特定的设备和你的 web 基础设施上监控程序活动。<br>监视活动是最积极的——它会告诉你发生了什么，把问题留给你发现和最终解决掉。<br>监视可以发现几种不同的问题。它们包括：<br>1.服务器宕机。<br>2.服务器出问题一直在丢失连接。<br>3.服务器出现大量的缓存未命中。<br>4.服务器没有发送正确的内容。<br>应用的总体性能监控工具，比如 New Relic 和 Dynatrace，可以帮助你监控到从远程加载网页的时间，而 NGINX 可以帮助你监控到应用交付端。当你需要考虑为基础设施添加容量以满足流量需求时，应用性能数据可以告诉你你的优化措施的确起作用了。<br>为了帮助开发者快速的发现、解决问题，NGINX Plus 增加了应用感知健康度检查 ——对重复出现的常规事件进行综合分析并在问题出现时向你发出警告。NGINX Plus 同时提供会话过滤功能，这可以阻止当前任务完成之前接受新的连接，另一个功能是慢启动，允许一个从错误恢复过来的服务器追赶上负载均衡服务器群的进度。当使用得当时，健康度检查可以让你在问题变得严重到影响用户体验前就发现它，而会话过滤和慢启动可以让你替换服务器，并且这个过程不会对性能和正常运行时间产生负面影响。下图就展示了内建的 NGINX Plus 模块实时活动监视的仪表盘，包括了服务器群，TCP 连接和缓存信息等 Web 架构信息。<br>Use real-time application performance monitoring tools to identify and resolve issues quickly<br>总结: 看看10倍性能提升的效果<br>这些性能提升方案对任何一个 web 应用都可用并且效果都很好，而实际效果取决于你的预算、你能花费的时间、目前实现方案的差距。所以你该如何对你自己的应用实现10倍性能提升？<br>为了指导你了解每种优化手段的潜在影响，这里是上i面详述的每个优化方法的关键点，虽然你的情况肯定大不相同：<br>1.反向代理服务器和负载均衡。没有负载均衡或者负载均衡很差都会造成间歇的性能低谷。增加一个反向代理，比如 NGINX ，可以避免web 应用程序在内存和磁盘之间波动。负载均衡可以将过载服务器的任务转移到空闲的服务器，还可以轻松的进行扩容。这些改变都可以产生巨大的性能提升，很容易就可以比你现在的实现方案的最差性能提高10倍，对于总体性能来说可能提高的不多，但是也是有实质性的提升。<br>2.缓存动态和静态数据。如果你有一个负担过重的 web 服务器，那么毫无疑问肯定是你的应用服务器，只通过缓存动态数据就可以在峰值时间提高10倍的性能。缓存静态文件可以提高几倍的性能。<br>3.压缩数据。使用媒体文件压缩格式，比如图像格式 JPEG，图形格式 PNG，视频格式 MPEG-4，音乐文件格式 MP3 可以极大的提高性能。一旦这些都用上了，然后压缩文件数据可以将初始页面加载速度提高两倍。<br>4.优化 SSL/TLS。安全握手会对性能产生巨大的影响，对它们的优化可能会对初始响应产生2倍的提升，特别是对于大量文本的站点。优化SSL/TLS 下媒体文件只会产生很小的性能提升。<br>5.使用 HTTP/2 和 SPDY。当你使用了 SSL/TLS，这些协议就可以提高整个站点的性能。<br>6.对 Linux 和 web 服务器软件进行调优。比如优化缓存机制，使用保活连接，分配时间敏感型任务到不同的线程池可以明显的提高性能；举个例子，线程池可以加速对磁盘敏感的任务近一个数量级。</p>
+        <p><strong>uptime</strong></p>
+<p>linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。</p>
+<p>eg:</p>
+<h1 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h1><p>02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05</p>
+<p>10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09</p>
+<p>显示内容说明：</p>
+<p>10:19:04 //系统当前时间 </p>
+<p>up 257 days, 18:56 //主机已运行时间,时间越大，说明你的机器越稳定。 </p>
+<p>12 user //用户连接数，是总连接数而不是用户数 </p>
+<p>load average // 系统平均负载，统计最近1，5，15分钟的系统平均负载</p>
+<p>那么什么是系统平均负载呢？</p>
+<p>系统平均负载是指在特定时间间隔内运行队列中的平均进程数。 </p>
+<p>如果每个CPU内核的当前活动进程数不大于3的话，那么系统的性能是良好的。</p>
+<p>如果每个CPU内核的任务数大于5，那么这台机器的性能有严重问题。 </p>
+<p>如果你的linux主机是1个双核CPU的话，当Load Average 为6的时候说明机器已经被充分使用了。</p>
+<p>1可以被认为是最优的负载值。负载是会随着系统不同改变得。</p>
+<p>单CPU系统1-3和SMP系统6-10都是可能接受的。</p>
+<p>cat /proc/loadavg</p>
+<h1 id="cat-proc-loadavg"><a href="#cat-proc-loadavg" class="headerlink" title="cat /proc/loadavg"></a>cat /proc/loadavg</h1><p>0.00 0.01 0.05 2/384 4482</p>
+<p>0.00 0.01 0.05 表示最近1分钟,5分钟,15分钟 系统的平均负载; 系统负载越高,代表CPU越繁忙;</p>
+<p>2/384 2代表此时运行队列中的进程个数;384 代表系统中进程的总数</p>
+<p>4482 代表到此为止创建的最后一个进程的ID.</p>
+<p>w</p>
+<h1 id="w"><a href="#w" class="headerlink" title="w"></a>w</h1><p>02:14:34 up 126 days, 13:08, 2 users, load average: 0.00, 0.01, 0.05<br>USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT<br>root tty1 - 29Jul16 114days 0.63s 0.30s -bash<br>ceshi pts/0 118.247.5.122 02:03 0.00s 0.00s 0.00s w</p>
+<pre><code>USER:用户名  
+TTY:录后系统分配的终端号           
+FROM: 远程主机名(即从哪儿登录来的)
+LOGIN@:何时登录
+IDLE:空闲了多长时间，表示用户闲置的时间。
 
+JCPU:和该终端（tty）连接的所有进程占用的时间，这个时间里并不包括过去的后台作业时间，但却包括当前正在运行的后台作业所 
+
+           占用的时间
+
+PCPU:指当前进程（即在WHAT项中显示的进程）所占用的时间   
+WHAT:当前正在运行进程的命令行
+</code></pre><p>tload</p>
+<h1 id="tload"><a href="#tload" class="headerlink" title="tload"></a>tload</h1><p>0.23, 0.32, 0.45   </p>
+<p>平均负载:0.23, 0.32, 0.45 表示最近1分钟,5分钟,15分钟的系统平均负载.</p>
+<p>top</p>
+<h1 id="top"><a href="#top" class="headerlink" title="top"></a>top</h1><p>top - 21:23:53 up 40 min,  2 users,  load average: 0.19, 0.35, 0.47<br>        Tasks: 255 total,   1 running, 253 sleeping,   0 stopped,   1 zombie<br>        %Cpu(s):  1.1 us,  0.3 sy,  0.0 ni, 98.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st<br>        KiB Mem:   4022756 total,  2130488 used,  1892268 free,   192608 buffers<br>        KiB Swap: 19999740 total,        0 used, 19999740 free.   919724 cached Mem</p>
+<p>第一行:时间为:21:23:53; 已经运行了 40min; 当前在线用户:2个;  平均负载:0.19, 0.35, 0.47 表示最近1分钟,5分钟,15分钟的系统平</p>
+<pre><code>             均负载.
+
+第二行:进程总数:255 正在运行进程数:1  睡眠进程数:253 停止的进程数:0  僵尸进程数:1
+
+第三行:用户空间占用CPU百分比: 1.1%  内核空间占用CPU百分比:0.3%  用户进程空间内改变过优先级的进程占用CPU百分
+
+             比:0.0%   空闲CPU百分比:0.0  等待输入输出的CPU时间百分比:0.0  CPU服务软中断所耗费的时间总额:0.0% Steal
+
+             Time:0.0%
+
+第四行: 物理内存总量:4022756  使用的物理内存总量:2130488  空闲内存总量:1892268   用作内核缓存的内存量:192608
+第五行: 交换区总量:19999740   使用的交换区总量:0          空闲交换区总量:19999740 缓冲的交换区总量:919724    
+
+第六行: 进程ID、进程所有者、优先级、nice值，负值表示高优先级，正值表示低优先级、进程使用的虚拟内存总量、进程使用的、未被
+
+              换出的物理内存大小、共享内存大小、进程状态、上次更新到现在的CPU时间占用百分比、进程使用的物理内存百分比、进
+
+              程使用CPU总时间、命令名、命令行
+</code></pre>
       
 
       
@@ -313,7 +370,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/14/将Web应用性能提高十倍的10条建议/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/linux_查看当前系统的负载情况/">展开全文 >></a>
         </p>
       
 
@@ -343,139 +400,91 @@
 
 
   
-    <article id="post-zabbix3.0邮件报警" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Centos搭建Nginx图片缓存服务器" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/14/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
+      <a class="article-title" href="/2017/12/15/Centos搭建Nginx图片缓存服务器/">Centos搭建Nginx图片缓存服务器</a>
     </h1>
   
 
         
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/Centos搭建Nginx图片缓存服务器/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:50:20.223Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p>搭建Nginx图片缓存服务器<br>[root@localhost ~]# yum -y install gcc gcc-c++ pcre-devel zlib-devel openssl<em><br>[root@localhost ~]# useradd -M -u 40 -s /sbin/nologin  nginx<br>[root@localhost ~]# tar zxvf ng<br>nginx-1.9.1.tar.gz              nginx-upload-module-2.2.tar.gz  ngx_cache_purge-2.3.tar.gz<br>[root@localhost ~]# tar zxvf nginx-1.9.1.tar.gz -C /usr/src/<br>[root@localhost ~]# tar zxvf nginx-upload-module-2.2.tar.gz -C /usr/src/<br>[root@localhost ~]# tar zxvf ngx_cache_purge-2.3.tar.gz -C /usr/src/<br>[root@localhost ~]# cd /usr/src/nginx-1.9.1/<br>[root@localhost nginx-1.9.1]# ./configure –prefix=/usr/local/nginx –user=nginx –group=nginx –add-module=/usr/src/ngx_cache_purge-2.3 –with-file-aio –with-http_stub_status_module –with-http_gzip_static_module –with-http_realip_module –with-http_ssl_module –add-module=/usr/src/nginx-upload-module-2.2<br>[root@localhost nginx-1.9.1]# make -j4<br>[root@localhost nginx-1.9.1]# make install<br>[root@localhost nginx-1.9.1]# ln -s /usr/local/nginx/sbin/</em> /usr/local/sbin/<br>[root@localhost nginx-1.9.1]# nginx<br>查看配置文件：<br>[root@localhost ~]# vim /usr/local/nginx/conf/nginx.conf</p>
+<p>#user  nobody;<br>user  nginx;<br>worker_processes  4;</p>
+<p>#error_log  logs/error.log;<br>error_log  logs/error.log  crit;</p>
+<p>#error_log  logs/error.log  info;</p>
+<p>pid        logs/nginx.pid;</p>
+<p>worker_rlimit_nofile 65535;</p>
+<p>events {<br>    use epoll;<br>    worker_connections  65535;<br>}</p>
+<p>http {<br>    include       mime.types;<br>    default_type  application/octet-stream;</p>
+<p> charset utf-8;<br>    server_names_hash_bucket_size 128;<br>    client_header_buffer_size 2k;<br>    large_client_header_buffers 4 4k;<br>    client_max_body_size 8m;</p>
+<p>server_tokens off;<br>    sendfile        on;<br>    tcp_nopush     on;<br>    tcp_nodelay on;</p>
+<p>fastcgi_connect_timeout 300;<br>    fastcgi_send_timeout 300;<br>    fastcgi_read_timeout 300;<br>    fastcgi_buffer_size 4k;<br>    fastcgi_buffers 8 4k;<br>    fastcgi_busy_buffers_size 8k;<br>fastcgi_temp_file_write_size 8k;</p>
+<p>open_file_cache max=204800 inactive=20s;<br>    open_file_cache_min_uses 1;<br>    open_file_cache_valid 30s;</p>
+<p> gzip on;<br>    gzip_min_length 1k;<br>    gzip_buffers 4 16k;<br>    gzip_http_version 1.0;<br>    gzip_comp_level 2;<br>    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript image/webp image/jpeg image/gif image/png;<br>    gzip_vary on;</p>
+<p> client_body_buffer_size  512k;<br>  proxy_connect_timeout    5;<br>  proxy_read_timeout       60;<br>  proxy_send_timeout       5;<br>  proxy_buffer_size        16k;<br>  proxy_buffers            4 64k;<br>  proxy_busy_buffers_size 128k;<br>  proxy_temp_file_write_size 128k;<br>  proxy_temp_path   /data/proxy_temp_dir;</p>
+<p>#设置Web缓存区名称为cache_one，内存缓存空间大小为200MB，1天没有被访问的内容自动清除，硬盘缓存空间大小为5GB。</p>
+<p>#proxy_cache_path和proxy_temp_path设置的目录需要在同一分区，因为它们之间是硬链接的关系。<br>  proxy_cache_path  /data/proxy_cache_dir  levels=1:2   keys_zone=cache_one:300m inactive=1d max_size=5g;</p>
+<p>keepalive_timeout  60;<br>    client_header_timeout 10;<br>    client_body_timeout 10;<br>    reset_timedout_connection on;<br>    send_timeout 10;</p>
+<pre><code>log_format  access  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
+         &apos;\status $body_bytes_sent &quot;$http_referer&quot; &apos;
+         &apos;&quot;$http_user_agent&quot; $http_x_forwarded_for&apos;;
+</code></pre><p>   upstream webservers{<br>        server 127.0.0.1:8100;<br>       }<br>include /usr/local/qxg/nginx/conf.d/*.conf;<br>}<br>[root@localhost ~]# vim /usr/local/qxg/nginx/conf.d/image.conf<br>server<br>    {<br>            listen  80;<br>            server_name  192.168.40.2;<br>            index index.php index.html index.htm;<br>            root   /data/imgerserver/;<br>            autoindex on;<br>            autoindex_localtime on;<br>            autoindex_exact_size off;<br>            access_log /data/nginx/logs/soft.log  combined;<br>            error_log  /data/nginx/logs/soft-error.log debug;</p>
+<pre><code>location ~ .*\.(webp|gif|jpg|jpeg|png|bmp|swf|ico)?$
+{
+    expires 30d;
+    proxy_cache cache_one;
+    proxy_cache_valid 200 304 301 302 10d;
+    proxy_cache_valid any 1d;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_cache_key $host$uri$is_args$args;
+    proxy_pass http://123.56.86.137:8010;
+} 
+
+
+location /nginx-status {
+    stub_status on;
+    access_log on;
+    allow 127.0.0.1;
+    allow 10.44.38.122; 
+    deny all;
+ }       
+
+
+location ~ .*\.(js|css)?$
+{
+    expires      24h;
+}
+</code></pre><p>}<br>server {<br>        listen 8010;<br>        server_name 192.168.40.2;<br>        root /data/imgerserver/;</p>
+<h1 id="autoindex-on"><a href="#autoindex-on" class="headerlink" title="autoindex on;"></a>autoindex on;</h1><pre><code>     autoindex_localtime on;
+     autoindex_exact_size off;
+     access_log /data/nginx/logs/image-access.log  combined;
+     error_log  /data/nginx/logs/image-error.log debug;
+
+
+location ~ .*\.(webp|gif|jpg|jpeg|png|bmp|swf|ico)$
+     {
+         expires 30d;
+     }
+
+
+     location ~ .*\.(js|css)?$
+     {
+         expires      24h;
+     }
+</code></pre><p>#proxy_cache cache_one;<br>}</p>
 
       
 
@@ -488,7 +497,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/14/zabbix3.0邮件报警/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/Centos搭建Nginx图片缓存服务器/">展开全文 >></a>
         </p>
       
 
@@ -518,35 +527,29 @@
 
 
   
-    <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Centos7安装node" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/14/hello-world/">Hello World</a>
+      <a class="article-title" href="/2017/12/15/Centos7安装node/">Centos7安装node</a>
     </h1>
   
 
         
-        <a href="/2017/12/14/hello-world/" class="archive-article-date">
-  	<time datetime="2017-12-14T16:16:44.018Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/Centos7安装node/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:49:46.596Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <p>1、 源码安装 Source Code<br>yum -y install gcc make gcc-c++openssl-devel wget<br>wget <a href="https://nodejs.org/dist/v8.9.3/node-v8.9.3.tar.gz" target="_blank" rel="noopener">https://nodejs.org/dist/v8.9.3/node-v8.9.3.tar.gz</a><br>tar zxvf node-v8.9.3.tar.gz -C /usr/src/<br>cd /usr/src/node-v8.9.3/<br>./configure<br>make &amp;&amp; make install<br>node -v<br>v8.9.3</p>
+<p>2、 二进制安装Binaries<br>通过wget下载<br>解压后，在bin文件夹中已经存在node以及npm，如果你进入到对应文件的中执行命令行一点问题都没有，不过不是全局的，所以将这个设置为全局就好了。<br>cd node-v8.9.3-linux-x64/bin<br>ls<br>./node -v<br>node文件夹具体放在哪，叫什么名字随你怎么定。然后设置全局：放在/usr/local/bin/下<br>ln -s /node-v8.9.3-linux-x64/bin/node /usr/local/bin/node<br>ln -s /node-v8.9.3-linux-x64/bin/npm /usr/local/bin/npm</p>
+<p>3、 yum安装<br>yum install nodejs npm<br>这种方式安装版本比较低，不建议此安装方法</p>
 
       
 
@@ -559,7 +562,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2017/12/14/hello-world/">展开全文 >></a>
+          <a class="article-more-a" href="/2017/12/15/Centos7安装node/">展开全文 >></a>
         </p>
       
 
@@ -589,6 +592,397 @@
 
 
   
+    <article id="post-Centos6.5搭建L2TP_VPN" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">Centos6.5搭建L2TP_VPN</a>
+    </h1>
+  
+
+        
+        <a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:48:48.222Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、L2Tp安装<br>1、环境准备</p>
+<p>#安装epel源<br>[root@localhost ~]# rpm -ivh <a href="http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm" target="_blank" rel="noopener">http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm</a><br>[root@localhost ~]#service iptables stop<br>[root@localhost ~]#setenforce 0<br>[root@localhost ~]# sysctl -w net.ipv4.ip_forward=1<br>net.ipv4.ip_forward = 1</p>
+<p>2、软件安装<br>[root@localhost ~]# yum install xl2tpd -y</p>
+<p>二、L2TP配置<br>1、配置xl2tpd.conf主配置文件<br>[root@localhost ~]# vi /etc/xl2tpd/xl2tpd.conf<br>修改<br>[lns default]<br>ip range = 192.168.10.150-192.168.10.200           #VPN客户分配的IP地址<br>local ip = 192.168.10.250                         #L2TP VPN服务器的地址<br>require chap = yes<br>refuse pap = yes<br>require authentication = yes<br>name = LinuxVPNserver<br>ppp debug = yes<br>pppoptfile = /etc/ppp/options.xl2tpd<br>length bit = yes</p>
+<p>2、配置options.xl2tpd文件<br>[root@localhost ~]# vi /etc/ppp/options.xl2tpd<br>ipcp-accept-local<br>ipcp-accept-remote<br>ms-dns  114.114.114.114</p>
+<h1 id="ms-dns-192-168-1-1"><a href="#ms-dns-192-168-1-1" class="headerlink" title="ms-dns  192.168.1.1"></a>ms-dns  192.168.1.1</h1><h1 id="ms-dns-192-168-1-3"><a href="#ms-dns-192-168-1-3" class="headerlink" title="ms-dns  192.168.1.3"></a>ms-dns  192.168.1.3</h1><h1 id="ms-wins-192-168-1-2"><a href="#ms-wins-192-168-1-2" class="headerlink" title="ms-wins 192.168.1.2"></a>ms-wins 192.168.1.2</h1><h1 id="ms-wins-192-168-1-4"><a href="#ms-wins-192-168-1-4" class="headerlink" title="ms-wins 192.168.1.4"></a>ms-wins 192.168.1.4</h1><p>noccp<br>auth<br>crtscts<br>idle 1800<br>mtu 1410<br>mru 1410<br>nodefaultroute<br>debug<br>lock<br>proxyarp<br>connect-delay 5000</p>
+<p>3、配置账号密码<br>[root@localhost ~]# vi /etc/ppp/chap-secrets</p>
+<h1 id="Secrets-for-authentication-using-CHAP"><a href="#Secrets-for-authentication-using-CHAP" class="headerlink" title="Secrets for authentication using CHAP"></a>Secrets for authentication using CHAP</h1><h1 id="client-server-secret-IP-addresses"><a href="#client-server-secret-IP-addresses" class="headerlink" title="client        server  secret                  IP addresses"></a>client        server  secret                  IP addresses</h1><p>vpn             <em>       123.com              </em></p>
+<p>4、配置IP映射<br>iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>iptables -I FORWARD -s 192.168.10.0/24 -j ACCEPT<br>iptables -I FORWARD -d 192.168.10.0/24 -j ACCEPT<br>iptables -A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>iptables -A INPUT -p icmp -j ACCEPT<br>iptables -A INPUT -i lo -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT<br>iptables –table nat –append POSTROUTING –jump MASQUERADE<br>service iptables save<br>service iptables restart<br>查看iptables配置：<br>cat /etc/sysconfig/iptables</p>
+<h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*nat<br>:PREROUTING ACCEPT [46084:9975135]<br>:POSTROUTING ACCEPT [0:0]<br>:OUTPUT ACCEPT [77:6376]<br>-A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>-A POSTROUTING -j MASQUERADE<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*filter<br>:INPUT ACCEPT [0:0]<br>:FORWARD ACCEPT [0:0]<br>:OUTPUT ACCEPT [8307:4482787]<br>-A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT<br>-A INPUT -p icmp -j ACCEPT<br>-A INPUT -i lo -j ACCEPT<br>-A INPUT -p tcp -m state –state NEW -m tcp –dport 22 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT</p>
+<p>#-A INPUT -j REJECT –reject-with icmp-host-prohibited   //注意：如果有配置这个，一定要注释，否则连接不上vpn<br>-A FORWARD -d 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -s 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><p>三、启动L2TP<br>[root@localhost ~]# service xl2tpd start<br>Starting xl2tpd:                                           [  OK  ]<br>[root@localhost ~]# netstat -antup<br>Active Internet connections (servers and established)<br>Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name<br>tcp        0      0 0.0.0.0:22                  0.0.0.0:<em>                   LISTEN      5828/sshd<br>tcp        0      0 127.0.0.1:25                0.0.0.0:</em>                   LISTEN      1093/master<br>tcp        0     64 192.168.10.250:22           192.168.10.88:50518         ESTABLISHED 2002/sshd<br>tcp        0      0 :::22                       :::<em>                        LISTEN      5828/sshd<br>tcp        0      0 ::1:25                      :::</em>                        LISTEN      1093/master<br>udp        0      0 0.0.0.0:1701                0.0.0.0:*                               19963/xl2tpd<br>链接查看日志<br>[root@localhost ~]# tail -f /var/log/messages<br>Apr 19 12:57:40 localhost xl2tpd[19958]: setsockopt recvref[30]: Protocol not available<br>Apr 19 12:57:40 localhost kernel: PPP generic driver version 2.4.2<br>Apr 19 12:57:40 localhost kernel: NET: Registered protocol family 24<br>Apr 19 12:57:40 localhost xl2tpd[19958]: L2TP kernel support not detected (try modprobing l2tp_ppp and pppol2tp)<br>Apr 19 12:57:40 localhost xl2tpd[19963]: xl2tpd version xl2tpd-1.3.6 started on localhost.localdomain PID:19963<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Written by Mark Spencer, Copyright (C) 1998, Adtran, Inc.<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked by Scott Balmos and David Stipp, (C) 2001<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Inherited by Jeff McAdams, (C) 2002<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked again by Xelerance (www.xelerance.com) (C) 2006<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Listening on IP address 0.0.0.0, port 1701</p>
+<p>四、安装IPsec<br>1、安装IPsec，修改sysctl.conf文件<br>[root@localhost ~]# yum install openswan ppp lsof iptables -y<br>[root@localhost ~]# vi /etc/sysctl.conf<br>net.ipv4.ip_forward = 0     修改为 net.ipv4.ip_forward = 1<br>增加：<br>net.ipv4.conf.all.arp_notify = 1<br>net.ipv4.conf.all.send_redirects = 0<br>net.ipv4.conf.default.send_redirects = 0<br>net.ipv4.conf.all.accept_redirects = 0<br>net.ipv4.conf.default.accept_redirects = 0</p>
+<p>[root@localhost ~]# for vpn in /proc/sys/net/ipv4/conf/*; do echo 0 &gt; $vpn/accept_redirects; echo 0 &gt; $vpn/send_redirects; done<br>[root@localhost ~]# sysctl -p<br>2、编辑/etc/ipsec.conf<br>[root@localhost ~]# vi /etc/ipsec.conf<br>将protostack=auto，修改为：protostack=netkey</p>
+<h1 id="basic-configuration"><a href="#basic-configuration" class="headerlink" title="basic configuration"></a>basic configuration</h1><p>config setup</p>
+<pre><code># Debug-logging controls:  &quot;none&quot; for (almost) none, &quot;all&quot; for lots.
+# klipsdebug=none
+# plutodebug=&quot;control parsing&quot;
+# For Red Hat Enterprise Linux and Fedora, leave protostack=netkey
+protostack=netkey
+nat_traversal=yes
+virtual_private=%v4:10.0.0.0/8,%v4:192.168.0.0/16,%v4:172.16.0.0/12
+oe=off
+# Enable this if you see &quot;failed to find any available worker&quot;
+# nhelpers=0
+</code></pre><p>#You may put your configuration (.conf) file in the “/etc/ipsec.d/“ and uncomment this.</p>
+<p>#include /etc/ipsec.d/*.conf</p>
+<p>conn L2TP-PSK-NAT<br>    rightsubnet=vhost:%priv<br>    also=L2TP-PSK-noNAT</p>
+<p>conn L2TP-PSK-noNAT<br>    authby=secret<br>    pfs=no<br>    auto=add<br>    keyingtries=3<br>    rekey=no<br>    ikelifetime=8h<br>    keylife=1h<br>    type=transport<br>    left=192.168.40.88                         #VPN外网地址<br>    leftprotoport=17/1701<br>    right=%any<br>    rightprotoport=17/%any</p>
+<p>3、编辑ipsec.secrets文件<br>[root@localhost ~]# vi /etc/ipsec.secrets<br>192.168.40.88  %any: PSK “YourPsk”<br>192.168.1.88换成你自己VPS实际的公网IP, YourPsk你自己定一个密钥，到时候连VPN的时候在安全设置里要用。<br>[root@localhost ~]# service ipsec start<br>[root@localhost ~]#  ipsec verify<br>Checking your system to see if IPsec got installed and started correctly:<br>Version check and ipsec on-path                                 [OK]<br>Linux Openswan U2.6.32/K2.6.32-431.el6.x86_64 (netkey)<br>Checking for IPsec support in kernel                            [OK]<br> SAref kernel support                                           [N/A]<br> NETKEY:  Testing for disabled ICMP send_redirects              [OK]<br>NETKEY detected, testing for disabled ICMP accept_redirects     [OK]<br>Testing against enforced SElinux mode                           [OK]<br>Checking that pluto is running                                  [OK]<br> Pluto listening for IKE on udp 500                             [OK]<br> Pluto listening for NAT-T on udp 4500                          [OK]<br>Two or more interfaces found, checking IP forwarding            [OK]<br>Checking NAT and MASQUERADEing                                  [OK]<br>Checking for ‘ip’ command                                       [OK]<br>Checking /bin/sh is not /bin/dash                               [OK]<br>Checking for ‘iptables’ command                                 [OK]<br>Opportunistic Encryption Support                                [DISABLED]</p>
+<p>如果有failed，就无法进行下去，那需要自己去百度、google找答案吧，我搭建的时候是没有遇到，记得把selinux关掉。<br>五、验证<br>在win7上测试连接vpn<br>  打开网络共享中心–设置新的连接或网络–连接到工作区–创建vpn<br>  点击右下角网络图标–vpn连接–点击属性<br>  1.常规中的ip为vps的公网ip<br>  2.vpn类型：使用Ipsec 的第二层隧道协议(L2TP/IPsec)<br>    数据加密：需要加(如果服务器拒绝将断开连接)<br>    高级设置：使用预共享的密钥作身份验证<br>         密钥：YourPsk    (前面设置过的)<br>  点击确定后输入用户名和密码即可登陆。</p>
+<p>错误789：L2TP连接尝试失败，因为安全层在初始化与远程计算机的协商时遇到一个出来错误。, 其解决办法如下:<br>具体修改注册表的方法:<br>要向基于<br>Windows 2000 的计算机添加<br>ProhibitIpSec 注册表值，请按照下列步骤操作：<br>1.<br>单击“开始”，单击“运行”，键入 regedt32，然后单击“确定”。 </p>
+<ol>
+<li>找到下面的注册表子项，然后单击它：<br>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Rasman\Parameters </li>
+<li>在“编辑”菜单上，单击“添加值”。 </li>
+<li>在“值名称”框中，键入<br>ProhibitIpSec。 </li>
+<li>在“数据类型”列表中，单击“REG_DWORD”，然后单击“确定”。 </li>
+<li>在“数据”框中，键入1，然后单击“确定”。 </li>
+<li>修改AllowL2TPWeakCrypto数据键入为 1。</li>
+<li>退出注册表编辑器，然后重新启动计算机。 </li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/Centos6.5搭建L2TP_VPN/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建支持SSH服务的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建支持SSH服务的CentOS镜像</p>
+<p>1、在/root目录下新建sshd_centos目录用于存放Dockerfile和其他相关文件。<br>[root@node4 sshd_centos]# vim run.sh</p>
+<p>#!/bin/bash<br>/usr/sbin/sshd –D<br>3、在宿主机上生成RSA密钥<br>[root@node4 sshd_centos]# cp /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub /root/sshd_centos<br>[root@node4 sshd_centos]# cat ssh_host_rsa_key.pub&gt;authorized_keys<br>[root@node4 sshd_centos]# cat Dockerfile</p>
+<p>#生成的新镜像以centos镜像为基础<br>FROM centos<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
+<p>#升级系统<br>RUN yum -y update</p>
+<p>#安装openssh-server<br>RUN yum -y install openssh-server</p>
+<p>#修改/etc/ssh/sshd_config<br>RUN sed -i ‘s/UsePAM yes/UsePAM no/g’ /etc/ssh/sshd_config</p>
+<p>#将密钥文件复制到/etc/ssh/目录中<br>ADD ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key<br>ADD ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub<br>RUN mkdir -p /root/.ssh<br>ADD authorized_keys /root/.ssh/authorized_keys<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key<br>RUN chown :ssh_keys /etc/ssh/ssh_host_rsa_key.pub</p>
+<p>#将ssh服务启动脚本复制到/usr/local/sbin目录中，并改变权限为755<br>ADD run.sh /usr/local/sbin/run.sh<br>RUN chmod 755 /usr/local/sbin/run.sh</p>
+<p>#变更root密码为147258<br>RUN echo “root:123456”|chpasswd</p>
+<p>#开放窗口的22端口<br>EXPOSE 22</p>
+<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
+<p>此时 /root/sshd_centos目录下应该存在如下文件：<br>[root@node4 sshd_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>sshd_dockerfile     latest              421be3ddedab        2 minutes ago       335.4 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</p>
+<p>7、以新创建的镜像新建容器<br>[root@node4 sshd_centos]# docker run -p 10022:22 -d /usr/local/sbin/run.sh<br>将宿主机的10022端口映射到容器的22端口，并启动sshd服务。<br>现在就可以使用ssh工具远程通过宿主机的10022端口访问容器了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建Tomcat的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建Tomcat的CentOS镜像<br>准备tomcat安装包<br>[root@node4 tomcat_centos]# ls<br>apache-tomcat-8.5.23.tar.gz  Dockerfile<br>[root@node4 tomcat_centos]# cat Dockerfile</p>
+<p>#生成的新镜像以centos镜像为基础<br>FROM jdk8_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
+<p>#升级系统<br>RUN yum -y update</p>
+<p>#添加tomcat安装包<br>ADD apache-tomcat-8.5.23.tar.gz /usr/local/<br>RUN mv /usr/local/apache-tomcat-8.5.23 /usr/local/tomcat</p>
+<p>#配置tomcat数据目录<br>RUN sed -i ‘/“%r”/a\        <context docbase="/data/" path="/" reloadable="true">‘ /usr/local/tomcat/conf/server.xml<br>RUN mkdir /data</context></p>
+<p>#删除tomcat默认目录<br>RUN rm -rf /usr/local/tomcat/webapps/*<br>RUN sed -i ‘/$var <em>must</em> be set to either true or false./aJAVA_OPTS=”-Xms1024m -Xmx4096m -Xss4096K -XX:PermSize=512m -XX:MaxPermSize=1024m”‘ /usr/local/tomcat/bin/catalina.sh</p>
+<p>#定义CATALINA_HOME和JAVA_HOME环境变量<br>ENV CATALINA_HOME /usr/local/tomcat<br>ENV JAVA_HOME /usr/java/jdk1.8.0_152<br>ENV PATH $PATH:$JAVA_HOME/bin<br>RUN sed -i ‘/sshd -D/i/usr/bin/sh /usr/local/tomcat/bin/startup.sh’ /usr/local/sbin/run.sh</p>
+<p>#开放窗口的22端口<br>EXPOSE 22<br>EXPOSE 8080</p>
+<p>#运行脚本，启动sshd和tomcat服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
+<p>[root@node4 tomcat_centos]# docker build -t tomcat_jdk8 .<br>[root@node4 tomcat_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>tomcat_jdk8         latest              044cd7aa7211        About an hour ago   606.1 MB<br>jdk7_dockerfile     latest              6545ebc02443        About an hour ago   577.6 MB<br>jdk8_dockerfile     latest              0324608bf1c3        25 hours ago        488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        30 hours ago        335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        30 hours ago        314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 tomcat_centos]# docker run -v /data/weixin:/data  -p 80:8080 -p 10024:22 -d tomcat_jdk8 /usr/local/sbin/run.sh</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Tomcat的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建nginx服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile生成镜像<br>在宿主机上准备的文件清单：<br>Dockerfile</p>
+<p>#启动ssh和apache服务的角本<br>run.sh<br>以上文件都放到/root/nginx_centos目录下<br>mkdir -p /root/nginx_centos<br>cd /root/nginx_centos<br>一、准备run.sh文件<br>在/root/nginx_centos目录新建run.sh<br>vim run.sh</p>
+<p>#!/bin/bash<br>/usr/sbin/sshd &amp;<br>/usr/local/nginx/sbin/nginx<br>二、准备Dockerfile<br>在/root/nginx_centos目录新建Dockerfile<br>cat Dockerfile</p>
+<p>#新生成的镜像是基于sshd:dockerfile镜像<br>FROM sshd-centos<br>MAINTAINER by cmzsteven<br>WORKDIR /usr/local/src</p>
+<p>#安装wget<br>RUN yum install -y  wget</p>
+<p>#下载并解压源码包<br>RUN wget <a href="http://nginx.org/download/nginx-1.12.1.tar.gz" target="_blank" rel="noopener">http://nginx.org/download/nginx-1.12.1.tar.gz</a><br>RUN tar zxvf nginx-1.12.1.tar.gz<br>WORKDIR nginx-1.12.1</p>
+<p>#编译安装nginx<br>RUN yum -y install gcc gcc-c++ pcre-devel zlib-devel openssl*<br>RUN useradd -M -u 40 -s /sbin/nologin  nginx<br>RUN ./configure –prefix=/usr/local/nginx –user=nginx –group=nginx –with-file-aio –with-http_stub_status_module –with-http_gzip_static_module –with-http_flv_module –with-http_ssl_module –with-http_realip_module<br>RUN make<br>RUN make install</p>
+<p>#启动Nginx服务<br>RUN ln -s /usr/local/nginx/sbin/* /usr/local/sbin/<br>RUN /usr/local/nginx/sbin/nginx</p>
+<p>#修改Nginx配置文件,以非daemon方式启动<br>RUN echo “daemon off;”&gt;&gt;/usr/local/nginx/conf/nginx.conf</p>
+<p>#复制服务启动脚本并设置权限<br>ADD run.sh /usr/local/sbin/run.sh<br>RUN chmod 755 /usr/local/sbin/run.sh</p>
+<p>#设置生成容器时需要执行的脚本<br>CMD [“/usr/local/sbin/run.sh”]</p>
+<p>#开放22、80、443端口<br>EXPOSE 22<br>EXPOSE 80<br>EXPOSE 443</p>
+<p>需要注意的是：在Dockerfile文件中更换当前目录不可以用“cd”命令，而要改用“WORKDIR”.<br>三、根据Dockerfile生成镜像<br>docker build -t nginx_dockerfile:centos .<br>查看镜像：<br>ocker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>nginx_dockerfile    centos              28d333149027        6 minutes ago       692MB<br>nginx               centos              bb2863c49d58        2 hours ago         586MB<br>sshd-centos         latest              0742cfe06535        3 hours ago         328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB<br>四、根据镜像生成的容器并进行测试<br>1、生成新的容器<br>docker run -d -p 2224:22 -p 8001:80 -p 4443:443 nginx_dockerfile:centos /usr/local/sbin/run.sh<br>将容器的22端口、80端口和443端口分别映射到到宿主机上的2224端口、8001端口和4443端口,并运行服务脚本。<br>2、测试</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建nginx服务的Centos镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建Mysql服务的Centos镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>创建Mysql服务的Centos Docker镜像<br>一、准备dockerfile<br>mkdir mysql_centos<br>cd mysql_centos<br>cat Dockerfile<br>FROM nginx_dockerfile:centos<br>RUN yum -y install gcc gcc-c++ make automake cmake<br>RUN groupadd mysql; useradd -r -M -u 39 -s /sbin/nologin -g mysql mysql<br>RUN mkdir /usr/local/mysql; mkdir /data/mysql/db -p<br>RUN yum install gcc gcc-c++ ncurses-devel bison bison-devel -y<br>RUN wget <a href="http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz" target="_blank" rel="noopener">http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.29.tar.gz</a><br>RUN tar zxf mysql-5.6.29.tar.gz -C /usr/src/<br>WORKDIR /usr/src/mysql-5.6.29<br>RUN cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql/db -DSYSCONFDIR=/etc -DMYSQL_TCP_PORT=3306 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DEXTRA_CHARSETS=all -DDEFAULT_COLLATION=utf8_general_ci -DWITH-MYSQLD-LDFLAGS=-all-static -DWITH-CLIENT-LD-FLAGS=-all-static -DWITH_DEBUG=0 &amp;&amp; gmake &amp;&amp; gmake install<br>RUN chown -R root:mysql /usr/local/mysql/ &amp;&amp; chown -R mysql:mysql /data/mysql/db/<br>RUN chmod 775 /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh<br>RUN /usr/src/mysql-5.6.29/scripts/mysql_install_db.sh –basedir=/usr/local/mysql –datadir=/data/mysql/db –no-defaults –user=mysql<br>RUN cp /usr/src/mysql-5.6.29/support-files/my-default.cnf /etc/my.cnf<br>RUN cp /usr/src/mysql-5.6.29/support-files/mysql.server /etc/init.d/mysqld<br>RUN chmod -R 775 /etc/init.d/mysqld &amp;&amp; /etc/init.d/mysqld start<br>RUN echo -e ‘#!/bin/bash\nexport PATH=$PATH:/usr/local/mysql/bin’ &gt;/etc/profile.d/mysql.sh<br>RUN source /etc/profile</p>
+<p>二、根据Dockerfile生成镜像<br>docker build -t mysql_dockerfile:nginx_dockerfile .</p>
+<p>docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>mysql_dockerfile    nginx_dockerfile    e8fcca4ad7b0        11 minutes ago      5.54GB<br>nginx_dockerfile    centos              28d333149027        3 days ago          692MB<br>nginx               centos              bb2863c49d58        3 days ago          586MB<br>sshd-centos         latest              0742cfe06535        3 days ago          328MB<br>centos              latest              36540f359ca3        3 weeks ago         193MB</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建Mysql服务的Centos镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-通过Dockerfile创建JDK8的CentOS镜像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建JDK8的CentOS镜像<br>[root@node4 ~]# mkdir jdk8_centos<br>[root@node4 ~]# cd jdk8_centos/<br>准备jdk安装包<br>[root@node4 jdk8_centos]# ls<br>Dockerfile  server-jre-8u152-linux-x64.tar.gz<br>[root@node4 jdk8_centos]# vim Dockerfile</p>
+<p>#生成的新镜像以centos镜像为基础<br>FROM sshd_dockerfile<br>MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</p>
+<p>#升级系统<br>RUN yum -y update</p>
+<p>#添加jdk安装包<br>RUN mkdir /usr/java<br>ADD server-jre-8u152-linux-x64.tar.gz /usr/java/</p>
+<p>#安装jdk<br>RUN sed -i ‘$a\export LANG=en_US.UTF-8’ /etc/profile<br>RUN sed -i ‘$a\JAVA_HOME=/usr/java/jdk1.8.0_152’ /etc/profile<br>RUN sed -i ‘$a\JAE_HOME=/usr/java/jdk1.8.0_152/jre’ /etc/profile<br>RUN sed -i ‘$a\PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin’ /etc/profile<br>RUN sed -i ‘$a\CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib’ /etc/profile<br>RUN sed -i ‘$a\export JAVA_HOME JRE_HOME PATH CLASSPATH’ /etc/profile</p>
+<p>#开放窗口的22端口<br>EXPOSE 22</p>
+<p>#运行脚本，启动sshd服务<br>CMD [“/usr/local/sbin/run.sh”]</p>
+<p>[root@node4 jdk8_centos]# docker build -t jdk8_dockerfile .<br>[root@node4 jdk8_centos]# docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>jdk8_dockerfile     latest              0324608bf1c3        12 minutes ago      488.7 MB<br>sshd_dockerfile     latest              eaae6e1fb5de        4 hours ago         335.4 MB<br>sshd-centos         latest              ae76d4ad6e0c        5 hours ago         314.6 MB<br>docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB<br>[root@node4 jdk8_centos]# docker run -p 10022:22 -d jdk8_dockerfile /usr/local/sbin/run.sh</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/12/15/通过Dockerfile创建JDK8的CentOS镜像/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 

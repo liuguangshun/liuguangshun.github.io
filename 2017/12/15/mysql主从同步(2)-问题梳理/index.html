@@ -6,37 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>zabbix3.0邮件报警 | Blogs</title>
+  <title>Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
+  <meta name="description" content="之前部署了Mysql主从复制环境（Mysql主从同步(1)-主从/主主环境部署梳理），在mysql同步过程中会出现很多问题，导致数据同步异常。以下梳理了几种主从同步中可能存在的问题:1）slave运行过慢不能与master同步，也就是MySQL数据库主从同步延迟MySQL数据库slave服务器延迟的现象是非常普遍的，MySQL复制允许从机进行SELECT操作，但是在实际线上环境下，由于从机延迟的关">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix3.0邮件报警">
-<meta property="og:url" content="http://yoursite.com/2017/12/14/zabbix3.0邮件报警/index.html">
+<meta property="og:title" content="Blogs">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/mysql主从同步(2)-问题梳理/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-14T19:16:09.623Z">
+<meta property="og:description" content="之前部署了Mysql主从复制环境（Mysql主从同步(1)-主从/主主环境部署梳理），在mysql同步过程中会出现很多问题，导致数据同步异常。以下梳理了几种主从同步中可能存在的问题:1）slave运行过慢不能与master同步，也就是MySQL数据库主从同步延迟MySQL数据库slave服务器延迟的现象是非常普遍的，MySQL复制允许从机进行SELECT操作，但是在实际线上环境下，由于从机延迟的关">
+<meta property="og:updated_time" content="2017-12-15T03:33:05.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix3.0邮件报警">
-<meta name="twitter:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="Blogs">
+<meta name="twitter:description" content="之前部署了Mysql主从复制环境（Mysql主从同步(1)-主从/主主环境部署梳理），在mysql同步过程中会出现很多问题，导致数据同步异常。以下梳理了几种主从同步中可能存在的问题:1）slave运行过慢不能与master同步，也就是MySQL数据库主从同步延迟MySQL数据库slave服务器延迟的现象是非常普遍的，MySQL复制允许从机进行SELECT操作，但是在实际线上环境下，由于从机延迟的关">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -158,139 +139,26 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zabbix3.0邮件报警" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-mysql主从同步(2)-问题梳理" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      zabbix3.0邮件报警
-    </h1>
-  
-
-        
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
-</a>
-        
-      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p>之前部署了Mysql主从复制环境（Mysql主从同步(1)-主从/主主环境部署梳理），在mysql同步过程中会出现很多问题，导致数据同步异常。<br>以下梳理了几种主从同步中可能存在的问题:<br>1）slave运行过慢不能与master同步，也就是MySQL数据库主从同步延迟<br>MySQL数据库slave服务器延迟的现象是非常普遍的，MySQL复制允许从机进行SELECT操作，但是在实际线上环境下，由于从机延迟的关系，很难将读取操作转向到从机。这就导致了有了以下一些潜规则：“实时性要求不高的读取操作可以放到slave服务器，实时性要求高的读取操作放到master服务器”，“从机仅能做前一天的统计类查询”。<br>slave滞后即slave不能快速执行来自于master的所有事件，从而不能避免更新slave数据延迟。<br>mysql的master-slave架构中master仅做写入、更新、删除操作，slave做select操作。造成slave滞后的原因有很多。<br>slave同步延迟的原理<br>MySQL的主从复制都是单线程的操作，主库对所有DDL和DML产生的日志写进binlog，由于binlog是顺序写，所以效率很高。<br>Slave的IO Thread线程从主库中bin log中读取取日志。<br>Slave的SQL Thread线程将主库的DDL和DML操作事件在slave中重放。DML和DDL的IO操作是随即的，不是顺序的，成本高很多。<br>由于SQL Thread也是单线程的，如果slave上的其他查询产生lock争用，又或者一个DML语句（大事务、大查询）执行了几分钟卡住了，那么所有之后的DML会等待这个DML执行完才会继续执行，这就导致了延时。也许有人会质疑：主库上那个相同的DDL也会执行几分钟，为什么slave会延时？原因是master可以并发执行，而Slave_SQL_Running线程却不可以。<br>slave同步延迟的可能原因<br>    1–slave的I/O线程推迟读取日志中的事件信息；最常见原因是slave是在单线程中执行所有事务，而master有很多线程可以并行执行事务。<br>    2–带来低效连接的长查询、磁盘读取的I/O限制、锁竞争和innodb线程同步启动等。<br>    3–Master负载；Slave负载<br>    4–网络延迟<br>    5–机器配置（cpu、内存、硬盘）<br>（主从同步延迟怎么产生的？）总之，当主库的TPS并发较高时，产生的DDL数量超过slave一个sql线程所能处理的承受范围时，主从同步就会产生延时；或者当slave中有大型query语句产生了锁等待也会产生延时。<br>如何查看同步延迟<br>    1–可以通过比对master、slave上的日志位置<br>    2–通过”show slave status”查看Seconds_Behind_Master的值，这个值代表主从同步延迟的时间，值越大说明延迟越严重。值为0为正常情况，正值表示已经出现延迟，数字越大从库落后主库越多。<br>    3–使用percona-toolkit的pt-hearbeat工具进行查看。<br>减少同步延迟的操作方案<br>    1–减少锁竞争<br>如果查询导致大量的表锁定，需要考虑重构查询语句，尽量避免过多的锁。<br>    2–负载均衡<br>搭建多少slave，并且使用lvs或nginx进行查询负载均衡，可以减少每个slave执行查询的次数和时间，从而将更多的时间用于去处理主从同步。<br>    3–salve较高的机器配置<br>    4–Slave调整参数<br>为了保障较高的数据安全性，配置sync_binlog=1，innodb_flush_log_at_trx_commit=1等设置。而Slave可以关闭binlog，innodb_flush_log_at_trx_commit也可以设置为0来提高sql的执行效率（这两个参数很管用）<br>    5–并行复制<br>即有单线程的复制改成多线程复制。<br>从库有两个线程与复制相关：io_thread 负责从主库拿binlog并写到relaylog， sql_thread 负责读relaylog并执行。<br>多线程的思路就是把sql_thread 变成分发线程，然后由一组worker_thread来负责执行。<br>几乎所有的并行复制都是这个思路，有不同的，便是sql_thread 的分发策略。<br>MySQL5.7的真正并行复制enhanced multi-threaded slave（MTS）很好的解决了主从同步复制的延迟问题。</p>
+<p>2）slave同步状态中出现Slave_IO_Running: NO<br>报错：Last_IO_Error: Got fatal error 1236 from master when reading data from binary log: ‘Could not find first log file name in binary log index file’</p>
+<p>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>原因1：清理数据导致主从库不同步（前提是主库的binlog日志没有被暴力删除或错误删除，即要确保正在使用的那个最新binlog文件在master主库机器上存在）。<br>解决办法：<br>1）先进入slave中执行:”slave stop;”来停止从库同步；<br>2）再去master中执行:”flush logs;”来清空日志；<br>3）然后在master中执行:”show master status;”查看下主库的状态，主要是日志的文件和position；<br>4）然后回到slave中，执行:”CHANGE MASTER TO ……执行同步指令</p>
+<p>原因2：该错误发生在从库的io进程从主库拉取日志时，发现主库的mysql_bin.index文件中第一个文件不存在。出现此类报错可能是由于你的slave 由于某种原因停止了好长一段<br>时间，当你重启slave 复制的时候，在主库上找不到相应的binlog ,会报此类错误。或者是由于某些设置主库上的binlog被删除了，导致从库获取不到对应的binglog file。<br>解决办法：<br>1）为了避免数据丢失，需要重新进行slave同步操作。<br>2）注意主库binlog的清理策略，选择基于时间过期的删除方式还是基于空间利用率的删除方式。<br>3）记住最好不要使用”rm -rf”命令删除binlog file，这样不会同步修改mysql_bin.index 记录的binlog 条目。在删除binlog的时候确保主库保留了从库”show slave status”<br>  的Relay_Master_Log_File对应的binlog file。任何时候都不能删除正在使用的那个最新binlog文件；最好把bin-log文件不要删除，最好给备份出来。</p>
+<p>原因2的情况下，使用原因1的处理方案显然是解决不了的！此时的解决方案是：<br>在从库上执行：<br>mysql&gt; stop slave;<br>mysql&gt; reset slave;<br>mysql&gt; start slave;<br>mysql&gt; show slave status \G;<br>3）slave同步状态中出现Slave_IO_Running: Connecting<br>导致这个错误的原因一般是：<br>    1–网络不通<br>    2–权限问题（连接master的用户名和密码跟master授权不一致）<br>    3–连接时用的log file和pos节点跟”show master status”的结果不一致</p>
+<p>4）slave同步状态中出现Slave_SQL_Running: No ，即slave不同步！<br>解决办法：<br>第一种方法：忽略错误后，继续同步。<br>该方法适用于主从库数据相差不大，或者要求数据可以不完全统一的情况，数据要求不严格的情况（下面均为在slave机器上的操作）<br>mysql&gt; stop slave;<br>mysql&gt; set global sql_slave_skip_counter =1;   //表示跳过一步错误，后面的数字可变；或者在my.cnf里添加slave-skip-errors = all（上面已在配置中添加）<br>mysql&gt; start slave;<br>mysql&gt; show slave status\G      //查看：<br>第二种方法：重新做主从，完全同步<br>该方法适用于主从库数据相差较大，或者要求数据完全统一的情况<br>1–master主库上操作<br>mysql&gt; flush tables with read lock;  //进行锁表，防止数据写入。注意该处是锁定为只读状态，语句不区分大小写</p>
+<p>#mysqldump –lock-all-tables –all-databases –flush-logs –master-data=2 &gt; /root/allsql.sql   //主库完全备份(如果是指定库同步，就备份指定库)，注意数据库备份一定要定期进行，确保数据万无一失<br>mysql&gt; show master status;      //查看master状态，注意log file和pos节点，slave同步会用到</p>
+<h1 id="scp-mysql-bak-sql-root-192-168-1-102-tmp-把备份文件传到slave从库机器，进行数据恢复"><a href="#scp-mysql-bak-sql-root-192-168-1-102-tmp-把备份文件传到slave从库机器，进行数据恢复" class="headerlink" title="scp mysql.bak.sql root@192.168.1.102:/tmp/        //把备份文件传到slave从库机器，进行数据恢复"></a>scp mysql.bak.sql root@192.168.1.102:/tmp/        //把备份文件传到slave从库机器，进行数据恢复</h1><p>2–slave从库操作<br>mysql&gt; stop slave;<br>mysql&gt; source /tmp/mysql.bak.sql<br>mysql&gt; change master to master_host = ‘192.168.1.101’, master_user = ‘slave’, master_port=3306…….；<br>mysql&gt; start slave;<br>mysql&gt; show slave status\G<br>…….<br>Slave_IO_Running: Yes<br>Slave_SQL_Running: Yes<br>此种方法中最为关键主要有两步：<br>①主服务器上锁表做完全备份，并滚动日志；<br>②从服务器上进行半道恢复.</p>
+<p>5）slave中继日志relay-log损坏？<br>什么是中继日志？<br>relay-log存放在从服务器上，从服务器将主服务器的二进制日志文件拷贝到自己的主机上放在中继日志中，然后调用SQL线程按照拷中继日志文件中的二进制日志文件执行以便就可达到数据的同步 。<br>如何中继日志避免：<br>mysql 5.6版本后，在my.cnf文件中开启relay_log_recover=1即可避免。</p>
+<p>6）slave连接超时且重新连接频繁<br>若有多少slave，且没有设置server_id或两个slave设置相同的server_id，将有可能会出现服务器的ID冲突。这种情况下，其中一台slave可能会频繁超时或丢失后重新连接序列。<br>所以一定要确保每台slave及master在my.cnf中都要设置不一样的server_id。</p>
+<p>7）主库与从库使用不同的存储引擎造成不同步</p>
+<p>8）从库同步时，提示表不存在<br>错误：Last_Error: Error executing row event: ‘Table ‘test.t1’ doesn’t exist’<br>解决方法：在从库重建这张表。</p>
+<p>9）max_allowed_packet设置过小导致slave报错<br>max_allowed_packet默认是16M，主从库的max_allowed_packet值和备库上的不匹配。<br>在这情况下，主库可能会记录一个备库认为过大的包。当备库获取到该二进制日志事件时，可能会碰到各种问题，如无限报错和重试、中继日志损坏等。<br>具体表现：<br>从库的Slave_IO_Thread死掉了，查看后，出现以下错误提示：<br>Got a packet bigger than ‘max_allowed_packet’ bytes<br>很明显是由于max_allowed_packet的设置太小导致的，然后查检主从库上的设置，主库的设置大于从库，因为max_allowed_packet是动态参数，先调整从库上的max_allowed_packet 与主库相同，重新单独启动I/O线程就正常了。<br>原理说明：binlog的事件以RBR格式记录，且当前的事件长度大于了从库的max_allowed_packet, 导致无法Slave IO不能正常读取master binlog event.</p>
+<p>10）在master上删除一条记录时出现的故障<br>在master上删除一条记录后，slave上因找不到这条记录而报错。<br>解决方法：<br>由于主库上已经对这条语句进行了删除操作，故可以跳过。<br>在这种情况下，说明主从同步可能数据会有不一致的情况发生，所以需要使用pt-table-checksum进行数据库一致性比对。<br>（参考：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理）</p>
+<p>11）在master更新一条记录，而slave却找不到。<br>主从数据不致时，master有某条记录，但在salve上没有这条记录，若在master上进行更新这条记录，则在slave中可能报错。<br>解决方法：<br>   1–根据从库发生异常的位置，查主库上的二进制日志。<br>   2–根据主库二进制日志信息，找到更新后的整条记录。<br>   3–在从库上执行在主库上找到的记录信息，进行insert操作。<br>   4–跳过这条语句，再同步slave。<br>   5–使用pt-table-checksum查看主从库表数据否一致</p>
 
       
 
@@ -370,7 +238,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/14/zabbix3.0邮件报警/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/mysql主从同步(2)-问题梳理/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -384,15 +252,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/nginx访问量统计/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          将Web应用性能提高十倍的10条建议
+          (no title)
         
       </div>
     </a>
   
+  
+    <a href="/2017/12/14/centos_6x系统下源码安装mysql操作记录/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">centos 6x系统下源码安装mysql操作记录</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 

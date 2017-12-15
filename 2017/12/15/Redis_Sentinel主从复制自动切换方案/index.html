@@ -6,37 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>zabbix3.0邮件报警 | Blogs</title>
+  <title>Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
+  <meta name="description" content="一、准备环境 #配置环境：Redis Sentinel：192.68.40.16:26379Redis server主：192.168.40.17:6379Redis server从：192.168.40.18:6380 #查看主服务器状态：[root@localhost ~]# redis-cli -p 6379 -a pwd123 info Replication Replicationrol">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix3.0邮件报警">
-<meta property="og:url" content="http://yoursite.com/2017/12/14/zabbix3.0邮件报警/index.html">
+<meta property="og:title" content="Blogs">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/Redis_Sentinel主从复制自动切换方案/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-14T19:16:09.623Z">
+<meta property="og:description" content="一、准备环境 #配置环境：Redis Sentinel：192.68.40.16:26379Redis server主：192.168.40.17:6379Redis server从：192.168.40.18:6380 #查看主服务器状态：[root@localhost ~]# redis-cli -p 6379 -a pwd123 info Replication Replicationrol">
+<meta property="og:updated_time" content="2017-12-15T03:21:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix3.0邮件报警">
-<meta name="twitter:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="Blogs">
+<meta name="twitter:description" content="一、准备环境 #配置环境：Redis Sentinel：192.68.40.16:26379Redis server主：192.168.40.17:6379Redis server从：192.168.40.18:6380 #查看主服务器状态：[root@localhost ~]# redis-cli -p 6379 -a pwd123 info Replication Replicationrol">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -158,139 +139,41 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zabbix3.0邮件报警" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Redis_Sentinel主从复制自动切换方案" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      zabbix3.0邮件报警
-    </h1>
-  
-
-        
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
-</a>
-        
-      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p>一、准备环境</p>
+<p>#配置环境：<br>Redis Sentinel：192.68.40.16:26379<br>Redis server主：192.168.40.17:6379<br>Redis server从：192.168.40.18:6380</p>
+<p>#查看主服务器状态：<br>[root@localhost ~]# redis-cli -p 6379 -a pwd123 info Replication</p>
+<h1 id="Replication"><a href="#Replication" class="headerlink" title="Replication"></a>Replication</h1><p>role:master<br>connected_slaves:1<br>slave0:ip=127.0.0.1,port=6380,state=online,offset=27794,lag=0<br>master_repl_offset:27794<br>repl_backlog_active:1<br>repl_backlog_size:1048576<br>repl_backlog_first_byte_offset:2<br>repl_backlog_histlen:27793<br>You have new mail in /var/spool/mail/root</p>
+<p>#查看从服务器状态<br>[root@localhost ~]# redis-cli -p 6380 -a pwd123 info Replication</p>
+<h1 id="Replication-1"><a href="#Replication-1" class="headerlink" title="Replication"></a>Replication</h1><p>role:slave<br>master_host:127.0.0.1<br>master_port:6379<br>master_link_status:up<br>master_last_io_seconds_ago:2<br>master_sync_in_progress:0<br>slave_repl_offset:29162<br>slave_priority:100<br>slave_read_only:1<br>connected_slaves:0<br>master_repl_offset:0<br>repl_backlog_active:0<br>repl_backlog_size:1048576<br>repl_backlog_first_byte_offset:0<br>repl_backlog_histlen:0<br>二、搭建sentinel哨兵服务</p>
+<p>#启动Redis Sentinel</p>
+<p>#Sentinel的配置文件为sentinel.conf，复制一下配置，修改IP地址即可<br>[root@localhost ~]# vim /etc/redis/sentinel.conf</p>
+<p>#sentinel实例监听的端口<br>port 26379</p>
+<p>#守护进程模式<br>daemonize yes</p>
+<p>#指明日志文件名<br>logfile “./sentinel1.log”</p>
+<p>#工作路径，sentinel一般指定/tmp比较简单<br>dir ./</p>
+<p>#master1</p>
+<p>#哨兵监控这个master，在至少quorum个哨兵实例都认为master down后把master标记为odown</p>
+<p>#（objective down客观down；相对应的存在sdown，subjective down，主观down）状态。</p>
+<p>#slaves是自动发现，所以你没必要明确指定slaves。<br>sentinel monitor master1 192.168.40.17 6379 1</p>
+<h1 id="master或slave多长时间（默认30秒）不能使用后标记为s-down状态。"><a href="#master或slave多长时间（默认30秒）不能使用后标记为s-down状态。" class="headerlink" title="master或slave多长时间（默认30秒）不能使用后标记为s_down状态。"></a>master或slave多长时间（默认30秒）不能使用后标记为s_down状态。</h1><p>sentinel down-after-milliseconds master1 1500</p>
+<p>#若sentinel在该配置值内未能完成failover操作（即故障时master/slave自动切换），则认为本次failover失败。<br>sentinel failover-timeout master1 10000</p>
+<p>#设置master和slaves验证密码<br>sentinel auth-pass master1 pwd123 </p>
+<p>[root@localhost ~]# redis-server /etc/redis/sentinel.conf –sentinel &amp;<br>[1] 19296</p>
+<p>#在sentinel中查看redis主从信息<br>[root@localhost ~]# redis-cli -p 26379<br>127.0.0.1:26379&gt; info Sentinel</p>
+<h1 id="Sentinel"><a href="#Sentinel" class="headerlink" title="Sentinel"></a>Sentinel</h1><p>sentinel_masters:1<br>sentinel_tilt:0<br>sentinel_running_scripts:0<br>sentinel_scripts_queue_length:0<br>master0:name=master1,status=ok,address=192.168.40.17:6379,slaves=3,sentinels=1 </p>
+<p>#在sentinel中查看所监控道的master和slave<br>127.0.0.1:26379&gt; SENTINEL masters<br>1)  1) “name”<br>    2) “master1”<br>    3) “ip”<br>    4) “192.168.40.17”<br>    5) “port”<br>    6) “6379”<br>    7) “runid”<br>    8) “91399b3205a9061a5f1aa306692886f200374e90”<br>    9) “flags”<br>   10) “master”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “898”<br>   15) “last-ping-reply”<br>   16) “898”<br>   17) “info-refresh”<br>   18) “5019”<br>   19) “role-reported”<br>   20) “master”<br>   21) “role-reported-time”<br>   22) “266970”<br>   23) “config-epoch”<br>   24) “0”<br>   25) “num-slaves”<br>   26) “1”<br>   27) “num-other-sentinels”<br>   28) “0”<br>   29) “quorum”<br>   30) “1”<br>   31) “down-after-milliseconds”<br>   32) “1500”<br>   33) “failover-timeout”<br>   34) “10000”<br>   35) “parallel-syncs”<br>   36) “1”<br>127.0.0.1:26379&gt; SENTINEL slaves master1<br>    1) “name”<br>    2) “192.168.40.18:6380”<br>    3) “ip”<br>    4) “192.168.40.18”<br>    5) “port”<br>    6) “6380”<br>    7) “runid”<br>    8) “7087b2cf81bcb53da6603ed5d7bc6509a632d11a”<br>    9) “flags”<br>   10) “slave”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “843”<br>   15) “last-ping-reply”<br>   16) “842”<br>   17) “info-refresh”<br>   18) “7765”<br>   19) “role-reported”<br>   20) “slave”<br>   21) “role-reported-time”<br>   22) “88238”<br>   23) “master-link-down-time”<br>   24) “0”<br>   25) “master-link-status”<br>   26) “ok”<br>   27) “master-host”<br>   28) “192.168.40.17”<br>   29) “master-port”<br>   30) “6379”<br>   31) “slave-priority”<br>   32) “100”<br>   33) “slave-repl-offset”<br>   34) “6114”</p>
+<p>#查看当前Master<br>127.0.0.1:26379&gt; SENTINEL get-master-addr-by-name master1<br>1) “192.168.40.17”<br>2) “6379”<br>三、验证：</p>
+<p>#停止主服务器<br>[root@localhost ~]# kill -9 2793</p>
+<p>#登陆sentinel查看6380从服务器已经自动转为主服务器<br>[root@localhost ~]# redis-cli -p 26379<br>127.0.0.1:26379&gt; SENTINEL get-master-addr-by-name master1<br>1) “127.0.0.1”<br>2) “6380”</p>
+<p>#6379主服务器转为从服务器，状态为down<br>127.0.0.1:26379&gt;  SENTINEL slaves master1<br>1)  1) “name”<br>    2) “127.0.0.1:6379”<br>    3) “ip”<br>    4) “127.0.0.1”<br>    5) “port”<br>    6) “6379”<br>    7) “runid”<br>    8) “”<br>    9) “flags”<br>   10) “s_down,slave,disconnected”<br>   11) “pending-commands”<br>   12) “0”<br>   13) “last-ok-ping-reply”<br>   14) “47310”<br>   15) “last-ping-reply”<br>   16) “47310”<br>   17) “s-down-time”<br>   18) “45778”<br>   19) “info-refresh”<br>   20) “1488253183255”<br>   21) “role-reported”<br>   22) “slave”<br>   23) “role-reported-time”<br>   24) “47310”<br>   25) “master-link-down-time”<br>   26) “0”<br>   27) “master-link-status”<br>   28) “err”<br>   29) “master-host”<br>   30) “?”<br>   31) “master-port”<br>   32) “0”<br>   33) “slave-priority”<br>   34) “100”<br>   35) “slave-repl-offset”<br>   36) “0”</p>
+<p>#/etc/redis/6379.conf配置文件自动增加slaveof 127.0.0.1 6380</p>
+<p>#/etc/redis/6380.conf配置文件里面的slaveof 127.0.0.1 6379自动消失</p>
+<p>#如果需要将6379在此变为主服务器，需要手动更改slaveof配置即可。</p>
 
       
 
@@ -370,7 +253,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/14/zabbix3.0邮件报警/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/Redis_Sentinel主从复制自动切换方案/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -384,15 +267,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/Top命令详解/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          将Web应用性能提高十倍的10条建议
+          (no title)
         
       </div>
     </a>
   
+  
+    <a href="/2017/12/15/nginx访问量统计/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 

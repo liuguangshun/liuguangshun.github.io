@@ -6,37 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>zabbix3.0邮件报警 | Blogs</title>
+  <title>Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
+  <meta name="description" content="一、服务端配置1、安装jdk（版本1.8.0_91）rpm -ivh jdk-8u91-linux-x64.rpmvi /etc/profile最后添加：JAVA_HOME=/usr/java/jdk1.8.0_91CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jarexport JAVA_HOMEexport PATHexport">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix3.0邮件报警">
-<meta property="og:url" content="http://yoursite.com/2017/12/14/zabbix3.0邮件报警/index.html">
+<meta property="og:title" content="Blogs">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/zabbix通过jmx监控tomcat/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-14T19:16:09.623Z">
+<meta property="og:description" content="一、服务端配置1、安装jdk（版本1.8.0_91）rpm -ivh jdk-8u91-linux-x64.rpmvi /etc/profile最后添加：JAVA_HOME=/usr/java/jdk1.8.0_91CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jarexport JAVA_HOMEexport PATHexport">
+<meta property="og:updated_time" content="2017-12-15T03:29:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix3.0邮件报警">
-<meta name="twitter:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="Blogs">
+<meta name="twitter:description" content="一、服务端配置1、安装jdk（版本1.8.0_91）rpm -ivh jdk-8u91-linux-x64.rpmvi /etc/profile最后添加：JAVA_HOME=/usr/java/jdk1.8.0_91CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jarexport JAVA_HOMEexport PATHexport">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -158,139 +139,26 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zabbix3.0邮件报警" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-zabbix通过jmx监控tomcat" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      zabbix3.0邮件报警
-    </h1>
-  
-
-        
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
-</a>
-        
-      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p>一、服务端配置<br>1、安装jdk（版本1.8.0_91）<br>rpm -ivh jdk-8u91-linux-x64.rpm<br>vi /etc/profile<br>最后添加：<br>JAVA_HOME=/usr/java/jdk1.8.0_91<br>CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br>export JAVA_HOME<br>export PATH<br>export CLASSPATH</p>
+<p>source /etc/profile<br>安装与配置比较简单，过程省略。执行java -version命令，出现类似界面表示成功。<br>[root@iZ25kscmkn3Z ~]# java -version<br>java version “1.8.0_91”<br>Java(TM) SE Runtime Environment (build 1.8.0_91-b14)<br>Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)</p>
+<p>2、安装Zabbix-Java-gateway<br>cd /usr/src/zabbix-3.0.0/<br>./configure –enable-java -prefix=/usr/local/zabbix/zabbix_java<br>make &amp;&amp; make install</p>
+<p>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>ls<br>bin  lib  settings.sh  shutdown.sh  startup.sh<br>3、修改Java-gateway的配置文件并启动它<br>配置文件路径为/data/zabbix/zabbix_java/sbin/zabbix_java/settings.sh<br>启用以下参数：<br>vi settings.sh<br>LISTEN_IP=”0.0.0.0”<br>LISTEN_PORT=10052<br>START_POLLERS=5</p>
+<p>4、修改zabbix_server的配置文件并重启<br>vi /usr/local/zabbix/etc/zabbix_server.conf<br>JavaGateway=127.0.0.1<br>JavaGatewayPort=10052<br>StartJavaPollers=5</p>
+<p>启动zabbix_java<br>cd /usr/local/zabbix/zabbix_java/sbin/zabbix_java/<br>./startup.sh<br>重启zabbix_server</p>
+<h1 id="etc-init-d-zabbix-server-restart"><a href="#etc-init-d-zabbix-server-restart" class="headerlink" title="/etc/init.d/zabbix_server restart"></a>/etc/init.d/zabbix_server restart</h1><p>二、Tomcat服务端<br>1、给tomcat启动脚本添加参数，开启JMX<br>vi /usr/local/site/bin/catalina.sh<br>添加如下内容：<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djava.rmi.server.hostname=10.44.21.14”  —-备注（10.44.21.14是客户端ip地址）<br>CATALINA_OPTS=”${CATALINA_OPTS} -Djavax.management.builder.initial=”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote=true”</p>
+<p>#CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.port=12345”#端口配置不用了<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.ssl=false”<br>CATALINA_OPTS=”${CATALINA_OPTS} -Dcom.sun.management.jmxremote.authenticate=false”  </p>
+<p>vi conf/server.xml(tomcat8.5版本不要在conf/server.xml增加以下内容，tomcat会起不来)<br>省略…  </p>
+<p><server port="8005" shutdown="SHUTDOWN"><br>     <listener classname="org.apache.catalina.startup.VersionLoggerListener"><br>     <!-- Security listener. Documentation at /docs/config/listeners.html  
+     <Listener className="org.apache.catalina.security.SecurityListener" />  
+     --><br>     <!--APR library loader. Documentation at /docs/apr.html --><br>     <listener classname="org.apache.catalina.core.AprLifecycleListener" sslengine="on"><br>     <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html --><br>     <listener classname="org.apache.catalina.core.JasperListener"><br>     <!-- Prevent memory leaks due to use of particular java/javax APIs--><br>     <listener classname="org.apache.catalina.core.JreMemoryLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"><br>     <listener classname="org.apache.catalina.core.ThreadLocalLeakPreventionListener"><br>     <listener classname="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" rmiregistryportplatform="10052" rmiserverportplatform="10053">     —-默认添加最后两行<br>省略..</listener></listener></listener></listener></listener></listener></listener></server></p>
+<p>2、下载catalina-jmx-remote.jar<br>wget  <a href="http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar" target="_blank" rel="noopener">http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.56/bin/extras/catalina-jmx-remote.jar</a>  #我的tomcat版本是7.0.56<br>将下载后后的jar包放到被监控的tomcat实例的lib目录下。<br>3、重启tomcat<br>/usr/local/site/bin/shutdown.sh<br>/usr/local/site/bin/startup.sh<br>4、测试是否可以获取数据<br>下载cmdline-jmxclient-0.10.3.jar工具<br>在服务器端进行测试<br>java -jar cmdline-jmxclient-0.10.3.jar -  10.44.21.143:10052 java.lang:type=Memory NonHeapMemoryUsage<br>08/29/2016 17:40:15 +0800 org.archive.jmx.Client NonHeapMemoryUsage:<br>committed: 105644032<br>init: 2555904<br>max: -1<br>used: 101895192</p>
+<p>问题：<br>web界面上显示cannot connect to [[192.168.18.20]:10052]: [111] Connection refused  ，192.168.18.20是我一个agent端的ip地址。debug级别已经调整为4，没有看到报错。 </p>
+<p>tomcat8.5只需要在bin/catalina.sh增加，重启tomcat服务<br>CATALINA_OPTS=”-Dcom.sun.management.jmxremote<br>-Dcom.sun.management.jmxremote.authenticate=false<br>-Dcom.sun.management.jmxremote.ssl=false<br>-Dcom.sun.management.jmxremote.port=12345<br>-Djava.rmi.server.hostname=10.27.242.110”</p>
 
       
 
@@ -370,7 +238,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/14/zabbix3.0邮件报警/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/zabbix通过jmx监控tomcat/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -384,15 +252,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          将Web应用性能提高十倍的10条建议
+          (no title)
         
       </div>
     </a>
   
+  
+    <a href="/2017/12/15/zabbix密钥监控mysal、nginx、php/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 

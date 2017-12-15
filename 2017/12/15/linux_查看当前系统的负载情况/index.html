@@ -6,37 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>zabbix3.0邮件报警 | Blogs</title>
+  <title>linux_查看当前系统的负载情况 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
+  <meta name="description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix3.0邮件报警">
-<meta property="og:url" content="http://yoursite.com/2017/12/14/zabbix3.0邮件报警/index.html">
+<meta property="og:title" content="linux_查看当前系统的负载情况">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/linux_查看当前系统的负载情况/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-14T19:16:09.623Z">
+<meta property="og:description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
+<meta property="og:updated_time" content="2017-12-15T16:50:43.062Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix3.0邮件报警">
-<meta name="twitter:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="linux_查看当前系统的负载情况">
+<meta name="twitter:description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -158,140 +139,87 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zabbix3.0邮件报警" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-linux_查看当前系统的负载情况" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      zabbix3.0邮件报警
+      linux_查看当前系统的负载情况
     </h1>
   
 
         
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/linux_查看当前系统的负载情况/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:50:43.121Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p><strong>uptime</strong></p>
+<p>linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。</p>
+<p>eg:</p>
+<h1 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h1><p>02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05</p>
+<p>10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09</p>
+<p>显示内容说明：</p>
+<p>10:19:04 //系统当前时间 </p>
+<p>up 257 days, 18:56 //主机已运行时间,时间越大，说明你的机器越稳定。 </p>
+<p>12 user //用户连接数，是总连接数而不是用户数 </p>
+<p>load average // 系统平均负载，统计最近1，5，15分钟的系统平均负载</p>
+<p>那么什么是系统平均负载呢？</p>
+<p>系统平均负载是指在特定时间间隔内运行队列中的平均进程数。 </p>
+<p>如果每个CPU内核的当前活动进程数不大于3的话，那么系统的性能是良好的。</p>
+<p>如果每个CPU内核的任务数大于5，那么这台机器的性能有严重问题。 </p>
+<p>如果你的linux主机是1个双核CPU的话，当Load Average 为6的时候说明机器已经被充分使用了。</p>
+<p>1可以被认为是最优的负载值。负载是会随着系统不同改变得。</p>
+<p>单CPU系统1-3和SMP系统6-10都是可能接受的。</p>
+<p>cat /proc/loadavg</p>
+<h1 id="cat-proc-loadavg"><a href="#cat-proc-loadavg" class="headerlink" title="cat /proc/loadavg"></a>cat /proc/loadavg</h1><p>0.00 0.01 0.05 2/384 4482</p>
+<p>0.00 0.01 0.05 表示最近1分钟,5分钟,15分钟 系统的平均负载; 系统负载越高,代表CPU越繁忙;</p>
+<p>2/384 2代表此时运行队列中的进程个数;384 代表系统中进程的总数</p>
+<p>4482 代表到此为止创建的最后一个进程的ID.</p>
+<p>w</p>
+<h1 id="w"><a href="#w" class="headerlink" title="w"></a>w</h1><p>02:14:34 up 126 days, 13:08, 2 users, load average: 0.00, 0.01, 0.05<br>USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT<br>root tty1 - 29Jul16 114days 0.63s 0.30s -bash<br>ceshi pts/0 118.247.5.122 02:03 0.00s 0.00s 0.00s w</p>
+<pre><code>USER:用户名  
+TTY:录后系统分配的终端号           
+FROM: 远程主机名(即从哪儿登录来的)
+LOGIN@:何时登录
+IDLE:空闲了多长时间，表示用户闲置的时间。
 
+JCPU:和该终端（tty）连接的所有进程占用的时间，这个时间里并不包括过去的后台作业时间，但却包括当前正在运行的后台作业所 
+
+           占用的时间
+
+PCPU:指当前进程（即在WHAT项中显示的进程）所占用的时间   
+WHAT:当前正在运行进程的命令行
+</code></pre><p>tload</p>
+<h1 id="tload"><a href="#tload" class="headerlink" title="tload"></a>tload</h1><p>0.23, 0.32, 0.45   </p>
+<p>平均负载:0.23, 0.32, 0.45 表示最近1分钟,5分钟,15分钟的系统平均负载.</p>
+<p>top</p>
+<h1 id="top"><a href="#top" class="headerlink" title="top"></a>top</h1><p>top - 21:23:53 up 40 min,  2 users,  load average: 0.19, 0.35, 0.47<br>        Tasks: 255 total,   1 running, 253 sleeping,   0 stopped,   1 zombie<br>        %Cpu(s):  1.1 us,  0.3 sy,  0.0 ni, 98.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st<br>        KiB Mem:   4022756 total,  2130488 used,  1892268 free,   192608 buffers<br>        KiB Swap: 19999740 total,        0 used, 19999740 free.   919724 cached Mem</p>
+<p>第一行:时间为:21:23:53; 已经运行了 40min; 当前在线用户:2个;  平均负载:0.19, 0.35, 0.47 表示最近1分钟,5分钟,15分钟的系统平</p>
+<pre><code>             均负载.
+
+第二行:进程总数:255 正在运行进程数:1  睡眠进程数:253 停止的进程数:0  僵尸进程数:1
+
+第三行:用户空间占用CPU百分比: 1.1%  内核空间占用CPU百分比:0.3%  用户进程空间内改变过优先级的进程占用CPU百分
+
+             比:0.0%   空闲CPU百分比:0.0  等待输入输出的CPU时间百分比:0.0  CPU服务软中断所耗费的时间总额:0.0% Steal
+
+             Time:0.0%
+
+第四行: 物理内存总量:4022756  使用的物理内存总量:2130488  空闲内存总量:1892268   用作内核缓存的内存量:192608
+第五行: 交换区总量:19999740   使用的交换区总量:0          空闲交换区总量:19999740 缓冲的交换区总量:919724    
+
+第六行: 进程ID、进程所有者、优先级、nice值，负值表示高优先级，正值表示低优先级、进程使用的虚拟内存总量、进程使用的、未被
+
+              换出的物理内存大小、共享内存大小、进程状态、上次更新到现在的CPU时间占用百分比、进程使用的物理内存百分比、进
+
+              程使用CPU总时间、命令名、命令行
+</code></pre>
       
 
       
@@ -370,7 +298,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/14/zabbix3.0邮件报警/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/linux_查看当前系统的负载情况/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -384,15 +312,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/Mysql主从同步(1)-主从_主主环境部署梳理/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          将Web应用性能提高十倍的10条建议
+          Mysql主从同步(1)-主从_主主环境部署梳理
         
       </div>
     </a>
   
+  
+    <a href="/2017/12/15/Centos搭建Nginx图片缓存服务器/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Centos搭建Nginx图片缓存服务器</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 

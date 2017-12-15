@@ -6,37 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>zabbix3.0邮件报警 | Blogs</title>
+  <title>Centos6.5搭建L2TP_VPN | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
+  <meta name="description" content="一、L2Tp安装1、环境准备 #安装epel源[root@localhost ~]# rpm -ivh http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm[root@localhost ~]#service iptables stop[root@localhost ~]#setenforce 0[root@loc">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zabbix3.0邮件报警">
-<meta property="og:url" content="http://yoursite.com/2017/12/14/zabbix3.0邮件报警/index.html">
+<meta property="og:title" content="Centos6.5搭建L2TP_VPN">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/Centos6.5搭建L2TP_VPN/index.html">
 <meta property="og:site_name" content="Blogs">
-<meta property="og:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-14T19:16:09.623Z">
+<meta property="og:description" content="一、L2Tp安装1、环境准备 #安装epel源[root@localhost ~]# rpm -ivh http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm[root@localhost ~]#service iptables stop[root@localhost ~]#setenforce 0[root@loc">
+<meta property="og:updated_time" content="2017-12-15T16:48:48.200Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zabbix3.0邮件报警">
-<meta name="twitter:description" content="一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容） 1、安装sendmail、mailx yum install sendmail mailx vim /etc/mail.rc  #添加相关发件人内容 set from=lgs6666@yeah.net smtp=smtp.yeah.net set smtp-auth-user=lgs6666@yeah.net smtp-a">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="Centos6.5搭建L2TP_VPN">
+<meta name="twitter:description" content="一、L2Tp安装1、环境准备 #安装epel源[root@localhost ~]# rpm -ivh http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm[root@localhost ~]#service iptables stop[root@localhost ~]#setenforce 0[root@loc">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -158,139 +139,68 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-zabbix3.0邮件报警" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Centos6.5搭建L2TP_VPN" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      zabbix3.0邮件报警
+      Centos6.5搭建L2TP_VPN
     </h1>
   
 
         
-        <a href="/2017/12/14/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-14T19:16:09.642Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-14</time>
+        <a href="/2017/12/15/Centos6.5搭建L2TP_VPN/" class="archive-article-date">
+  	<time datetime="2017-12-15T16:48:48.222Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-15</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、使用外部邮箱地址发送邮件（使用sendmail发送邮件，不能显示内容）</p>
-<p>1、安装sendmail、mailx</p>
-<p>yum install sendmail mailx</p>
-<p>vim /etc/mail.rc  #添加相关发件人内容</p>
-<p>set from=lgs6666@yeah.net smtp=smtp.yeah.net</p>
-<p>set smtp-auth-user=lgs6666@yeah.net smtp-auth-password= ….</p>
-<p>set smtp-auth=login</p>
-<p>2、登录外部邮箱，启用SMTP登录<br><img src="http://img.blog.csdn.net/20171208171515503?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>service sendmail start</p>
-<p>echo “test.hahahahaha” | mail -s “test” <a href="mailto:329984300@qq.com" target="_blank" rel="noopener">469234634@qq.com</a>     #发邮件进行测试</p>
-<p>测试sendmail成功，登陆我的QQ邮箱可以收到邮件！<br><img src="http://img.blog.csdn.net/20171208171536095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3、添加zabbix邮件报警脚本</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/etc/zabbix_server.conf</p>
-<p>AlertScriptsPath=/usr/local/zabbix/share/zabbix/alertscripts</p>
-<p>[root@iZ25kscmkn3Z ~]# vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>echo “$3” | mail -s “$2” $1</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>[root@iZ25kscmkn3Z ~]# chmod +x /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>1）zabbix进入网页设置邮件报警</p>
-<p>​          选择    管理——示警媒介类型<br><img src="http://img.blog.csdn.net/20171208171554382?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>2）点击sendmail进入设置界面：选择类型——脚本，输入前面写的脚本名称；</p>
-<p>在Script parameters添加参数，3.0版本必须添加，2.0不需要添加</p>
-<p>{ALERT.SENDTO}</p>
-<p>{ALERT.SUBJECT}</p>
-<p>{ALERT.MESSAGE}<br><img src="http://img.blog.csdn.net/20171208171624350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>3）编辑用户</p>
-<p>选择  管理-用户<br><img src="http://img.blog.csdn.net/20171208171652182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击示警媒介<br><img src="http://img.blog.csdn.net/20171208171712396?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>添加<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>更新</p>
-<p>点击许可权，设置所有权限<br><img src="http://img.blog.csdn.net/20171208171821540?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择-用户群组<br><img src="http://img.blog.csdn.net/20171208171835230?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击 Zabbix administrator<br><img src="http://img.blog.csdn.net/20171208171740880?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>点击许可权</p>
-<p>添加所有组合许可权、主机群组、主机<br><img src="http://img.blog.csdn.net/20171208172042316?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>4）添加动作</p>
-<p>选择  组态-动作<br><img src="http://img.blog.csdn.net/20171208171945766?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p> 点击<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a><br><img src="http://img.blog.csdn.net/20171208172205405?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>名称：<a href="http://101.200.145.219/actionconf.php?form=update&amp;actionid=3" target="_blank" rel="noopener">Report problems to Zabbix administrators</a></p>
-<p>默认接收人：故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
-<p>默认信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>恢复信息：打钩</p>
-<p>恢复主旨：恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
-<p>恢复信息：</p>
-<p>告警主机:{HOSTNAME1}</p>
-<p>告警时间:{EVENT.DATE} {EVENT.TIME}</p>
-<p>告警等级:{TRIGGER.SEVERITY}</p>
-<p>告警信息:{TRIGGER.NAME}</p>
-<p>告警项目:{TRIGGER.KEY1}</p>
-<p>问题详情:{ITEM.NAME}:{ITEM.VALUE}</p>
-<p>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}</p>
-<p>事件ID:{EVENT.ID}</p>
-<p>选择条件，计算方式选择Or<br><img src="http://img.blog.csdn.net/20171208172500351?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>选择操作，编辑操作<br><img src="http://img.blog.csdn.net/20171208172510142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171208172525138?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>更新——更新</p>
-<p>测试</p>
-<p>[root@iZ25kscmkn3Z ~]# /etc/init.d/zabbix_agentd stop</p>
-<p>一分钟后会收到报警邮件<br><img src="http://img.blog.csdn.net/20171208172534565?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>附件的.bin文件就是报警内容，需要使用第三方软件打开</p>
-<p>二、使用外部邮箱地址发送邮件（使用sendmail发送邮件，显示内容）</p>
-<p>1、安装组件</p>
-<p>yum install perl-Net-SSLeay perl-IO-Socket-SSL -y</p>
-<p>2、安装sendEmail</p>
-<p>wget <a href="http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz" target="_blank" rel="noopener">http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz</a></p>
-<p>tar zxf sendEmail-v1.56.tar.gz -C /usr/src</p>
-<p>cd /usr/src/sendEmail-v1.56/</p>
-<p>cp -a sendEmail /usr/local/bin</p>
-<p>chmod +x /usr/local/bin/sendEmail</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “test邮件”   //测试发送邮件</p>
-<p>注意：perl版本必须是5.10.0，centos7以上版本perl默认是5.16，需要将perl版本换为5.10.0</p>
-<p>perl -v</p>
-<p>cd</p>
-<p>wget <a href="http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz" target="_blank" rel="noopener">http://www.cpan.org/src/5.0/perl-5.10.0.tar.gz</a></p>
-<p>tar -zxf perl-5.10.0.tar.gz -C /usr/src/</p>
-<p>cd /usr/src/perl-5.10.0/</p>
-<p>./configure.gnu -des -Dprefix=/usr/local/perl</p>
-<p>echo $?</p>
-<p>make -j2</p>
-<p>make install</p>
-<p>mv /usr/bin/perl /usr/bin/perl.bak</p>
-<p>ln -s /usr/local/perl/bin/perl /usr/bin/perl</p>
-<p>perl -v</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t 469234634@qq.com -s smtp.yeah.net -u zabbix -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp ‘liuguangshuN0820’ -m “test邮件”</p>
-<p>Mar 14 15:45:58 iz25kscmkn3z sendEmail[11484]: Email was sent successfully!  //发送成功</p>
-<p>3、编辑sendmail.sh文件</p>
-<p>vim /usr/local/zabbix/share/zabbix/alertscripts/sendmail.sh</p>
-<p>#!/bin/bash</p>
-<p>#echo “$3” | mail -s “$2” $1</p>
-<p>to=$1</p>
-<p>subject=$2</p>
-<p>body=$3</p>
-<p>/usr/local/bin/sendEmail  -f lgs6666@yeah.net -t “$to” -s smtp.yeah.net -u “$subject” -o message-content-type=html -o message-charset=utf8 -xu lgs6666@yeah.net -xp liuguangshuN0820 -m “$body”</p>
-<p>#echo “$body” | mail -s “$subject” $to</p>
-<p>#其中$1是zabbix传递过来的收件人信息，$2是邮件主题，$3是邮件内容；</p>
-<p>4、修改动作，因为我用sendmail.sh脚本格式指定html,所以添加换行符</p>
-<p>告警主机:&nbsp;{HOSTNAME1}<br></p>
-<p>告警时间:&nbsp;{EVENT.DATE} {EVENT.TIME}<br></p>
-<p>告警等级:&nbsp;{TRIGGER.SEVERITY}<br></p>
-<p>告警信息:&nbsp;{TRIGGER.NAME}<br></p>
-<p>告警项目:&nbsp;{TRIGGER.KEY1}<br></p>
-<p>问题详情:&nbsp;{ITEM.NAME}:&nbsp;{ITEM.VALUE}<br></p>
-<p>当前状态:&nbsp;{TRIGGER.STATUS}:&nbsp;{ITEM.VALUE1}<br></p>
-<p>事件ID:&nbsp;{EVENT.ID}</p>
-<p>5、收到的报警内容<br><img src="http://img.blog.csdn.net/20171208172545691?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzMyODUxMTI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+        <p>一、L2Tp安装<br>1、环境准备</p>
+<p>#安装epel源<br>[root@localhost ~]# rpm -ivh <a href="http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm" target="_blank" rel="noopener">http://mirrors.yun-idc.com/epel/6/x86_64/epel-release-6-8.noarch.rpm</a><br>[root@localhost ~]#service iptables stop<br>[root@localhost ~]#setenforce 0<br>[root@localhost ~]# sysctl -w net.ipv4.ip_forward=1<br>net.ipv4.ip_forward = 1</p>
+<p>2、软件安装<br>[root@localhost ~]# yum install xl2tpd -y</p>
+<p>二、L2TP配置<br>1、配置xl2tpd.conf主配置文件<br>[root@localhost ~]# vi /etc/xl2tpd/xl2tpd.conf<br>修改<br>[lns default]<br>ip range = 192.168.10.150-192.168.10.200           #VPN客户分配的IP地址<br>local ip = 192.168.10.250                         #L2TP VPN服务器的地址<br>require chap = yes<br>refuse pap = yes<br>require authentication = yes<br>name = LinuxVPNserver<br>ppp debug = yes<br>pppoptfile = /etc/ppp/options.xl2tpd<br>length bit = yes</p>
+<p>2、配置options.xl2tpd文件<br>[root@localhost ~]# vi /etc/ppp/options.xl2tpd<br>ipcp-accept-local<br>ipcp-accept-remote<br>ms-dns  114.114.114.114</p>
+<h1 id="ms-dns-192-168-1-1"><a href="#ms-dns-192-168-1-1" class="headerlink" title="ms-dns  192.168.1.1"></a>ms-dns  192.168.1.1</h1><h1 id="ms-dns-192-168-1-3"><a href="#ms-dns-192-168-1-3" class="headerlink" title="ms-dns  192.168.1.3"></a>ms-dns  192.168.1.3</h1><h1 id="ms-wins-192-168-1-2"><a href="#ms-wins-192-168-1-2" class="headerlink" title="ms-wins 192.168.1.2"></a>ms-wins 192.168.1.2</h1><h1 id="ms-wins-192-168-1-4"><a href="#ms-wins-192-168-1-4" class="headerlink" title="ms-wins 192.168.1.4"></a>ms-wins 192.168.1.4</h1><p>noccp<br>auth<br>crtscts<br>idle 1800<br>mtu 1410<br>mru 1410<br>nodefaultroute<br>debug<br>lock<br>proxyarp<br>connect-delay 5000</p>
+<p>3、配置账号密码<br>[root@localhost ~]# vi /etc/ppp/chap-secrets</p>
+<h1 id="Secrets-for-authentication-using-CHAP"><a href="#Secrets-for-authentication-using-CHAP" class="headerlink" title="Secrets for authentication using CHAP"></a>Secrets for authentication using CHAP</h1><h1 id="client-server-secret-IP-addresses"><a href="#client-server-secret-IP-addresses" class="headerlink" title="client        server  secret                  IP addresses"></a>client        server  secret                  IP addresses</h1><p>vpn             <em>       123.com              </em></p>
+<p>4、配置IP映射<br>iptables -t nat -A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>iptables -I FORWARD -s 192.168.10.0/24 -j ACCEPT<br>iptables -I FORWARD -d 192.168.10.0/24 -j ACCEPT<br>iptables -A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>iptables -A INPUT -p icmp -j ACCEPT<br>iptables -A INPUT -i lo -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>iptables -A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT<br>iptables –table nat –append POSTROUTING –jump MASQUERADE<br>service iptables save<br>service iptables restart<br>查看iptables配置：<br>cat /etc/sysconfig/iptables</p>
+<h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*nat<br>:PREROUTING ACCEPT [46084:9975135]<br>:POSTROUTING ACCEPT [0:0]<br>:OUTPUT ACCEPT [77:6376]<br>-A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE<br>-A POSTROUTING -j MASQUERADE<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><h1 id="Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Generated-by-iptables-save-v1-4-7-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017"></a>Generated by iptables-save v1.4.7 on Wed Apr 26 13:16:28 2017</h1><p>*filter<br>:INPUT ACCEPT [0:0]<br>:FORWARD ACCEPT [0:0]<br>:OUTPUT ACCEPT [8307:4482787]<br>-A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT<br>-A INPUT -p icmp -j ACCEPT<br>-A INPUT -i lo -j ACCEPT<br>-A INPUT -p tcp -m state –state NEW -m tcp –dport 22 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 1701 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 500 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 68 -j ACCEPT<br>-A INPUT -p udp -m state –state NEW -m udp –dport 4500 -j ACCEPT</p>
+<p>#-A INPUT -j REJECT –reject-with icmp-host-prohibited   //注意：如果有配置这个，一定要注释，否则连接不上vpn<br>-A FORWARD -d 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -s 192.168.10.0/24 -j ACCEPT<br>-A FORWARD -j REJECT –reject-with icmp-host-prohibited<br>COMMIT</p>
+<h1 id="Completed-on-Wed-Apr-26-13-16-28-2017-1"><a href="#Completed-on-Wed-Apr-26-13-16-28-2017-1" class="headerlink" title="Completed on Wed Apr 26 13:16:28 2017"></a>Completed on Wed Apr 26 13:16:28 2017</h1><p>三、启动L2TP<br>[root@localhost ~]# service xl2tpd start<br>Starting xl2tpd:                                           [  OK  ]<br>[root@localhost ~]# netstat -antup<br>Active Internet connections (servers and established)<br>Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name<br>tcp        0      0 0.0.0.0:22                  0.0.0.0:<em>                   LISTEN      5828/sshd<br>tcp        0      0 127.0.0.1:25                0.0.0.0:</em>                   LISTEN      1093/master<br>tcp        0     64 192.168.10.250:22           192.168.10.88:50518         ESTABLISHED 2002/sshd<br>tcp        0      0 :::22                       :::<em>                        LISTEN      5828/sshd<br>tcp        0      0 ::1:25                      :::</em>                        LISTEN      1093/master<br>udp        0      0 0.0.0.0:1701                0.0.0.0:*                               19963/xl2tpd<br>链接查看日志<br>[root@localhost ~]# tail -f /var/log/messages<br>Apr 19 12:57:40 localhost xl2tpd[19958]: setsockopt recvref[30]: Protocol not available<br>Apr 19 12:57:40 localhost kernel: PPP generic driver version 2.4.2<br>Apr 19 12:57:40 localhost kernel: NET: Registered protocol family 24<br>Apr 19 12:57:40 localhost xl2tpd[19958]: L2TP kernel support not detected (try modprobing l2tp_ppp and pppol2tp)<br>Apr 19 12:57:40 localhost xl2tpd[19963]: xl2tpd version xl2tpd-1.3.6 started on localhost.localdomain PID:19963<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Written by Mark Spencer, Copyright (C) 1998, Adtran, Inc.<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked by Scott Balmos and David Stipp, (C) 2001<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Inherited by Jeff McAdams, (C) 2002<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Forked again by Xelerance (www.xelerance.com) (C) 2006<br>Apr 19 12:57:40 localhost xl2tpd[19963]: Listening on IP address 0.0.0.0, port 1701</p>
+<p>四、安装IPsec<br>1、安装IPsec，修改sysctl.conf文件<br>[root@localhost ~]# yum install openswan ppp lsof iptables -y<br>[root@localhost ~]# vi /etc/sysctl.conf<br>net.ipv4.ip_forward = 0     修改为 net.ipv4.ip_forward = 1<br>增加：<br>net.ipv4.conf.all.arp_notify = 1<br>net.ipv4.conf.all.send_redirects = 0<br>net.ipv4.conf.default.send_redirects = 0<br>net.ipv4.conf.all.accept_redirects = 0<br>net.ipv4.conf.default.accept_redirects = 0</p>
+<p>[root@localhost ~]# for vpn in /proc/sys/net/ipv4/conf/*; do echo 0 &gt; $vpn/accept_redirects; echo 0 &gt; $vpn/send_redirects; done<br>[root@localhost ~]# sysctl -p<br>2、编辑/etc/ipsec.conf<br>[root@localhost ~]# vi /etc/ipsec.conf<br>将protostack=auto，修改为：protostack=netkey</p>
+<h1 id="basic-configuration"><a href="#basic-configuration" class="headerlink" title="basic configuration"></a>basic configuration</h1><p>config setup</p>
+<pre><code># Debug-logging controls:  &quot;none&quot; for (almost) none, &quot;all&quot; for lots.
+# klipsdebug=none
+# plutodebug=&quot;control parsing&quot;
+# For Red Hat Enterprise Linux and Fedora, leave protostack=netkey
+protostack=netkey
+nat_traversal=yes
+virtual_private=%v4:10.0.0.0/8,%v4:192.168.0.0/16,%v4:172.16.0.0/12
+oe=off
+# Enable this if you see &quot;failed to find any available worker&quot;
+# nhelpers=0
+</code></pre><p>#You may put your configuration (.conf) file in the “/etc/ipsec.d/“ and uncomment this.</p>
+<p>#include /etc/ipsec.d/*.conf</p>
+<p>conn L2TP-PSK-NAT<br>    rightsubnet=vhost:%priv<br>    also=L2TP-PSK-noNAT</p>
+<p>conn L2TP-PSK-noNAT<br>    authby=secret<br>    pfs=no<br>    auto=add<br>    keyingtries=3<br>    rekey=no<br>    ikelifetime=8h<br>    keylife=1h<br>    type=transport<br>    left=192.168.40.88                         #VPN外网地址<br>    leftprotoport=17/1701<br>    right=%any<br>    rightprotoport=17/%any</p>
+<p>3、编辑ipsec.secrets文件<br>[root@localhost ~]# vi /etc/ipsec.secrets<br>192.168.40.88  %any: PSK “YourPsk”<br>192.168.1.88换成你自己VPS实际的公网IP, YourPsk你自己定一个密钥，到时候连VPN的时候在安全设置里要用。<br>[root@localhost ~]# service ipsec start<br>[root@localhost ~]#  ipsec verify<br>Checking your system to see if IPsec got installed and started correctly:<br>Version check and ipsec on-path                                 [OK]<br>Linux Openswan U2.6.32/K2.6.32-431.el6.x86_64 (netkey)<br>Checking for IPsec support in kernel                            [OK]<br> SAref kernel support                                           [N/A]<br> NETKEY:  Testing for disabled ICMP send_redirects              [OK]<br>NETKEY detected, testing for disabled ICMP accept_redirects     [OK]<br>Testing against enforced SElinux mode                           [OK]<br>Checking that pluto is running                                  [OK]<br> Pluto listening for IKE on udp 500                             [OK]<br> Pluto listening for NAT-T on udp 4500                          [OK]<br>Two or more interfaces found, checking IP forwarding            [OK]<br>Checking NAT and MASQUERADEing                                  [OK]<br>Checking for ‘ip’ command                                       [OK]<br>Checking /bin/sh is not /bin/dash                               [OK]<br>Checking for ‘iptables’ command                                 [OK]<br>Opportunistic Encryption Support                                [DISABLED]</p>
+<p>如果有failed，就无法进行下去，那需要自己去百度、google找答案吧，我搭建的时候是没有遇到，记得把selinux关掉。<br>五、验证<br>在win7上测试连接vpn<br>  打开网络共享中心–设置新的连接或网络–连接到工作区–创建vpn<br>  点击右下角网络图标–vpn连接–点击属性<br>  1.常规中的ip为vps的公网ip<br>  2.vpn类型：使用Ipsec 的第二层隧道协议(L2TP/IPsec)<br>    数据加密：需要加(如果服务器拒绝将断开连接)<br>    高级设置：使用预共享的密钥作身份验证<br>         密钥：YourPsk    (前面设置过的)<br>  点击确定后输入用户名和密码即可登陆。</p>
+<p>错误789：L2TP连接尝试失败，因为安全层在初始化与远程计算机的协商时遇到一个出来错误。, 其解决办法如下:<br>具体修改注册表的方法:<br>要向基于<br>Windows 2000 的计算机添加<br>ProhibitIpSec 注册表值，请按照下列步骤操作：<br>1.<br>单击“开始”，单击“运行”，键入 regedt32，然后单击“确定”。 </p>
+<ol>
+<li>找到下面的注册表子项，然后单击它：<br>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Rasman\Parameters </li>
+<li>在“编辑”菜单上，单击“添加值”。 </li>
+<li>在“值名称”框中，键入<br>ProhibitIpSec。 </li>
+<li>在“数据类型”列表中，单击“REG_DWORD”，然后单击“确定”。 </li>
+<li>在“数据”框中，键入1，然后单击“确定”。 </li>
+<li>修改AllowL2TPWeakCrypto数据键入为 1。</li>
+<li>退出注册表编辑器，然后重新启动计算机。 </li>
+</ol>
 
       
 
@@ -370,7 +280,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/14/zabbix3.0邮件报警/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/15/Centos6.5搭建L2TP_VPN/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -384,15 +294,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/12/14/将Web应用性能提高十倍的10条建议/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/15/Centos7安装node/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          将Web应用性能提高十倍的10条建议
+          Centos7安装node
         
       </div>
     </a>
   
+  
+    <a href="/2017/12/15/通过Dockerfile创建支持SSH服务的CentOS镜像/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
