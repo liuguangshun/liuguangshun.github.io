@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | Blogs</title>
+  <title>通过Dockerfile创建Tomcat的CentOS镜像 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/page/2/index.html">
+  <meta name="description" content="通过Dockerfile创建Tomcat的CentOS镜像准备tomcat安装包123456789101112131415161718192021222324252627[root@node4 tomcat_centos]# lsapache-tomcat-8.5.23.tar.gz  Dockerfile[root@node4 tomcat_centos]# cat Dockerfile#生成的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过Dockerfile创建Tomcat的CentOS镜像">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="通过Dockerfile创建Tomcat的CentOS镜像准备tomcat安装包123456789101112131415161718192021222324252627[root@node4 tomcat_centos]# lsapache-tomcat-8.5.23.tar.gz  Dockerfile[root@node4 tomcat_centos]# cat Dockerfile#生成的">
+<meta property="og:updated_time" content="2017-12-19T02:50:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="通过Dockerfile创建Tomcat的CentOS镜像">
+<meta name="twitter:description" content="通过Dockerfile创建Tomcat的CentOS镜像准备tomcat安装包123456789101112131415161718192021222324252627[root@node4 tomcat_centos]# lsapache-tomcat-8.5.23.tar.gz  Dockerfile[root@node4 tomcat_centos]# cat Dockerfile#生成的">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,295 +139,165 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-通过Dockerfile创建Tomcat的CentOS镜像" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      通过Dockerfile创建Tomcat的CentOS镜像
+    </h1>
+  
+
+        
+        <a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
+  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>通过Dockerfile创建Tomcat的CentOS镜像<br>准备tomcat安装包<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 tomcat_centos]<span class="comment"># ls</span></span><br><span class="line">apache-tomcat-8.5.23.tar.gz  Dockerfile</span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># cat Dockerfile</span></span><br><span class="line"><span class="comment">#生成的新镜像以centos镜像为基础</span></span><br><span class="line">FROM jdk8_dockerfile</span><br><span class="line">MAINTAINER by liuguangshun (liuguangshun@zljr100.com)</span><br><span class="line"><span class="comment">#升级系统</span></span><br><span class="line">RUN yum -y update</span><br><span class="line"><span class="comment">#添加tomcat安装包</span></span><br><span class="line">ADD apache-tomcat-8.5.23.tar.gz /usr/<span class="built_in">local</span>/</span><br><span class="line">RUN mv /usr/<span class="built_in">local</span>/apache-tomcat-8.5.23 /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line"><span class="comment">#配置tomcat数据目录</span></span><br><span class="line">RUN sed -i <span class="string">'/"%r"/a\        &lt;Context docBase="/data/" path="/" reloadable="true" /&gt;'</span> /usr/<span class="built_in">local</span>/tomcat/conf/server.xml</span><br><span class="line">RUN mkdir /data</span><br><span class="line"><span class="comment">#删除tomcat默认目录</span></span><br><span class="line">RUN rm -rf /usr/<span class="built_in">local</span>/tomcat/webapps/*</span><br><span class="line">RUN sed -i <span class="string">'/$var _must_ be set to either true or false./aJAVA_OPTS="-Xms1024m -Xmx4096m -Xss4096K -XX:PermSize=512m -XX:MaxPermSize=1024m"'</span> /usr/<span class="built_in">local</span>/tomcat/bin/catalina.sh</span><br><span class="line"><span class="comment">#定义CATALINA_HOME和JAVA_HOME环境变量</span></span><br><span class="line">ENV CATALINA_HOME /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line">ENV JAVA_HOME /usr/java/jdk1.8.0_152</span><br><span class="line">ENV PATH <span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin</span><br><span class="line">RUN sed -i <span class="string">'/sshd -D/i/usr/bin/sh /usr/local/tomcat/bin/startup.sh'</span> /usr/<span class="built_in">local</span>/sbin/run.sh</span><br><span class="line"><span class="comment">#开放窗口的22端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line">EXPOSE 8080</span><br><span class="line"><span class="comment">#运行脚本，启动sshd和tomcat服务</span></span><br><span class="line">CMD [<span class="string">"/usr/local/sbin/run.sh"</span>]</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker build -t tomcat_jdk8 .</span></span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">tomcat_jdk8         latest              044cd7aa7211        About an hour ago   606.1 MB</span><br><span class="line">jdk7_dockerfile     latest              6545ebc02443        About an hour ago   577.6 MB</span><br><span class="line">jdk8_dockerfile     latest              0324608bf1c3        25 hours ago        488.7 MB</span><br><span class="line">sshd_dockerfile     latest              eaae6e1fb5de        30 hours ago        335.4 MB</span><br><span class="line">sshd-centos         latest              ae76d4ad6e0c        30 hours ago        314.6 MB</span><br><span class="line">docker.io/centos    latest              196e0ce0c9fb        6 weeks ago         196.6 MB</span><br><span class="line">[root@node4 tomcat_centos]<span class="comment"># docker run -v /data/weixin:/data  -p 80:8080 -p 10024:22 -d tomcat_jdk8 /usr/local/sbin/run.sh</span></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          通过Dockerfile创建Mysql服务的Centos镜像
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/Centos7安装node/">Centos7安装node</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix密钥监控mysal、nginx、php/">zabbix密钥监控mysal、nginx、php</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/page/3/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -447,8 +321,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

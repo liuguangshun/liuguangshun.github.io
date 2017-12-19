@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | Blogs</title>
+  <title>zabbix密钥监控mysal、nginx、php | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/page/2/index.html">
+  <meta name="description" content="一、zabbix监控mysql在客户机上配置： 1[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_mysql.sh 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zabbix密钥监控mysal、nginx、php">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/zabbix密钥监控mysal、nginx、php/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="一、zabbix监控mysql在客户机上配置： 1[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_mysql.sh 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061">
+<meta property="og:updated_time" content="2017-12-19T02:50:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="zabbix密钥监控mysal、nginx、php">
+<meta name="twitter:description" content="一、zabbix监控mysql在客户机上配置： 1[root@iZ25j76vlxnZ ~]# vim /usr/local/zabbix/etc/chk_mysql.sh 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,295 +139,192 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-zabbix密钥监控mysal、nginx、php" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      zabbix密钥监控mysal、nginx、php
+    </h1>
+  
+
+        
+        <a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
+  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、zabbix监控mysql<br>在客户机上配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/zabbix/etc/chk_mysql.sh</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># -------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment"># FileName:    check_mysql.sh</span></span><br><span class="line"><span class="comment"># Revision:    1.0</span></span><br><span class="line"><span class="comment"># Date:        2016/06/20</span></span><br><span class="line"><span class="comment"># Author:      Liuguangshun</span></span><br><span class="line"><span class="comment"># Email:       lgs6666@yeah.net</span></span><br><span class="line"><span class="comment"># Website:     liuguangshun.github.io</span></span><br><span class="line"><span class="comment"># Description: </span></span><br><span class="line"><span class="comment"># Notes:       ~</span></span><br><span class="line"><span class="comment"># -------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment"># Copyright:   2016 (c) Liuguangshun</span></span><br><span class="line"><span class="comment"># License:     </span></span><br><span class="line"><span class="comment"># 用户名</span></span><br><span class="line">MYSQL_USER=<span class="string">'root'</span></span><br><span class="line"><span class="comment"># 密码</span></span><br><span class="line">MYSQL_PWD=<span class="string">'YyIrpFNhIofsd'</span></span><br><span class="line"><span class="comment"># 主机地址/IP</span></span><br><span class="line">MYSQL_HOST=<span class="string">'127.0.0.1'</span></span><br><span class="line"><span class="comment"># 端口</span></span><br><span class="line">MYSQL_PORT=<span class="string">'3306'</span></span><br><span class="line"><span class="comment"># 数据连接</span></span><br><span class="line">MYSQL_CONN=<span class="string">"/usr/local/bin/mysqladmin -u<span class="variable">$&#123;MYSQL_USER&#125;</span> -p<span class="variable">$&#123;MYSQL_PWD&#125;</span> -h<span class="variable">$&#123;MYSQL_HOST&#125;</span> -P<span class="variable">$&#123;MYSQL_PORT&#125;</span>"</span></span><br><span class="line"><span class="comment"># 参数是否正确</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$#</span> -ne <span class="string">"1"</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"arg error!"</span> </span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment"># 获取数据</span></span><br><span class="line"><span class="keyword">case</span> <span class="variable">$1</span> <span class="keyword">in</span></span><br><span class="line">    Uptime)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status|cut -f2 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"T"</span>`</span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">        ;;</span><br><span class="line">    Com_update)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_update"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">        ;;</span><br><span class="line">    Slow_queries)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status |cut -f5 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"O"</span>`</span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">        ;;</span><br><span class="line">    Com_select)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_select"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$result</span></span><br><span class="line">               ;;</span><br><span class="line">    Com_rollback)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_rollback"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Questions)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status|cut -f4 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"S"</span>`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Com_insert)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_insert"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Com_delete)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_delete"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Com_commit)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_commit"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Bytes_sent)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Bytes_sent"</span> |cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">Bytes_received)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Bytes_received"</span> |cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">    Com_begin)</span><br><span class="line">        result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_begin"</span>|cut -d<span class="string">"|"</span> -f3`</span><br><span class="line">                <span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">                ;;</span><br><span class="line">        *)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Usage:<span class="variable">$0</span>(Uptime|Com_update|Slow_queries|Com_select|Com_rollback|Questions|Com_insert|Com_delete|Com_commit|Bytes_sent|Bytes_received|Com_begin)"</span> </span><br><span class="line">        ;;</span><br><span class="line">Esac</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/zabbix/etc/zabbix_agentd.conf</span></span><br></pre></td></tr></table></figure>
+<p>在后面添加：</p>
+<h1 id="获取mysql版本"><a href="#获取mysql版本" class="headerlink" title="获取mysql版本"></a>获取mysql版本</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=mysql.version,mysql -V</span><br></pre></td></tr></table></figure>
+<h1 id="获取mysql性能指标-这个是上面定义好的脚本"><a href="#获取mysql性能指标-这个是上面定义好的脚本" class="headerlink" title="获取mysql性能指标,这个是上面定义好的脚本"></a>获取mysql性能指标,这个是上面定义好的脚本</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=mysql.status[*],/usr/<span class="built_in">local</span>/zabbix/etc/chk_mysql.sh <span class="variable">$1</span></span><br></pre></td></tr></table></figure>
+<h1 id="获取mysql运行状态"><a href="#获取mysql运行状态" class="headerlink" title="获取mysql运行状态"></a>获取mysql运行状态</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=mysql.ping,mysqladmin -uroot -pYyIrpFNhIofsd -P3306 -h127.0.0.1  ping | grep -c alive</span><br></pre></td></tr></table></figure>
+<p>服务端取值：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25t2tlsnqZ ~]<span class="comment"># zabbix_get -s 10.44.37.221 -p10050 -k mysql.status[Com_update]</span></span><br><span class="line">297</span><br></pre></td></tr></table></figure></p>
+<p>二、监控php-fpm<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/php/etc/php-fpm.conf</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm.status_path = /status    //把；好去掉，启用监控fpm状态</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">location ~ ^/(status|ping)$</span><br><span class="line">        &#123;</span><br><span class="line">       fastcgi_pass   127.0.0.1:9000;</span><br><span class="line">       include fastcgi_params;</span><br><span class="line">       fastcgi_index index.php;</span><br><span class="line">       fastcgi_param SCRIPT_FILENAME /scripts<span class="variable">$fastcgi_script_name</span>;</span><br><span class="line">       allow 127.0.0.1;</span><br><span class="line">       allow 10.170.236.125;</span><br><span class="line">       deny all;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># service nginx restart</span></span><br><span class="line">[root@iZ25j76vlxnZ etc]<span class="comment"># curl -s http://localhost/status  //测试是否可以看到php-fpm的状态，有信息即可</span></span><br><span class="line">创建监控脚本：</span><br><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/zabbix/etc/chk_php-fpm.sh</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#monitor php-fpm status from zabbix</span></span><br><span class="line"><span class="comment">#lincense:GPL</span></span><br><span class="line"><span class="comment">#mail:lgs6666@yeah.net</span></span><br><span class="line"><span class="comment">#date:2016.06.20</span></span><br><span class="line"><span class="built_in">source</span> /etc/bashrc &gt;/dev/null 2&gt;&amp;1</span><br><span class="line"><span class="built_in">source</span> /etc/profile &gt;/dev/null 2&gt;&amp;1</span><br><span class="line">LOG=/usr/<span class="built_in">local</span>/zabbix/etc/phpfpm_status.log</span><br><span class="line">curl -s http://localhost/status &gt;<span class="variable">$LOG</span></span><br><span class="line"><span class="function"><span class="title">pool</span></span>()&#123;</span><br><span class="line"> awk <span class="string">'/pool/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">process_manager</span></span>()&#123;</span><br><span class="line"> awk <span class="string">'/process manager/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">start_since</span></span>()&#123;</span><br><span class="line"> awk <span class="string">'/start since:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">accepted_conn</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/accepted conn:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">listen_queue</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/^(listen queue:)/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">max_listen_queue</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/max listen queue:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">listen_queue_len</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/listen queue len:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">idle_processes</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/idle processes:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">active_processes</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/^(active processes:)/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">total_processes</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/total processes:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">max_active_processes</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/max active processes:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">max_children_reached</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/max children reached:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">slow_requests</span></span>()&#123;</span><br><span class="line">        awk <span class="string">'/slow requests:/ &#123;print $NF&#125;'</span> <span class="variable">$LOG</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span></span><br><span class="line">pool)</span><br><span class="line"> pool</span><br><span class="line"> ;;</span><br><span class="line">process_manager)</span><br><span class="line"> process_manager</span><br><span class="line"> ;;</span><br><span class="line">start_since)</span><br><span class="line"> start_since</span><br><span class="line"> ;;</span><br><span class="line">accepted_conn)</span><br><span class="line"> accepted_conn</span><br><span class="line"> ;;</span><br><span class="line">listen_queue)</span><br><span class="line"> listen_queue</span><br><span class="line"> ;;</span><br><span class="line">max_listen_queue)</span><br><span class="line"> max_listen_queue</span><br><span class="line"> ;;</span><br><span class="line">listen_queue_len)</span><br><span class="line"> listen_queue_len</span><br><span class="line"> ;;</span><br><span class="line">idle_processes)</span><br><span class="line"> idle_processes</span><br><span class="line"> ;;</span><br><span class="line">active_processes)</span><br><span class="line"> active_processes</span><br><span class="line"> ;;</span><br><span class="line">total_processes)</span><br><span class="line"> total_processes</span><br><span class="line"> ;;</span><br><span class="line">max_active_processes)</span><br><span class="line"> max_active_processes</span><br><span class="line"> ;;</span><br><span class="line">max_children_reached)</span><br><span class="line"> max_children_reached</span><br><span class="line"> ;;</span><br><span class="line">slow_requests)</span><br><span class="line"> slow_requests</span><br><span class="line"> ;;</span><br><span class="line">*)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> &#123;pool|process_manager|start_since|accepted_conn|listen_queue|max_listen_queue|listen_queue_len|idle_processes|active_processes|total_processes|max_active_processes|max_children_reached|slow_requests&#125;"</span></span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
+<p>引用脚本文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/zabbix/etc/zabbix_agentd.conf</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#UserParameter=php-fpm[*],/usr/local/zabbix/etc/chk_php-fpm.sh "$1"</span></span><br><span class="line">UserParameter=phpfpm.status.pool,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh pool</span><br><span class="line">UserParameter=phpfpm.status.process.manager,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh process_manager</span><br><span class="line">UserParameter=phpfpm.status.start.since,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh start_since</span><br><span class="line">UserParameter=phpfpm.status.accepted.conn,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh accepted_conn</span><br><span class="line">UserParameter=phpfpm.status.listen.queue,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh listen_queue</span><br><span class="line">UserParameter=phpfpm.status.max.listen.queue,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh max_listen_queue</span><br><span class="line">UserParameter=phpfpm.status.listen.queue.len,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh listen_queue_len</span><br><span class="line">UserParameter=phpfpm.status.idle.processes,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh idle_processes</span><br><span class="line">UserParameter=phpfpm.status.active.processes,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh active_processes</span><br><span class="line">UserParameter=phpfpm.status.total.processes,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh total_processes</span><br><span class="line">UserParameter=phpfpm.status.max.active.processes,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh max_active_processes</span><br><span class="line">UserParameter=phpfpm.status.max.children.reached,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh max_children_reached</span><br><span class="line">UserParameter=phpfpm.status.slow.requests,/usr/<span class="built_in">local</span>/zabbix/etc/chk_php-fpm.sh slow_requests</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># /etc/init.d/zabbix_agentd restart</span></span><br><span class="line">[root@iZ25wrxqp21Z etc]<span class="comment"># curl http://127.0.0.1/status</span></span><br><span class="line">pool:                 www</span><br><span class="line">process manager:      dynamic</span><br><span class="line">start time:           27/Apr/2016:14:21:33 +0800</span><br><span class="line">start since:          85601</span><br><span class="line">accepted conn:        37078</span><br><span class="line">listen queue:         0</span><br><span class="line">max listen queue:     13</span><br><span class="line">listen queue len:     128</span><br><span class="line">idle processes:       2</span><br><span class="line">active processes:     1</span><br><span class="line">total processes:      3</span><br><span class="line">max active processes: 5</span><br><span class="line">max children reached: 4</span><br><span class="line">slow requests:        0</span><br></pre></td></tr></table></figure>
+<p>下面介绍每个参数的作用：<br>pool：php-fpm池的名称，一般都是应该是www<br>process manage：进程的管理方法，php-fpm支持三种管理方法，分别是static,dynamic和ondemand，一般情况下都是dynamic<br>start time：php-fpm启动时候的时间，不管是restart或者reload都会更新这里的时间<br>start since：php-fpm自启动起来经过的时间，默认为秒<br>accepted conn：当前接收的连接数<br>listen queue：在队列中等待连接的请求个数，如果这个数字为非0，那么最好增加进程的fpm个数<br>max listen queue：从fpm启动以来，在队列中等待连接请求的最大值<br>listen queue len：等待连接的套接字队列大小<br>idle processes：空闲的进程个数<br>active processes：活动的进程个数<br>total processes：总共的进程个数<br>max active processes：从fpm启动以来，活动进程的最大个数，如果这个值小于当前的max_children，可以调小此值<br>max children reached：当pm尝试启动更多的进程，却因为max_children的限制，没有启动更多进程的次数。如果这个值非0，那么可以适当增加fpm的进程数<br>slow requests：慢请求的次数，一般如果这个值未非0，那么可能会有慢的php进程，一般一个不好的mysql查询是最大的祸首。</p>
+<p>服务器验证：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25t2tlsnqZ ~]<span class="comment"># zabbix_get -s 10.44.37.221 -p 10050 -k phpfpm.status.idle.processes</span></span><br><span class="line">127        //获取到数据说明配置没问题了，接下来在web页面上添加模板</span><br></pre></td></tr></table></figure></p>
+<p>三、监控nginx<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br></pre></td></tr></table></figure></p>
+<p>在php-pfm下增加：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">location /nginx-status &#123;</span><br><span class="line">     stub_status on;</span><br><span class="line">     access_log on;</span><br><span class="line">     allow 127.0.0.1;</span><br><span class="line">     allow 10.170.236.125;</span><br><span class="line">     deny all;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25j76vlxnZ ~]<span class="comment"># vim /usr/local/zabbix/etc/chk_nginx.sh</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># Script to fetch nginx statuses for tribily monitoring systems</span></span><br><span class="line"><span class="comment"># Author: lgs6666@yeah.net</span></span><br><span class="line"><span class="comment"># License: GPLv2</span></span><br><span class="line"><span class="comment"># Set Variables</span></span><br><span class="line">BKUP_DATE=`/bin/date +%Y%m%d`</span><br><span class="line">LOG=<span class="string">"/data/log/zabbix/webstatus.log"</span></span><br><span class="line">HOST=127.0.0.1</span><br><span class="line">PORT=<span class="string">"80"</span></span><br><span class="line"><span class="comment"># Functions to return nginx stats</span></span><br><span class="line"><span class="keyword">function</span> active &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| grep <span class="string">'Active'</span> | awk <span class="string">'&#123;print $NF&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> reading &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| grep <span class="string">'Reading'</span> | awk <span class="string">'&#123;print $2&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> writing &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| grep <span class="string">'Writing'</span> | awk <span class="string">'&#123;print $4&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> waiting &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| grep <span class="string">'Waiting'</span> | awk <span class="string">'&#123;print $6&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> accepts &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| awk NR==3 | awk <span class="string">'&#123;print $1&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> handled &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| awk NR==3 | awk <span class="string">'&#123;print $2&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> requests &#123;</span><br><span class="line">/usr/bin/curl <span class="string">"http://<span class="variable">$HOST</span>:<span class="variable">$PORT</span>/nginx-status"</span> 2&gt;/dev/null| awk NR==3 | awk <span class="string">'&#123;print $3&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># Run the requested function</span></span><br><span class="line"><span class="variable">$1</span></span><br></pre></td></tr></table></figure>
+<p>在被监控端配置：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[liuguangshun@iZ25j76vlxnZ ~]$ vim /usr/<span class="built_in">local</span>/zabbix/etc/zabbix_agentd.conf</span><br></pre></td></tr></table></figure></p>
+<p>在最后添加：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=nginx.accepts,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh accepts</span><br><span class="line">UserParameter=nginx.handled,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh handled</span><br><span class="line">UserParameter=nginx.requests,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh requests</span><br><span class="line">UserParameter=nginx.connections.active,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh active</span><br><span class="line">UserParameter=nginx.connections.reading,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh reading</span><br><span class="line">UserParameter=nginx.connections.writing,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh writing</span><br><span class="line">UserParameter=nginx.connections.waiting,/usr/<span class="built_in">local</span>/zabbix/etc/chk_nginx.sh waiting</span><br></pre></td></tr></table></figure></p>
+<p>在被监控查看nginx状态：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25wrxqp21Z etc]<span class="comment"># curl http://127.0.0.1/nginx-status</span></span><br><span class="line">Active connections: 1 </span><br><span class="line">server accepts handled requests</span><br><span class="line"> 67561 67561 159860 </span><br><span class="line">Reading: 0 Writing: 1 Waiting: 0</span><br><span class="line">Activeconnections:对后端发起的活动连接数；</span><br><span class="line">server accepts 67561：nginx 总共处理了67561个连接；</span><br><span class="line">handled：成功创建了67561次握手；</span><br><span class="line">requests：总共处理了159860请求。</span><br><span class="line">Reading：nginx读取客户端的header数；</span><br><span class="line">Writing: nginx 返回给客户端的header数；</span><br><span class="line">Waiting: nginx 请求处理完成，正在等待下一请求指令的连接。</span><br></pre></td></tr></table></figure></p>
+<p>服务器上测试<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ25t2tlsnqZ ~]<span class="comment"># zabbix_get -s 10.44.37.221 -p 10050 -k "nginx.accepts"</span></span><br><span class="line">3151</span><br></pre></td></tr></table></figure></p>
+<p>注意：在web添加模板时，键值（密钥，web是通过键值来链接监控服务器的）要和监控端UserParameter后面的值一样，例如nginx.accepts</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/19/zabbix密钥监控mysal、nginx、php/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/12/19/zabbix通过jmx监控tomcat/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          zabbix通过jmx监控tomcat
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">通过Dockerfile创建JDK8的CentOS镜像</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/Centos7安装node/">Centos7安装node</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix密钥监控mysal、nginx、php/">zabbix密钥监控mysal、nginx、php</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/page/3/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -447,8 +348,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

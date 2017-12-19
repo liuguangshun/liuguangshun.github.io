@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | Blogs</title>
+  <title>nginx访问量统计 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/page/2/index.html">
+  <meta name="description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx访问量统计">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/nginx访问量统计/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
+<meta property="og:updated_time" content="2017-12-19T02:50:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="nginx访问量统计">
+<meta name="twitter:description" content="PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。 1.根据访问IP统计UVawk ‘{print $1">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,295 +139,166 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-nginx访问量统计" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nginx访问量统计
+    </h1>
+  
+
+        
+        <a href="/2017/12/19/nginx访问量统计/" class="archive-article-date">
+  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>PV(访问量)：即Page View, 即页面浏览量或点击量，用户每次刷新即被计算一次。<br>UV(独立访客)：即Unique Visitor,访问您网站的一台电脑客户端为一个访客。00:00-24:00内相同的客户端只被计算一次。<br>IP(独立IP)：即Internet Protocol,指独立IP数。00:00-24:00内相同IP地址之被计算一次。</p>
+<p>1.根据访问IP统计UV<br>awk ‘{print $1}’  access.log|sort | uniq -c |wc -l</p>
+<p>2.统计访问URL统计PV<br>awk ‘{print $7}’ access.log|wc -l</p>
+<p>3.查询访问最频繁的URL<br>awk ‘{print $7}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
+<p>4.查询访问最频繁的IP<br>awk ‘{print $1}’ access.log|sort | uniq -c |sort -n -k 1 -r|more</p>
+<p>5.根据时间段统计查看日志<br>cat  access.log| sed -n ‘/14\/Mar\/2015:21/,/14\/Mar\/2015:22/p’|more</p>
+<p>6.统计IP访问个数（和根据访问IP统计UV一样）<br>cat access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort -nr | wc -l</p>
+<p>7.查看3点-6点之间的Ip访问个数<br>grep “2016:0[3-6]” access.log | awk ‘{ips[$1]+=1} END{for(ip in ips) print ips[ip],ip}’ | sort –nr | wc -l</p>
+<p>8.查看3点-6点之间的ip访问数，并且访问数&gt;=200的ip.<br>grep ‘2016:0[3-12]’ access.log | awk ‘{ips[$1]+=1}END{for(ip in ips) if(ips[ip]&gt;=200) print ips[ip],ip}’ | sort -nr</p>
+<p>9.查看并发连接数<br>netstat -nat|grep ESTABLISHED|wc -l</p>
+<p>10.获取每分钟的请求数量，输出成csv文件<br>cat /usr/local/nginx/logs/access.log  | awk ‘{print substr($4,14,5)}’ | uniq -c | awk ‘{print $2”,”$1}’ &gt; access.csv</p>
+<p>11.获取最耗时的请求时间、url、耗时，前10名, 可以修改后面的数字获取更多，不加则获取全部。<br>cat /usr/local/nginx/logs/access.log | awk ‘{print $4,$7,$NF}’ | awk -F ‘“‘ ‘{print $1,$2,$3}’ | sort -k3 -rn | head -10</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/19/nginx访问量统计/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2017/12/19/Centos6.5搭建L2TP_VPN/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Centos6.5搭建L2TP_VPN</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/Centos7安装node/">Centos7安装node</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix密钥监控mysal、nginx、php/">zabbix密钥监控mysal、nginx、php</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/page/3/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -447,8 +322,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

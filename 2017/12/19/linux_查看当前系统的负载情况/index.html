@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | Blogs</title>
+  <title>linux_查看当前系统的负载情况 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/page/2/index.html">
+  <meta name="description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux_查看当前系统的负载情况">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/linux_查看当前系统的负载情况/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
+<meta property="og:updated_time" content="2017-12-19T02:50:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="linux_查看当前系统的负载情况">
+<meta name="twitter:description" content="uptime linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。 eg: uptime02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05 10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09 显示">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,295 +139,223 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-linux_查看当前系统的负载情况" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux_查看当前系统的负载情况
+    </h1>
+  
+
+        
+        <a href="/2017/12/19/linux_查看当前系统的负载情况/" class="archive-article-date">
+  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>uptime</strong></p>
+<p>linux uptime命令主要用于获取主机运行时间和查询linux系统负载等信息。</p>
+<p>eg:</p>
+<h1 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h1><p>02:03:50 up 126 days, 12:57, 2 users, load average: 0.08, 0.03, 0.05</p>
+<p>10:19:04 up 257 days, 18:56, 12 users, load average: 2.10, 2.10,2.09</p>
+<p>显示内容说明：</p>
+<p>10:19:04 //系统当前时间 </p>
+<p>up 257 days, 18:56 //主机已运行时间,时间越大，说明你的机器越稳定。 </p>
+<p>12 user //用户连接数，是总连接数而不是用户数 </p>
+<p>load average // 系统平均负载，统计最近1，5，15分钟的系统平均负载</p>
+<p>那么什么是系统平均负载呢？</p>
+<p>系统平均负载是指在特定时间间隔内运行队列中的平均进程数。 </p>
+<p>如果每个CPU内核的当前活动进程数不大于3的话，那么系统的性能是良好的。</p>
+<p>如果每个CPU内核的任务数大于5，那么这台机器的性能有严重问题。 </p>
+<p>如果你的linux主机是1个双核CPU的话，当Load Average 为6的时候说明机器已经被充分使用了。</p>
+<p>1可以被认为是最优的负载值。负载是会随着系统不同改变得。</p>
+<p>单CPU系统1-3和SMP系统6-10都是可能接受的。</p>
+<p>cat /proc/loadavg</p>
+<h1 id="cat-proc-loadavg"><a href="#cat-proc-loadavg" class="headerlink" title="cat /proc/loadavg"></a>cat /proc/loadavg</h1><p>0.00 0.01 0.05 2/384 4482</p>
+<p>0.00 0.01 0.05 表示最近1分钟,5分钟,15分钟 系统的平均负载; 系统负载越高,代表CPU越繁忙;</p>
+<p>2/384 2代表此时运行队列中的进程个数;384 代表系统中进程的总数</p>
+<p>4482 代表到此为止创建的最后一个进程的ID.</p>
+<p>w</p>
+<h1 id="w"><a href="#w" class="headerlink" title="w"></a>w</h1><p>02:14:34 up 126 days, 13:08, 2 users, load average: 0.00, 0.01, 0.05<br>USER TTY FROM LOGIN@ IDLE JCPU PCPU WHAT<br>root tty1 - 29Jul16 114days 0.63s 0.30s -bash<br>ceshi pts/0 118.247.5.122 02:03 0.00s 0.00s 0.00s w</p>
+<pre><code>USER:用户名  
+TTY:录后系统分配的终端号           
+FROM: 远程主机名(即从哪儿登录来的)
+LOGIN@:何时登录
+IDLE:空闲了多长时间，表示用户闲置的时间。
+
+JCPU:和该终端（tty）连接的所有进程占用的时间，这个时间里并不包括过去的后台作业时间，但却包括当前正在运行的后台作业所 
+
+           占用的时间
+
+PCPU:指当前进程（即在WHAT项中显示的进程）所占用的时间   
+WHAT:当前正在运行进程的命令行
+</code></pre><p>tload</p>
+<h1 id="tload"><a href="#tload" class="headerlink" title="tload"></a>tload</h1><p>0.23, 0.32, 0.45   </p>
+<p>平均负载:0.23, 0.32, 0.45 表示最近1分钟,5分钟,15分钟的系统平均负载.</p>
+<p>top</p>
+<h1 id="top"><a href="#top" class="headerlink" title="top"></a>top</h1><p>top - 21:23:53 up 40 min,  2 users,  load average: 0.19, 0.35, 0.47<br>        Tasks: 255 total,   1 running, 253 sleeping,   0 stopped,   1 zombie<br>        %Cpu(s):  1.1 us,  0.3 sy,  0.0 ni, 98.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st<br>        KiB Mem:   4022756 total,  2130488 used,  1892268 free,   192608 buffers<br>        KiB Swap: 19999740 total,        0 used, 19999740 free.   919724 cached Mem</p>
+<p>第一行:时间为:21:23:53; 已经运行了 40min; 当前在线用户:2个;  平均负载:0.19, 0.35, 0.47 表示最近1分钟,5分钟,15分钟的系统平</p>
+<pre><code>             均负载.
+
+第二行:进程总数:255 正在运行进程数:1  睡眠进程数:253 停止的进程数:0  僵尸进程数:1
+
+第三行:用户空间占用CPU百分比: 1.1%  内核空间占用CPU百分比:0.3%  用户进程空间内改变过优先级的进程占用CPU百分
+
+             比:0.0%   空闲CPU百分比:0.0  等待输入输出的CPU时间百分比:0.0  CPU服务软中断所耗费的时间总额:0.0% Steal
+
+             Time:0.0%
+
+第四行: 物理内存总量:4022756  使用的物理内存总量:2130488  空闲内存总量:1892268   用作内核缓存的内存量:192608
+第五行: 交换区总量:19999740   使用的交换区总量:0          空闲交换区总量:19999740 缓冲的交换区总量:919724    
+
+第六行: 进程ID、进程所有者、优先级、nice值，负值表示高优先级，正值表示低优先级、进程使用的虚拟内存总量、进程使用的、未被
+
+              换出的物理内存大小、共享内存大小、进程状态、上次更新到现在的CPU时间占用百分比、进程使用的物理内存百分比、进
+
+              程使用CPU总时间、命令名、命令行
+</code></pre>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/19/linux_查看当前系统的负载情况/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/12/19/centos_6x系统下源码安装mysql操作记录/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          centos 6x系统下源码安装mysql操作记录
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/19/mysql主从同步(2)-问题梳理/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/Centos7安装node/">Centos7安装node</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix密钥监控mysal、nginx、php/">zabbix密钥监控mysal、nginx、php</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/page/3/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -447,8 +379,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

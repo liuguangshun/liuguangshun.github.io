@@ -6,14 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017 | Blogs</title>
+  <title>利用mk-table-checksum监测Mysql主从数据一致性操作记录 | Blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Blogs">
-<meta property="og:url" content="http://yoursite.com/archives/2017/page/2/index.html">
+  <meta name="description" content="前面已经提到了mysql主从环境下数据一致性检查：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理今天这里再介绍另一种Mysql数据一致性自动检测工具:Maatkit。（不过Maatkit工具现在已经不维护了，推荐还是使用percona-toolkit工具吧！） Maatkit是一个开源的工具包，为mySQL日常管理提供了帮助，它包含很多工具，这里主">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用mk-table-checksum监测Mysql主从数据一致性操作记录">
+<meta property="og:url" content="http://yoursite.com/2017/12/19/利用mk-table-checksum监测Mysql主从数据一致性操作记录/index.html">
 <meta property="og:site_name" content="Blogs">
+<meta property="og:description" content="前面已经提到了mysql主从环境下数据一致性检查：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理今天这里再介绍另一种Mysql数据一致性自动检测工具:Maatkit。（不过Maatkit工具现在已经不维护了，推荐还是使用percona-toolkit工具吧！） Maatkit是一个开源的工具包，为mySQL日常管理提供了帮助，它包含很多工具，这里主">
+<meta property="og:updated_time" content="2017-12-19T02:50:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Blogs">
+<meta name="twitter:title" content="利用mk-table-checksum监测Mysql主从数据一致性操作记录">
+<meta name="twitter:description" content="前面已经提到了mysql主从环境下数据一致性检查：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理今天这里再介绍另一种Mysql数据一致性自动检测工具:Maatkit。（不过Maatkit工具现在已经不维护了，推荐还是使用percona-toolkit工具吧！） Maatkit是一个开源的工具包，为mySQL日常管理提供了帮助，它包含很多工具，这里主">
   
     <link rel="alternative" href="/atom.xml" title="Blogs" type="application/atom+xml">
   
@@ -135,295 +139,197 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-利用mk-table-checksum监测Mysql主从数据一致性操作记录" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      利用mk-table-checksum监测Mysql主从数据一致性操作记录
+    </h1>
+  
+
+        
+        <a href="/2017/12/19/利用mk-table-checksum监测Mysql主从数据一致性操作记录/" class="archive-article-date">
+  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前面已经提到了mysql主从环境下数据一致性检查：mysql主从同步(3)-percona-toolkit工具（数据一致性监测、延迟监控）使用梳理<br>今天这里再介绍另一种Mysql数据一致性自动检测工具:Maatkit。（不过Maatkit工具现在已经不维护了，推荐还是使用percona-toolkit工具吧！）</p>
+<p>Maatkit是一个开源的工具包，为mySQL日常管理提供了帮助，它包含很多工具，这里主要说下面两个：<br>1）mk-table-checksum                     用来检测master和slave上的表结构和数据是否一致的；<br>2）mk-table-sync                             在主从数据不一致时，用来修复数据的；先主后从有效保证表一致的工具，不必重载从表而能够保证一致。 </p>
+<h2 id="上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。"><a href="#上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。" class="headerlink" title="上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。"></a>上面两个perl脚本在运行时都会锁表，表的大小取决于执行的快慢，勿在高峰期间运行，可选择凌晨。</h2><p>下面记录了这一操作过程：<br>基本信息：<br>master：192.168.1.101<br>slave：192.168.1.102<br>版本：mysql5.6<br>同步的库：huanqiu、huanpc</p>
+<p>Maatkit安装过程：（主库和从库服务器上都可以安装，因为数据一致性检查操作在主库或从库机器上都可以运行；建议主从机器上都安装）<br>1）安装该工具依赖的软件包<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server src]<span class="comment"># yum install perl-IO-Socket-SSL perl-DBD-MySQL perl-Time-HiRes perl perl-DBI -y</span></span><br></pre></td></tr></table></figure></p>
+<p>2）maatkit下载安装    [需要FQ到官网下载：<a href="https://code.google.com/archive/p/maatkit/downloads" target="_blank" rel="noopener">https://code.google.com/archive/p/maatkit/downloads</a>]<br>百度云盘下载地址：<a href="https://pan.baidu.com/s/1c1AufW8" target="_blank" rel="noopener">https://pan.baidu.com/s/1c1AufW8</a>    （提取密码：vbi1）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># tar -zvxf maatkit-7540.tar.gz  &amp;&amp; cd maatkit-7540 </span></span><br><span class="line">[root@master-server maatkit-7540]<span class="comment"># perl Makefile.PL</span></span><br><span class="line">Checking <span class="keyword">if</span> your kit is complete...</span><br><span class="line">Looks good</span><br><span class="line">Writing Makefile <span class="keyword">for</span> maatkit</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>如有报错：<br>Can’t locate ExtUtils/MakeMaker.pm in @INC (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at Makefile.PL line 1.<br>BEGIN failed–compilation aborted at Makefile.PL line 1.<br>解决办法：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@slave-server maatkit-4334]<span class="comment"># yum install perl-ExtUtils-Embed perl-ExtUtils-CBuilder perl-ExtUtils-MakeMaker -y</span></span><br><span class="line">------------------------------------------------------------------------------------------------------------</span><br><span class="line">[root@master-server maatkit-4334]<span class="comment"># make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line">[root@master-server ~]<span class="comment"># mk-               //按TAB键补全，可以查看到Maatkit的所有命令</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mk-archiver               mk-find                   mk-parallel-dump          mk-show-grants            mk-table-sync</span><br><span class="line">mk-checksum-filter        mk-heartbeat              mk-parallel-restore       mk-slave-delay            mk-table-usage</span><br><span class="line">mk-config-diff            mk-index-usage            mk-profile-compact        mk-slave-find             mk-tcp-model</span><br><span class="line">mk-deadlock-logger        mk-kill                   mk-purge-logs             mk-slave-move             mk-upgrade</span><br><span class="line">mk-duplicate-key-checker  mk-loadavg                mk-query-advisor          mk-slave-prefetch         mk-variable-advisor</span><br><span class="line">mk-error-log              mk-log-player             mk-query-digest           mk-slave-restart          mk-visual-explain</span><br><span class="line">mk-fifo-split             mk-merge-mqd-results      mk-query-profiler         mk-table-checksum</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后，一定要在被校验的主从服务器上创建只有SELECT权限的帐号（最好保持主从上创建的账号和密码一样，方便操作）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; GRANT SELECT ON *.* TO <span class="string">'data_check'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'check@123'</span>;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"> </span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>使用mk-table-checksum检查主从数据一致性<br>1）在主库服务器上运行数据一致性检查操作（也可以在从库服务器上进行数据一致性检查操作，命令跟下面一样）<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DATABASE TABLE                     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">mysql    columns_priv                  0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    columns_priv                  0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    db                            0 192.168.1.101 MyISAM       NULL       4197331717    0    0 NULL NULL</span><br><span class="line">mysql    db                            0 192.168.1.102 MyISAM       NULL       4197331717    0    0 NULL NULL</span><br><span class="line">mysql    event                         0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    event                         0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    func                          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    func                          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    general_log                   0 192.168.1.101 CSV          NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    general_log                   0 192.168.1.102 CSV          NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    help_category                 0 192.168.1.101 MyISAM       NULL       2621154011    0    0 NULL NULL</span><br><span class="line">mysql    help_category                 0 192.168.1.102 MyISAM       NULL       2621154011    0    0 NULL NULL</span><br><span class="line">mysql    help_keyword                  0 192.168.1.101 MyISAM       NULL       2791798352    0    0 NULL NULL</span><br><span class="line">mysql    help_keyword                  0 192.168.1.102 MyISAM       NULL        578891347    0    0 NULL NULL</span><br><span class="line">mysql    help_relation                 0 192.168.1.101 MyISAM       NULL       3733405838    0    0 NULL NULL</span><br><span class="line">mysql    help_relation                 0 192.168.1.102 MyISAM       NULL       1649042165    0    0 NULL NULL</span><br><span class="line">mysql    help_topic                    0 192.168.1.101 MyISAM       NULL       1795841156    0    0 NULL NULL</span><br><span class="line">mysql    help_topic                    0 192.168.1.102 MyISAM       NULL       2642710534    0    0 NULL NULL</span><br><span class="line">mysql    innodb_index_stats            0 192.168.1.101 InnoDB       NULL       1853713685    0    0 NULL NULL</span><br><span class="line">mysql    innodb_index_stats            0 192.168.1.102 InnoDB       NULL        213249811    0    0 NULL NULL</span><br><span class="line">mysql    innodb_table_stats            0 192.168.1.101 InnoDB       NULL       2028951538    0    0 NULL NULL</span><br><span class="line">mysql    innodb_table_stats            0 192.168.1.102 InnoDB       NULL       4163315044    0    0 NULL NULL</span><br><span class="line">mysql    ndb_binlog_index              0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    ndb_binlog_index              0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    plugin                        0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    plugin                        0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    proc                          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    proc                          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    procs_priv                    0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    procs_priv                    0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    proxies_priv                  0 192.168.1.101 MyISAM       NULL       3956276869    0    0 NULL NULL</span><br><span class="line">mysql    proxies_priv                  0 192.168.1.102 MyISAM       NULL       2040113179    0    0 NULL NULL</span><br><span class="line">mysql    servers                       0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    servers                       0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_master_info             0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_master_info             0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_relay_log_info          0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_relay_log_info          0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_worker_info             0 192.168.1.101 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slave_worker_info             0 192.168.1.102 InnoDB       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slow_log                      0 192.168.1.101 CSV          NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    slow_log                      0 192.168.1.102 CSV          NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    tables_priv                   0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    tables_priv                   0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone                     0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone                     0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_leap_second         0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_leap_second         0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_name                0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_name                0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_transition          0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_transition          0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_transition_type     0 192.168.1.101 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    time_zone_transition_type     0 192.168.1.102 MyISAM       NULL                0    0    0 NULL NULL</span><br><span class="line">mysql    user                          0 192.168.1.101 MyISAM       NULL        882367917    0    0 NULL NULL</span><br><span class="line">mysql    user                          0 192.168.1.102 MyISAM       NULL        883514797    0    0 NULL NULL</span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB       NULL       1230819712    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB       NULL       3864574229    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB       NULL       1378115040    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB       NULL       1378115040    0    0 NULL NULL</span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB       NULL       2427682155    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB       NULL        289696409    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB       NULL       1446184115    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB       NULL       1956266704    0    0 NULL NULL</span><br></pre></td></tr></table></figure></p>
+<p>上面命令中参数解释：<br>第一个h：   填写主库ip<br>第一个u：   主库授权的用户名<br>第一个p：   主库授权的密码<br>第二个h：   填写从库ip<br>第二个u：   从库授权的用户名<br>第二个p：   从库授权的密码<br>P：   mysql的端口</p>
+<p>上面的命令所示检查主从的所有库的数据一致性；一般我们检查的是同步的库。这就需要添加参数：<br>-d(或者–database)    后接数据库名，注意后面不需要加=号，多个数据库之间用逗号隔开，比如-dhuanqiu,huanpc;如果不加-d，校验的是所有库；<br>–count    会计算出表的行数</p>
+<p>如下操作：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu --count                //针对单个库huanqiu，检查主从数据一致性</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL</span><br><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanpc --count               //针对单个库huanpc，检查主从数据一致性</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL</span><br><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc --count        //针对多个库huaniu、huanpc，检查主从数据一致性</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL</span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL</span><br></pre></td></tr></table></figure></p>
+<p>上述结果中的参数解释：<br>DATABASE：     检查的库名<br>TABLE：           检查的库中的表名<br>CHUNK：          checksum时的近似数值<br>HOST：            主从MYSQL的地址<br>ENGINE：         表引擎<br>COUNT：         表的行数<br>CHECKSUM：  校验值<br>TIME：            所用时间<br>WAIT：           等待时间<br>STAT：           MASTER_POS_WAIT()返回值<br>LAG：            slave的延时时间</p>
+<p>mk-checksum-filter过滤工具的使用<br>如果只想知道huanqiu库中哪些表不是一致的，那么只需要加一个管道符即可，如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu --count | mk-checksum-filter                   //如下表示huanqiu库下只有haha表的数据，主从不一致</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL</span><br><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanpc --count  | mk-checksum-filter                 //如下表示huanqiu库下只有haha表的数据，主从不一致</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL</span><br><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc --count | mk-checksum-filter                    //如下表示huanqiu库下只有haha表的数据，主从不一致</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB          1         f163e1ff    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB          4         481dfe49    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB          5         ecb4850b    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB          1         96d7dfcf    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB          6          a12d47d    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB          7         5681c480    0    0 NULL NULL</span><br></pre></td></tr></table></figure></p>
+<p>使用mk-table-sync修复主从不同步的数据<br>顾名思义，mk-table-sync用来修复多个实例之间数据的不一致。它可以让主从的数据修复到最终一致，也可以使通过应用双写或多写的多个不相关的数据库实例修复到一致。同时它还内部集成了pt-table-checksum的校验功能，可以一边校验一边修复，也可以基于pt-table-checksum的计算结果来进行修复。<br>mk-table-sync工作原理<br>1）单行数据checksum值的计算<br>计算逻辑与pt-table-checksum一样，也是先检查表结构，并获取每一列的数据类型，把所有数据类型都转化为字符串，然后用concat_ws()函数进行连接，由此计算出该行的checksum值。checksum默认采用crc32计算。</p>
+<p>2）数据块checksum值的计算<br>同pt-table-checksum工具一样，pt-table-sync会智能分析表上的索引，然后把表的数据split成若干个chunk，计算的时候以chunk为单位。可以理解为把chunk内所有行的数据拼接起来，再计算crc32的值，即得到该chunk的checksum值。</p>
+<p>3）坏块检测和修复<br>前面两步，pt-table-sync与pt-table-checksum的算法和原理一样。再往下，就开始有所不同：<br>pt-table-checksum只是校验，所以它把checksum结果存储到统计表，然后把执行过的sql语句记录到binlog中，任务就算完成。语句级的复制把计算逻辑传递到从库，并在从库执行相同的计算。pt-table-checksum的算法本身并不在意从库的延迟，延迟多少都一样计算(有同事对此不理解，可以参考我的前一篇文章)，不会影响计算结果的正确性(但是我们还是会检测延迟，因为延迟太多会影响业务，所以总是要加上—max-lag来限流)。<br>pt-table-sync则不同。它首先要完成chunk的checksum值的计算，一旦发现主从上同样的chunk的checksum值不同，就深入到该chunk内部，逐行比较并修复有问题的行。其计算逻辑描述如下(以修复主从结构的数据不一致为例，业务双写的情况修复起来更复杂—因为涉及到冲突解决和基准选择的问题，限于篇幅，这里不介绍)：<br>    1）对每一个从库，每一个表，循环进行如下校验和修复过程。<br>    2）对每一个chunk，在校验时加上for update锁。一旦获得锁，就记录下当前主库的show master status值。<br>    3）在从库上执行select master_pos_wait()函数，等待从库sql线程执行到show master status得到的位置。以此保证，主从上关于这个chunk的内容均不再改变。<br>    4）对这个chunk执行checksum，然后与主库的checksum进行比较。<br>    5）如果checksum相同，说明主从数据一致，就继续下一个chunk。<br>    6）如果checksum不同，说明该chunk有不一致。深入chunk内部，逐行计算checksum并比较(单行checksum比较过程与chunk的比较过程一样，单行实际是chunk的size为1的特例)。<br>    7）如果发现某行不一致，则标记下来。继续检测剩余行，直到这个chunk结束。<br>    8）对找到的主从不一致的行，采用replace into语句，在主库执行一遍以生成该行全量的binlog，并同步到从库，这会以主库数据为基准来修复从库；对于主库有的行而从库没有的行，采用replace在主库上插入(必须不能是insert)；对于从库有而主库没有的行，通过在主库执行delete来删除(pt-table-sync强烈建议所有的数据修复都只在主库进行，而不建议直接修改从库数据；但是也有特例，后面会讲到)。<br>    9）直到修复该chunk所有不一致的行。继续检查和修复下一个chunk。<br>   10）直到这个从库上所有的表修复结束。开始修复下一个从库。</p>
+<p>重要选项<br>–print                    显示同步需要执行的语句<br>–execute               执行数据同步<br>–charset=utf8        设置字符集，避免从库乱码。</p>
+<p>实例说明：<br>mk-table-sync的工作方式是：先一行一行检查主从库的表是否一样，如果哪里不一样，就执行删除，更新，插入等操作，使其达到一致。<br>通过上面mk-table-checksum的检查结果可以看出，同步的两个库huanqiu和huanpc的数据并不一致，这时就可以使用mk-table-sync进行数据修复了。</p>
+<p>数据修复命令如下：（如果mysql端口是默认的3306，则下面命令中的P=3306可以省略）<br>由于上面在mk-table-checksum检查时用的data_check只有select权限，权限太小，不能用于mk-table-sync修复数据只用。<br>所以还需要在主库和从库数据库里创建用于mk-table-sync修复数据之用的账号权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; GRANT ALL ON *.* to mksync@<span class="string">'%'</span> identified by <span class="string">"sync@123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"> </span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line">[root@master-server lib]<span class="comment"># mk-table-sync --execute --charset=utf8 --print --no-check-slave --databases huanqiu,huanpc h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">UPDATE `huanpc`.`checksums` SET `chunk_time`=<span class="string">'0.002821'</span>, `chunk_index`=NULL, `lower_boundary`=NULL, `upper_boundary`=NULL, `this_crc`=<span class="string">'5681c480'</span>, `this_cnt`=<span class="string">'7'</span>, `master_crc`=<span class="string">'5681c480'</span>, `master_cnt`=<span class="string">'7'</span>, `ts`=<span class="string">'2017-01-12 14:29:14'</span> WHERE `db`=<span class="string">'huanpc'</span> AND `tbl`=<span class="string">'heihei'</span> AND `chunk`=<span class="string">'1'</span> LIMIT 1 /*maatkit src_db:huanpc src_tbl:checksums src_dsn:A=utf8,P=3306,h=192.168.1.101,p=...,u=mksync dst_db:huanpc dst_tbl:checksums dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=...,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server*/;</span><br><span class="line">DELETE FROM `huanpc`.`heihei` WHERE `member`=<span class="string">'90'</span> LIMIT 1 /*maatkit src_db:huanpc src_tbl:heihei src_dsn:A=utf8,P=3306,h=192.168.1.101,p=...,u=mksync dst_db:huanpc dst_tbl:heihei dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=...,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server*/;</span><br><span class="line">UPDATE `huanqiu`.`checksums` SET `chunk_time`=<span class="string">'0.002495'</span>, `chunk_index`=NULL, `lower_boundary`=NULL, `upper_boundary`=NULL, `this_crc`=<span class="string">'ecb4850b'</span>, `this_cnt`=<span class="string">'5'</span>, `master_crc`=<span class="string">'ecb4850b'</span>, `master_cnt`=<span class="string">'5'</span>, `ts`=<span class="string">'2017-01-12 14:27:45'</span> WHERE `db`=<span class="string">'huanqiu'</span> AND `tbl`=<span class="string">'haha'</span> AND `chunk`=<span class="string">'1'</span> LIMIT 1 /*maatkit src_db:huanqiu src_tbl:checksums src_dsn:A=utf8,P=3306,h=192.168.1.101,p=...,u=mksync dst_db:huanqiu dst_tbl:checksums dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=...,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server*/;</span><br><span class="line">DELETE FROM `huanqiu`.`haha` WHERE `id`=<span class="string">'90'</span> LIMIT 1 /*maatkit src_db:huanqiu src_tbl:haha src_dsn:A=utf8,P=3306,h=192.168.1.101,p=...,u=mksync dst_db:huanqiu dst_tbl:haha dst_dsn:A=utf8,P=3306,h=192.168.1.102,p=...,u=mksync lock:0 transaction:1 changing_src:0 replicate:0 bidirectional:0 pid:13702 user:root host:master-server*/;</span><br></pre></td></tr></table></figure>
+<p>上面那条命令执行后，再次检查主从数据，发现主从已经同步：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc --count</span></span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanqiu  checksums     0 192.168.1.101 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  checksums     0 192.168.1.102 InnoDB          1         705c5e2e    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.101 InnoDB          3         b9b29a07    0    0 NULL NULL</span><br><span class="line">huanqiu  haha          0 192.168.1.102 InnoDB          3         b9b29a07    0    0 NULL NULL</span><br><span class="line">DATABASE TABLE     CHUNK HOST          ENGINE      COUNT         CHECKSUM TIME WAIT STAT  LAG</span><br><span class="line">huanpc   checksums     0 192.168.1.101 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   checksums     0 192.168.1.102 InnoDB          1          5af891e    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.101 InnoDB          7         22a57b1c    0    0 NULL NULL</span><br><span class="line">huanpc   heihei        0 192.168.1.102 InnoDB          7         22a57b1c    0    0 NULL NULL</span><br></pre></td></tr></table></figure>
+<p>或者加mk-checksum-filter<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server ~]<span class="comment"># mk-table-checksum h=192.168.1.101,u=data_check,p=check@123,P=3306  h=192.168.1.102,u=data_check,p=check@123,P=3306 -dhuanqiu,huanpc --count | mk-checksum-filter</span></span><br><span class="line">[root@master-server ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>如有报错：<br>DBD::mysql::db do failed: Access denied; you need (at least one of) the SUPER privilege(s) for this operation [for Statement “/<em>!50105 SET @@binlog_format=”STATEMENT”</em>/“] at /usr/local/bin/mk-table-sync line 8568.<br>Issuing rollback() due to DESTROY without explicit disconnect() of DBD::mysql::db handle ;host=192.168.1.101;port=3306;mysql_read_default_group=client at /usr/local/bin/mk-table-sync line 8568.</p>
+<p>解决办法：安装DBI和DBD-MySQL<br>下载地址：<br><a href="http://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/T/TI/TIMB/" target="_blank" rel="noopener">http://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/T/TI/TIMB/</a><br><a href="http://search.cpan.org/dist/DBD-mysql/" target="_blank" rel="noopener">http://search.cpan.org/dist/DBD-mysql/</a><br>或者百度云盘下载：<a href="https://pan.baidu.com/s/1miv0S8g" target="_blank" rel="noopener">https://pan.baidu.com/s/1miv0S8g</a> （提取密码：fh24）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@master-server src]<span class="comment"># tar -zvxf DBI-1.634.tar.gz </span></span><br><span class="line">[root@master-server src]<span class="comment"># cd DBI-1.634</span></span><br><span class="line">[root@master-server DBI-1.634]<span class="comment"># perl Makefile.PL</span></span><br><span class="line">[root@master-server DBI-1.634]<span class="comment"># make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line">[root@master-server src]<span class="comment"># tar -zvxf DBD-mysql-4.041_01.tar.gz </span></span><br><span class="line">[root@master-server src]<span class="comment"># cd DBD-mysql-4.041_01</span></span><br><span class="line">[root@master-server DBD-mysql-4.041_01]<span class="comment"># perl Makefile.PL --mysql_config=/usr/local/mysql/bin/mysql_config         //主库mysql安装路径/usr/local/mysql</span></span><br><span class="line">[root@master-server DBD-mysql-4.041_01]<span class="comment"># make</span></span><br><span class="line">[root@master-server DBD-mysql-4.041_01]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>这里要说明一下：<br>主从数据库表和表结构必须一致,否则会报错！<br>–no-check-slave这个参数，如果不加这个参数，会提示报错，因为此工具默认不允许在从库上修改数据，但这里为了不在主库上dump出来，再到从库上导入进去，加了这个参数。</p>
+<p>特别注意的是：<br>1）如果想要看下到底哪些数据不同步，可以这样做：（如果不跟-t参数，就是说同步整个库的所有表的数据）<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave –databases huanqiu,huanpc h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result<br>2）如果有好几个从库的话，建议分开同步，除非几个从库的checksum一样！<br>因为每个从库同步的步调不一定都一致，如果几个从库一块同步的话，很容易造成主键冲突，导致主从同步中断。<br>举个例子来说：<br>主库：192.168.1.101<br>从库1: 192.168.1.102<br>从库2: 192.168.1.103<br>从库3: 192.168.1.104</p>
+<p>建议(分开同步，一个个操作)：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result1<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.103,u=mksync,p=sync@123,P=3306 &gt; /root/result2<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.104,u=mksync,p=sync@123,P=3306 &gt; /root/result3<br>不建议（放在一起同步）：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t haha h=192.168.1.101,u=mksync,p=sync@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 h=192.168.1.103,u=mksync,p=sync@123,P=3306 h=192.168.1.104,u=data_check,p=check@123,P=3306 &gt; /root/result</p>
+<p>4）为了减少重复操作，也可以一次同步好几个表，多个表时可以在-t后加=号，即-t=tables1,tables2,table3…比如：<br>mk-table-sync –execute –charset=utf8 –print –no-check-slave -d huanqiu -t=haha,heihei,hehe,name h=192.168.1.101,u=data_check,p=check@123,P=3306 h=192.168.1.102,u=mksync,p=sync@123,P=3306 &gt; /root/result</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/mysql主从同步(3)-percona-toolkit工具_使用梳理/">mysql主从同步(3)-percona-toolkit工具_使用梳理</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2017/12/19/利用mk-table-checksum监测Mysql主从数据一致性操作记录/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/Centos7安装node/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2017/12/19/通过Dockerfile创建nginx服务的Centos镜像/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          通过Dockerfile创建nginx服务的Centos镜像
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/19/将Web应用性能提高十倍的10条建议/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">将Web应用性能提高十倍的10条建议</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/Centos7安装node/">Centos7安装node</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix3.0邮件报警/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix3.0邮件报警/">zabbix3.0邮件报警</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix通过jmx监控tomcat/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix通过jmx监控tomcat/">zabbix通过jmx监控tomcat</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/zabbix密钥监控mysal、nginx、php/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/zabbix密钥监控mysal、nginx、php/">zabbix密钥监控mysal、nginx、php</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建JDK8的CentOS镜像/">通过Dockerfile创建JDK8的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Mysql服务的Centos镜像/">通过Dockerfile创建Mysql服务的Centos镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建Tomcat的CentOS镜像/">通过Dockerfile创建Tomcat的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN/">搭建适用于Ubuntu_CentOS的IKEV2_L2TP的VPN</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/" class="archive-article-date">
-  	<time datetime="2017-12-19T02:50:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/12/19/通过Dockerfile创建支持SSH服务的CentOS镜像/">通过Dockerfile创建支持SSH服务的CentOS镜像</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2017/">&laquo; Prev</a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="extend next" rel="next" href="/archives/2017/page/3/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -447,8 +353,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
